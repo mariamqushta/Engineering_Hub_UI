@@ -1,0 +1,99 @@
+
+<aside class="sidebar">
+  <a class="brand" routerLink="/admin/dashboard">
+    <span class="brand-icon">EH</span>
+
+    <span class="brand-text">
+      <strong>{{ languageService.translate('engineeringHub') }}</strong>
+      <small>{{ languageService.translate('adminPanel') }}</small>
+    </span>
+  </a>
+
+  <nav class="navigation" aria-label="Admin navigation">
+    <p class="section-label">{{ languageService.translate('workspace') }}</p>
+
+    <a
+      routerLink="/admin/dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-link"
+    >
+      <span class="nav-icon">▦</span>
+      <span>{{ languageService.translate('dashboard') }}</span>
+    </a>
+
+    <a
+      routerLink="/admin/bookings"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">✓</span>
+      <span>{{ languageService.translate('bookingRequests') }}</span>
+    </a>
+
+    <p class="section-label">{{ languageService.translate('management') }}</p>
+
+    <a
+      routerLink="/admin/tracks"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">▤</span>
+      <span>{{ languageService.translate('tracks') }}</span>
+    </a>
+
+    <a
+      routerLink="/admin/instructors"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">♙</span>
+      <span>{{ languageService.translate('instructors') }}</span>
+    </a>
+
+    <a
+      routerLink="/admin/students"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">♧</span>
+      <span>{{ languageService.translate('students') }}</span>
+    </a>
+
+    <p class="section-label">{{ languageService.translate('activities') }}</p>
+
+    <a
+      routerLink="/admin/workshops"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">▣</span>
+      <span>{{ languageService.translate('workshops') }}</span>
+    </a>
+
+    <a
+      routerLink="/admin/interactive"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">▷</span>
+      <span>{{ languageService.translate('interactiveActivities') }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a
+      routerLink="/admin/profile"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">◎</span>
+      <span>{{ languageService.translate('myProfile') }}</span>
+    </a>
+
+    <button type="button" class="nav-link logout-link" (click)="logout()">
+      <span class="nav-icon">↪</span>
+      <span>{{ languageService.translate('logout') }}</span>
+    </button>
+  </div>
+</aside>

@@ -1,0 +1,51 @@
+<section class="welcome-section">
+  <h2>{{ languageService.translate('welcomeToDashboard') }} 👋</h2>
+  <p>
+    {{ languageService.translate('dashboardWelcomeDescription') }}
+  </p>
+</section>
+
+<section class="overview-grid">
+  <article class="overview-card">
+    <div class="card-icon">▤</div>
+    <h3>{{ languageService.translate('myTracks') }}</h3>
+    <p>{{ languageService.translate('viewManageAssignedTracks') }}</p>
+    <button type="button" (click)="selectPage('My Tracks')">
+      {{ languageService.translate('viewTracks') }} →
+    </button>
+  </article>
+
+  <article class="overview-card">
+    <div class="card-icon">☑</div>
+    <h3>{{ languageService.translate('pendingGrading') }}</h3>
+    <p>{{ languageService.translate('reviewStudentSubmissions') }}</p>
+    <button type="button" (click)="selectPage('Assignments')">
+      {{ languageService.translate('viewAssignments') }} →
+    </button>
+  </article>
+
+  <article class="overview-card">
+    <div class="card-icon">▦</div>
+    <h3>{{ languageService.translate('upcomingSessions') }}</h3>
+    <p>{{ languageService.translate('trackUpcomingSessionsDescription') }}</p>
+    <button type="button" (click)="selectPage('Calendar')">
+      {{ languageService.translate('openCalendar') }} →
+    </button>
+  </article>
+
+  <article class="overview-card">
+    <div class="card-icon">✉</div>
+    <h3>{{ languageService.translate('coachingChat') }}</h3>
+    <p>{{ languageService.translate('coachingChatDescription') }}</p>
+    <button type="button" (click)="selectPage('Coaching Chat')">
+      {{ languageService.translate('openChat') }} →
+    </button>
+  </article>
+</section>
+
+<section class="activity-section">
+  <h2>{{ languageService.translate('teachingWorkspace') }}</h2>
+  <p>
+    {{ languageService.translate('teachingWorkspaceDescription') }}
+  </p>
+</section>

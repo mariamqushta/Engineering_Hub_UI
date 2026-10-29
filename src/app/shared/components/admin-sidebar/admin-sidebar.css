@@ -1,0 +1,150 @@
+:host {
+  display: block;
+  flex-shrink: 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  min-height: 100vh;
+  padding: 26px 16px 18px;
+  background: #182f57;
+  color: #ffffff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 30px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #49dceb;
+  color: #182f57;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.brand-text strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.brand-text small {
+  color: #a9bddb;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-label {
+  margin: 18px 10px 8px;
+  color: #a9bddb;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #d9e4f4;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #29456e;
+  color: #ffffff;
+}
+
+.nav-link.active {
+  background: #29456e;
+  color: #49dceb;
+  font-weight: 600;
+}
+
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  flex-shrink: 0;
+  font-size: 19px;
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.logout-link {
+  color: #ffc5c5;
+}
+
+.logout-link:hover {
+  background: #3a3652;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 76px;
+    padding: 20px 10px;
+  }
+
+  .brand {
+    justify-content: center;
+    padding: 0 0 28px;
+  }
+
+  .brand-text,
+  .section-label,
+  .nav-link > span:last-child {
+    display: none;
+  }
+
+  .nav-link {
+    justify-content: center;
+    padding: 12px 8px;
+  }
+
+  .nav-icon {
+    font-size: 21px;
+  }
+}

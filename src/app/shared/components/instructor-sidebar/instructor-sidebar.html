@@ -1,0 +1,45 @@
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="brand">
+    <div class="brand-logo">E</div>
+
+    <div>
+      <h2>{{ languageService.translate('engineeringHub') }}</h2>
+      <p>{{ languageService.translate('instructorPortal') }}</p>
+    </div>
+  </div>
+
+  <nav class="sidebar-menu">
+    @for (item of menuItems; track item.name) {
+      <button
+        type="button"
+        class="menu-item"
+        [class.active]="
+          router.url === '/instructor/' + item.route ||
+          router.url.startsWith('/instructor/' + item.route + '/')
+        "
+        (click)="selectPage(item.route)"
+      >
+        <span class="menu-icon">{{ item.icon }}</span>
+        <span>{{ languageService.translate(item.name) }}</span>
+      </button>
+    }
+
+    <button
+      type="button"
+      (click)="logout()"
+      class="mt-4 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-semibold text-white transition hover:bg-white/10 hover:text-[#49DCEB]"
+    >
+      <span class="menu-icon">↪</span>
+      <span>{{ languageService.translate('logout') }}</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="status-dot"></span>
+    {{ languageService.translate('instructorWorkspace') }}
+  </div>
+
+</aside>

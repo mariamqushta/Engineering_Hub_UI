@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-[#F3F6FB] px-4 py-8 sm:px-6">
+  <div class="mx-auto max-w-4xl">
+
+    <button
+      type="button"
+      (click)="goBack()"
+      class="mb-6 rounded-lg border border-[#29456E] px-4 py-2 text-sm font-semibold text-[#182f57] transition hover:bg-[#182f57] hover:text-white">
+      ← {{ languageService.translate('back') }}
+    </button>
+
+    <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-8">
+
+      <!-- Loading -->
+      <div
+        *ngIf="loading"
+        class="py-12 text-center text-[#29456E]">
+        {{ languageService.translate('loadingPrerequisiteQuiz') }}
+      </div>
+
+      <!-- Error when the quiz could not be loaded -->
+      <div
+        *ngIf="!loading && !quiz && errorMessage"
+        class="rounded-lg bg-red-50 p-4 text-red-700">
+        {{ errorMessage }}
+
+        <button
+          type="button"
+          (click)="loadQuiz()"
+          class="ml-2 font-semibold underline">
+          {{ languageService.translate('tryAgain') }}
+        </button>
+      </div>
+
+      <ng-container *ngIf="!loading && quiz">
+
+        <!-- Quiz heading -->
+        <div class="mb-6 border-b border-gray-200 pb-5">
+          <p
+            class="mb-2 text-sm font-semibold uppercase tracking-wide text-[#41a6b1]">
+            {{ languageService.translate('prerequisiteQuiz') }}
+          </p>
+
+          <h1 class="text-2xl font-bold text-[#182f57] sm:text-3xl">
+            {{ quiz.title }}
+          </h1>
+
+          <p class="mt-2 text-sm text-gray-500">
+            {{ quiz.questions.length }}
+            {{ languageService.translate('questions') }}
+            <span class="mx-2">•</span>
+            {{ languageService.translate('passingScore') }}: 80%
+          </p>
+
+          <p class="mt-3 text-sm text-gray-600">
+            {{ languageService.translate('passQuizToUnlockLesson') }}
+          </p>
+        </div>
+
+        <!-- Result -->
+        <div
+          *ngIf="quizResult as result"
+          class="mb-6 rounded-xl border p-5"
+          [ngClass]="result.result.passed
+            ? 'border-green-200 bg-green-50'
+            : 'border-red-200 bg-red-50'">
+
+          <h2
+            class="text-xl font-bold"
+            [ngClass]="result.result.passed
+              ? 'text-green-800'
+              : 'text-red-800'">
+            {{
+              languageService.translate(
+                result.result.passed
+                  ? 'prerequisiteQuizPassed'
+                  : 'quizNotPassed'
+              )
+            }}
+          </h2>
+
+          <p class="mt-2 text-gray-700">
+            {{ languageService.translate('score') }}:
+            {{ result.result.score }}%
+          </p>
+
+          <p class="mt-1 text-sm text-gray-600">
+            {{ languageService.translate('correctAnswers') }}:
+            {{ result.result.correctAnswers }}
+            {{ languageService.translate('outOf') }}
+            {{ result.result.totalQuestions }}
+          </p>
+
+          <p class="mt-3 text-sm text-gray-600">
+            {{ result.message }}
+          </p>
+
+          <div class="mt-5 flex flex-wrap gap-3">
+
+            <button
+              *ngIf="result.result.passed"
+              type="button"
+              (click)="openLesson()"
+              class="rounded-lg bg-[#182f57] px-5 py-3 font-semibold text-white transition hover:bg-[#29456E]">
+              {{ languageService.translate('openLesson') }}
+            </button>
+
+            <button
+              *ngIf="!result.result.passed"
+              type="button"
+              (click)="retryQuiz()"
+              class="rounded-lg bg-[#29456E] px-5 py-3 font-semibold text-white transition hover:bg-[#182f57]">
+              {{ languageService.translate('tryAgain') }}
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Questions -->
+        <form
+          *ngIf="!quizResult"
+          (ngSubmit)="submitQuiz()">
+
+          <div
+            *ngFor="let question of quiz.questions; let i = index"
+            class="mb-6 rounded-xl border border-gray-200 p-4 sm:p-5">
+
+            <h2 class="mb-4 font-semibold leading-6 text-[#182f57]">
+              <span class="mr-2 text-[#41a6b1]">
+                {{ languageService.translate('question') }}
+                {{ i + 1 }}.
+              </span>
+
+              {{ question.text }}
+            </h2>
+
+            <div class="space-y-3">
+              <label
+                *ngFor="let option of question.options"
+                class="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 p-3 transition hover:border-[#49DCEB] hover:bg-[#F3F6FB]"
+                [ngClass]="selectedAnswers[question.id] === option.id
+                  ? 'border-[#49DCEB] bg-cyan-50'
+                  : 'bg-white'">
+
+                <input
+                  type="radio"
+                  [name]="'question-' + question.id"
+                  [checked]="selectedAnswers[question.id] === option.id"
+                  (change)="selectAnswer(question.id, option.id)"
+                  [disabled]="submitting"
+                  class="mt-1 accent-[#29456E]" />
+
+                <span class="text-sm text-gray-700">
+                  {{ option.text }}
+                </span>
+
+              </label>
+            </div>
+          </div>
+
+          <p
+            *ngIf="errorMessage"
+            class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            {{ errorMessage }}
+          </p>
+
+          <button
+            type="submit"
+            [disabled]="submitting"
+            class="w-full rounded-xl bg-[#182f57] px-6 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+            {{
+              submitting
+                ? languageService.translate('submitting')
+                : languageService.translate('submitAnswers')
+            }}
+          </button>
+
+        </form>
+      </ng-container>
+    </div>
+  </div>
+</div>

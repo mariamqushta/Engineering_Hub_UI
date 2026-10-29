@@ -1,0 +1,747 @@
+<div class="min-h-screen bg-[#F3F6FB] p-6 md:p-8">
+
+  <!-- Header -->
+  <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+    <div>
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('instructorWorkspace') }}
+      </p>
+      <h1 class="text-3xl font-bold text-[#182f57]">
+        {{ languageService.translate('interactiveActivities') }}
+      </h1>
+      <p class="mt-2 text-gray-500">
+        {{ languageService.translate('createManageOnlineSessions') }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreateForm()"
+      [disabled]="!selectedTrackId"
+      class="rounded-xl bg-[#182f57] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-50">
+      + {{ languageService.translate('createActivity') }}
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div
+    *ngIf="errorMessage"
+    class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+    {{ errorMessage }}
+  </div>
+
+  <div
+    *ngIf="successMessage"
+    class="mb-5 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+    {{ successMessage }}
+  </div>
+
+  <!-- Track selector -->
+  <section class="mb-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <label for="trackSelect" class="mb-2 block font-semibold text-[#182f57]">
+      {{ languageService.translate('selectTrack') }}
+    </label>
+
+    <div *ngIf="isLoadingTracks" class="text-sm text-gray-500">
+      {{ languageService.translate('loadingAssignedTracks') }}
+    </div>
+
+    <select
+      *ngIf="!isLoadingTracks && tracks.length > 0"
+      id="trackSelect"
+      class="w-full max-w-xl rounded-xl border border-gray-200 bg-white px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+      [ngModel]="selectedTrackId"
+      (ngModelChange)="onTrackChange($event)">
+      <option *ngFor="let track of tracks" [ngValue]="track.id">
+        {{ track.title }}
+      </option>
+    </select>
+
+    <p
+      *ngIf="!isLoadingTracks && tracks.length === 0 && !errorMessage"
+      class="text-sm text-gray-500">
+      {{ languageService.translate('noAssignedTracksAskAdmin') }}
+    </p>
+
+    <p *ngIf="selectedTrack" class="mt-3 text-sm text-gray-500">
+      {{ languageService.translate('managingActivitiesFor') }}
+      <span class="font-semibold text-[#29456E]">
+        {{ selectedTrack.title }}
+      </span>
+    </p>
+  </section>
+
+  <!-- Create activity form -->
+  <section
+    *ngIf="showForm"
+    class="mb-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+
+    <div class="mb-6 flex items-center justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-[#182f57]">
+          {{ languageService.translate('createInteractiveActivity') }}
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">
+          {{ languageService.translate('scheduleOnlineSessionForTrack') }}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="closeCreateForm()"
+        class="rounded-lg px-3 py-2 text-gray-500 transition hover:bg-gray-100 hover:text-[#182f57]">
+        {{ languageService.translate('close') }}
+      </button>
+    </div>
+
+    <div class="mb-6 flex flex-wrap gap-3">
+      <button
+        type="button"
+        (click)="setActivityFormMode('single')"
+        [ngClass]="activityFormMode === 'single'
+          ? 'bg-[#182f57] text-white'
+          : 'border border-gray-200 bg-white text-[#29456E]'"
+        class="rounded-xl px-4 py-3 font-semibold transition">
+        {{ languageService.translate('oneTimeSession') }}
+      </button>
+
+      <button
+        type="button"
+        (click)="setActivityFormMode('recurring')"
+        [ngClass]="activityFormMode === 'recurring'
+          ? 'bg-[#182f57] text-white'
+          : 'border border-gray-200 bg-white text-[#29456E]'"
+        class="rounded-xl px-4 py-3 font-semibold transition">
+        {{ languageService.translate('recurringSchedule') }}
+      </button>
+    </div>
+
+    <!-- One-time session form -->
+    <form
+      *ngIf="activityFormMode === 'single'"
+      (ngSubmit)="createActivity()"
+      #activityForm="ngForm">
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+        <!-- Title -->
+        <div class="md:col-span-2">
+          <label for="title" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('activityTitle') }} *
+          </label>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            [(ngModel)]="form.title"
+            required
+            maxlength="200"
+            [placeholder]="languageService.translate('activityTitlePlaceholder')"
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <!-- Description -->
+        <div class="md:col-span-2">
+          <label for="description" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('description') }}
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="form.description"
+            rows="3"
+            [placeholder]="languageService.translate('activityDescriptionPlaceholder')"
+            class="w-full resize-y rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"></textarea>
+        </div>
+
+        <!-- Date -->
+        <div>
+          <label for="date" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('date') }} *
+          </label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            [(ngModel)]="form.date"
+            [min]="minDate"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <!-- Capacity -->
+        <div>
+          <label for="capacity" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('maximumParticipants') }} *
+          </label>
+          <input
+            id="capacity"
+            name="capacity"
+            type="number"
+            [(ngModel)]="form.capacity"
+            min="1"
+            step="1"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <!-- Start time -->
+        <div>
+          <label for="startTime" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('startTime') }} *
+          </label>
+          <input
+            id="startTime"
+            name="startTime"
+            type="time"
+            [(ngModel)]="form.startTime"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <!-- End time -->
+        <div>
+          <label for="endTime" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('endTime') }} *
+          </label>
+          <input
+            id="endTime"
+            name="endTime"
+            type="time"
+            [(ngModel)]="form.endTime"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label for="price" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('priceEGP') }} *
+          </label>
+          <input
+            id="price"
+            name="price"
+            type="number"
+            [(ngModel)]="form.price"
+            min="0"
+            step="0.01"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <!-- Meeting URL -->
+        <div>
+          <label for="meetingUrl" class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('onlineMeetingUrl') }}
+          </label>
+          <input
+            id="meetingUrl"
+            name="meetingUrl"
+            type="url"
+            [(ngModel)]="form.meetingUrl"
+            placeholder="https://meet.google.com/..."
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+          <p class="mt-1 text-xs text-gray-500">
+            {{ languageService.translate('optionalMeetingLink') }}
+          </p>
+        </div>
+
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-end gap-3">
+        <button
+          type="button"
+          (click)="closeCreateForm()"
+          class="rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-600 transition hover:bg-gray-50">
+          {{ languageService.translate('cancel') }}
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isSaving || activityForm.invalid"
+          class="rounded-xl bg-[#182f57] px-6 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-50">
+          {{
+            isSaving
+              ? languageService.translate('creating')
+              : languageService.translate('createActivity')
+          }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Recurring schedule form -->
+    <form
+      *ngIf="activityFormMode === 'recurring'"
+      (ngSubmit)="createSchedule()"
+      #scheduleNgForm="ngForm">
+
+      <div class="mb-5 rounded-xl bg-[#F3F6FB] p-4">
+        <h3 class="font-bold text-[#182f57]">
+          {{ languageService.translate('weeklyRecurringSession') }}
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">
+          {{ languageService.translate('recurringSessionInstructions') }}
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+        <div class="md:col-span-2">
+          <label for="scheduleTitle"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('sessionTitle') }} *
+          </label>
+          <input
+            id="scheduleTitle"
+            name="scheduleTitle"
+            [(ngModel)]="scheduleForm.title"
+            required
+            maxlength="200"
+            [placeholder]="languageService.translate('weeklySessionTitlePlaceholder')"
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="scheduleDescription"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('description') }}
+          </label>
+          <textarea
+            id="scheduleDescription"
+            name="scheduleDescription"
+            [(ngModel)]="scheduleForm.description"
+            rows="3"
+            [placeholder]="languageService.translate('sessionDescriptionPlaceholder')"
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]"></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <p class="mb-3 text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('repeatOnTheseDays') }} *
+          </p>
+
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <label
+              *ngFor="let day of weekdays"
+              class="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 p-3 hover:bg-[#F3F6FB]">
+
+              <input
+                type="checkbox"
+                [checked]="scheduleForm.daysOfWeek.includes(day.value)"
+                (change)="toggleScheduleDay(day.value, $any($event.target).checked)"
+                class="h-4 w-4 accent-[#29456E]" />
+
+              <span class="text-sm font-medium text-[#29456E]">
+                {{ languageService.translate(day.label) }}
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label for="scheduleStartDate"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('startDate') }} *
+          </label>
+          <input
+            id="scheduleStartDate"
+            name="scheduleStartDate"
+            type="date"
+            [(ngModel)]="scheduleForm.startDate"
+            [min]="minDate"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div>
+          <label for="scheduleEndDate"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('endDate') }} *
+          </label>
+          <input
+            id="scheduleEndDate"
+            name="scheduleEndDate"
+            type="date"
+            [(ngModel)]="scheduleForm.endDate"
+            [min]="scheduleForm.startDate || minDate"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div>
+          <label for="scheduleStartTime"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('startTime') }} *
+          </label>
+          <input
+            id="scheduleStartTime"
+            name="scheduleStartTime"
+            type="time"
+            [(ngModel)]="scheduleForm.startTime"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div>
+          <label for="scheduleEndTime"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('endTime') }} *
+          </label>
+          <input
+            id="scheduleEndTime"
+            name="scheduleEndTime"
+            type="time"
+            [(ngModel)]="scheduleForm.endTime"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div>
+          <label for="scheduleCapacity"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('maximumParticipants') }} *
+          </label>
+          <input
+            id="scheduleCapacity"
+            name="scheduleCapacity"
+            type="number"
+            [(ngModel)]="scheduleForm.capacity"
+            min="1"
+            step="1"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div>
+          <label for="schedulePrice"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('priceEGP') }} *
+          </label>
+          <input
+            id="schedulePrice"
+            name="schedulePrice"
+            type="number"
+            [(ngModel)]="scheduleForm.price"
+            min="0"
+            step="0.01"
+            required
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="scheduleMeetingUrl"
+            class="mb-2 block text-sm font-semibold text-[#29456E]">
+            {{ languageService.translate('onlineMeetingUrl') }}
+          </label>
+          <input
+            id="scheduleMeetingUrl"
+            name="scheduleMeetingUrl"
+            type="url"
+            [(ngModel)]="scheduleForm.meetingUrl"
+            placeholder="https://meet.google.com/..."
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#41a6b1]" />
+        </div>
+
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-end gap-3">
+        <button
+          type="button"
+          (click)="closeCreateForm()"
+          class="rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-600 hover:bg-gray-50">
+          {{ languageService.translate('cancel') }}
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isSaving || scheduleNgForm.invalid"
+          class="rounded-xl bg-[#182f57] px-6 py-3 font-semibold text-white hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-50">
+          {{
+            isSaving
+              ? languageService.translate('creatingSchedule')
+              : languageService.translate('createRecurringSchedule')
+          }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Activity list heading -->
+  <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-xl font-bold text-[#182f57]">
+        {{ languageService.translate('yourInteractiveActivities') }}
+      </h2>
+      <p class="mt-1 text-sm text-gray-500">
+        {{ languageService.translate('trackSessionsDescription') }}
+      </p>
+    </div>
+
+    <span class="rounded-full bg-[#49DCEB]/15 px-4 py-2 text-sm font-semibold text-[#29456E]">
+      {{ normalActivities.length }}
+      {{ languageService.translate('individualSessions') }} /
+      {{ recurringSchedules.length }}
+      {{ languageService.translate('recurringSchedules') }}
+    </span>
+  </div>
+
+  <!-- Loading -->
+  <div
+    *ngIf="isLoadingActivities"
+    class="rounded-2xl bg-white p-10 text-center text-gray-500 shadow-sm">
+    {{ languageService.translate('loadingInteractiveActivities') }}
+  </div>
+
+  <!-- Empty state -->
+  <div
+    *ngIf="!isLoadingActivities && selectedTrackId && activities.length === 0"
+    class="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
+
+    <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#49DCEB]/15 text-2xl text-[#29456E]">
+      ▶
+    </div>
+
+    <h3 class="text-lg font-bold text-[#182f57]">
+      {{ languageService.translate('noInteractiveActivitiesYet') }}
+    </h3>
+
+    <p class="mt-2 text-sm text-gray-500">
+      {{ languageService.translate('createFirstOnlineSession') }}
+    </p>
+
+    <button
+      type="button"
+      (click)="openCreateForm()"
+      class="mt-5 rounded-xl bg-[#182f57] px-5 py-3 font-semibold text-white transition hover:bg-[#29456E]">
+      {{ languageService.translate('createActivity') }}
+    </button>
+  </div>
+
+  <!-- Normal one-time sessions -->
+  <section
+    *ngIf="!isLoadingActivities && normalActivities.length > 0"
+    class="mb-8">
+
+    <h2 class="mb-4 text-xl font-bold text-[#182f57]">
+      {{ languageService.translate('individualSessions') }}
+    </h2>
+
+    <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+      <article
+        *ngFor="let activity of normalActivities"
+        class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+
+        <h3 class="text-lg font-bold text-[#182f57]">
+          {{ activity.title }}
+        </h3>
+
+        <p class="mt-2 text-sm text-gray-500">
+          {{ activity.description || languageService.translate('noDescriptionProvided') }}
+        </p>
+
+        <div class="mt-4 space-y-2 text-sm text-[#29456E]">
+          <p>
+            <strong>{{ languageService.translate('date') }}:</strong>
+            {{ activity.date | date:'mediumDate' }}
+          </p>
+
+          <p>
+            <strong>{{ languageService.translate('time') }}:</strong>
+            {{ formatTime(activity.startTime) }} –
+            {{ formatTime(activity.endTime) }}
+          </p>
+
+          <p>
+            <strong>{{ languageService.translate('capacity') }}:</strong>
+            {{ activity.capacity }}
+          </p>
+
+          <p>
+            <strong>{{ languageService.translate('price') }}:</strong>
+            {{ activity.price | number:'1.2-2' }}
+            {{ languageService.translate('egp') }}
+          </p>
+
+          <p>
+            <strong>{{ languageService.translate('status') }}:</strong>
+            {{ getStatusLabel(activity.status) }}
+          </p>
+        </div>
+
+        <a
+          *ngIf="activity.meetingUrl"
+          [href]="activity.meetingUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-4 inline-block break-all font-semibold text-[#41a6b1] hover:underline">
+          {{ languageService.translate('openMeetingLink') }}
+        </a>
+
+        <div class="mt-5 flex justify-end">
+          <button
+            *ngIf="
+              activity.status !== 2 &&
+              activity.status !== 3 &&
+              activity.status !== 5
+            "
+            type="button"
+            (click)="cancelActivity(activity)"
+            [disabled]="isCancelling === activity.id"
+            class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50">
+            {{
+              isCancelling === activity.id
+                ? languageService.translate('cancelling')
+                : languageService.translate('cancelSession')
+            }}
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Recurring schedules -->
+  <div
+    *ngIf="!isLoadingActivities && recurringSchedules.length > 0"
+    class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+
+    <article
+      *ngFor="let group of recurringSchedules"
+      class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+
+      <div class="mb-5">
+        <h3 class="text-lg font-bold text-[#182f57]">
+          {{ group.title }}
+        </h3>
+
+        <p class="mt-2 text-sm leading-6 text-gray-500">
+          {{ group.description || languageService.translate('noDescriptionProvided') }}
+        </p>
+
+        <span class="mt-3 inline-block rounded-full bg-[#49DCEB]/15 px-3 py-1 text-xs font-semibold text-[#29456E]">
+          {{ group.occurrences.length }}
+          {{
+            group.occurrences.length === 1
+              ? languageService.translate('session')
+              : languageService.translate('sessions')
+          }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+        <div class="rounded-xl bg-[#F3F6FB] p-4">
+          <p class="text-xs font-medium text-gray-500">
+            {{ languageService.translate('startDate') }}
+          </p>
+          <p class="mt-1 font-semibold text-[#29456E]">
+            {{ group.startDate | date:'mediumDate' }}
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-[#F3F6FB] p-4">
+          <p class="text-xs font-medium text-gray-500">
+            {{ languageService.translate('endDate') }}
+          </p>
+          <p class="mt-1 font-semibold text-[#29456E]">
+            {{ group.endDate | date:'mediumDate' }}
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-[#F3F6FB] p-4">
+          <p class="text-xs font-medium text-gray-500">
+            {{ languageService.translate('days') }}
+          </p>
+          <p class="mt-1 font-semibold text-[#29456E]">
+            {{ group.days.join(', ') }}
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-[#F3F6FB] p-4">
+          <p class="text-xs font-medium text-gray-500">
+            {{ languageService.translate('time') }}
+          </p>
+          <p class="mt-1 font-semibold text-[#29456E]">
+            {{ formatTime(group.startTime) }} –
+            {{ formatTime(group.endTime) }}
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-[#F3F6FB] p-4">
+          <p class="text-xs font-medium text-gray-500">
+            {{ languageService.translate('capacity') }}
+          </p>
+          <p class="mt-1 font-semibold text-[#29456E]">
+            {{ group.occurrences[0].capacity }}
+            {{ languageService.translate('participantsPerSession') }}
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-[#F3F6FB] p-4">
+          <p class="text-xs font-medium text-gray-500">
+            {{ languageService.translate('price') }}
+          </p>
+          <p class="mt-1 font-semibold text-[#29456E]">
+            {{ group.occurrences[0].price | number:'1.2-2' }}
+            {{ languageService.translate('egp') }}
+          </p>
+        </div>
+      </div>
+
+      <div *ngIf="group.occurrences[0].meetingUrl" class="mt-4">
+        <a
+          [href]="group.occurrences[0].meetingUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="break-all font-semibold text-[#41a6b1] hover:underline">
+          {{ languageService.translate('openMeetingLink') }}
+        </a>
+      </div>
+
+      <!-- Occurrences stay available for individual cancellation -->
+      <details class="mt-5 border-t border-gray-100 pt-4">
+        <summary class="cursor-pointer font-semibold text-[#29456E]">
+          {{ languageService.translate('manageIndividualSessions') }}
+        </summary>
+
+        <div class="mt-3 space-y-3">
+          <div
+            *ngFor="let occurrence of group.occurrences"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-100 p-3">
+
+            <div>
+              <p class="font-semibold text-[#182f57]">
+                {{ occurrence.date | date:'mediumDate' }}
+              </p>
+              <p class="mt-1 text-sm text-gray-500">
+                {{ formatTime(occurrence.startTime) }} –
+                {{ formatTime(occurrence.endTime) }}
+              </p>
+              <p class="mt-1 text-xs text-gray-500">
+                {{ getStatusLabel(occurrence.status) }}
+              </p>
+            </div>
+
+            <button
+              *ngIf="
+                occurrence.status !== 2 &&
+                occurrence.status !== 3 &&
+                occurrence.status !== 5
+              "
+              type="button"
+              (click)="cancelActivity(occurrence)"
+              [disabled]="isCancelling === occurrence.id"
+              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">
+              {{
+                isCancelling === occurrence.id
+                  ? languageService.translate('cancelling')
+                  : languageService.translate('cancel')
+              }}
+            </button>
+          </div>
+        </div>
+      </details>
+
+    </article>
+  </div>
+
+</div>

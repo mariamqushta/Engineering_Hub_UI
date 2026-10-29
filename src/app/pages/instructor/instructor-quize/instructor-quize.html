@@ -1,0 +1,386 @@
+<div class="min-h-screen bg-[#F3F6FB] p-4 sm:p-6 lg:p-8 text-[#182f57]">
+  <div class="mx-auto max-w-6xl space-y-7">
+
+    <!-- Page Header -->
+    <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div>
+        <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#41a6b1]">
+          {{ languageService.translate('instructorWorkspace') }}
+        </p>
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+          {{ languageService.translate('quizManagement') }}
+        </h1>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
+          {{ languageService.translate('quizManagementDescription') }}
+        </p>
+      </div>
+
+      <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#182f57] text-2xl text-white shadow-sm">
+        📝
+      </div>
+    </header>
+
+    <!-- Track and Lesson Selection -->
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+      <div class="mb-6">
+        <h2 class="text-lg font-bold">{{ languageService.translate('selectLesson') }}</h2>
+        <p class="mt-1 text-sm text-slate-500">
+          {{ languageService.translate('chooseTrackAndLessonForQuiz') }}
+        </p>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2">
+        <div>
+          <label for="track" class="mb-2 block text-sm font-semibold">
+            {{ languageService.translate('track') }}
+          </label>
+
+          <select
+            id="track"
+            name="track"
+            [(ngModel)]="selectedTrackId"
+            (ngModelChange)="onTrackChange()"
+            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+          >
+            <option [ngValue]="null">{{ languageService.translate('selectTrack') }}</option>
+            @for (track of tracks; track track.id) {
+              <option [ngValue]="track.id">{{ track.title }}</option>
+            }
+          </select>
+
+          @if (tracks.length === 0) {
+            <p class="mt-2 text-xs text-slate-400">
+              {{ languageService.translate('trackDataWillAppearAfterApiIntegration') }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label for="lesson" class="mb-2 block text-sm font-semibold">
+            {{ languageService.translate('lesson') }}
+          </label>
+
+          <select
+            id="lesson"
+            name="lesson"
+            [(ngModel)]="selectedLessonId"
+            (ngModelChange)="onLessonChange()"
+            [disabled]="!selectedTrackId || lessons.length === 0"
+            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+          >
+            <option [ngValue]="null">{{ languageService.translate('selectLesson') }}</option>
+            @for (lesson of lessons; track lesson.id) {
+              <option [ngValue]="lesson.id">
+                {{ lesson.order }}. {{ lesson.title }}
+              </option>
+            }
+          </select>
+
+          @if (selectedTrackId && lessons.length === 0) {
+            <p class="mt-2 text-xs text-slate-400">
+              {{ languageService.translate('lessonsWillAppearAfterTrackApiConnected') }}
+            </p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Existing Quizzes -->
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold">{{ languageService.translate('existingQuizzes') }}</h2>
+          <p class="mt-1 text-sm text-slate-500">
+            @if (selectedLesson) {
+              {{ languageService.translate('quizzesFor') }} {{ selectedLesson.title }}
+            } @else {
+              {{ languageService.translate('selectLessonToViewQuizzes') }}
+            }
+          </p>
+        </div>
+
+        <span class="rounded-full bg-[#49DCEB]/15 px-3 py-1.5 text-xs font-bold text-[#29456E]">
+          {{ quizzes.length }} {{ languageService.translate('quizzes') }}
+        </span>
+      </div>
+
+      @if (quizzes.length > 0) {
+        <div class="space-y-3">
+          @for (quiz of quizzes; track quiz.id) {
+            <article class="flex flex-col gap-4 rounded-xl border border-slate-100 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex min-w-0 items-center gap-4">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#182f57] text-lg text-white">
+                  📝
+                </div>
+
+                <div class="min-w-0">
+                  <h3 class="break-words font-bold">{{ quiz.title }}</h3>
+                  <p class="mt-1 text-sm text-slate-500">
+                    {{ quiz.questionCount }} {{ languageService.translate('questions') }}
+                    <span class="mx-1">·</span>
+                    {{ languageService.translate(quiz.type === 'EndOfLesson' ? 'endOfLesson' : 'prerequisite') }}
+                  </p>
+                </div>
+              </div>
+
+              <span
+                class="w-fit rounded-full px-3 py-1 text-xs font-bold"
+                [ngClass]="quiz.isActive
+                  ? 'bg-emerald-50 text-emerald-700'
+                  : 'bg-slate-200 text-slate-600'"
+              >
+                {{ languageService.translate(quiz.isActive ? 'active' : 'inactive') }}
+              </span>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 text-center">
+          <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#182f57]/5 text-2xl">
+            📚
+          </div>
+          <h3 class="font-bold">{{ languageService.translate('noQuizzesToDisplay') }}</h3>
+          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+            {{ languageService.translate('selectLessonToSeeQuizzesBackend') }}
+          </p>
+        </div>
+      }
+    </section>
+
+    <!-- Create Quiz -->
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="border-b border-slate-100 bg-gradient-to-r from-[#182f57] to-[#29456E] px-5 py-6 text-white sm:px-7">
+        <h2 class="text-xl font-bold">{{ languageService.translate('createQuiz') }}</h2>
+        <p class="mt-1 text-sm leading-6 text-blue-100">
+          {{ languageService.translate('configureAssessmentAndQuestions') }}
+        </p>
+      </div>
+
+      <form (ngSubmit)="createQuiz()" class="space-y-7 p-5 sm:p-7">
+
+        <!-- Quiz Details -->
+        <div class="grid gap-5 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label for="quizTitle" class="mb-2 block text-sm font-semibold">
+              {{ languageService.translate('quizTitle') }} <span class="text-rose-500">*</span>
+            </label>
+
+            <input
+              id="quizTitle"
+              name="quizTitle"
+              type="text"
+              [(ngModel)]="quizTitle"
+              maxlength="150"
+              [placeholder]="languageService.translate('quizTitlePlaceholder')"
+              class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="quizDescription" class="mb-2 block text-sm font-semibold">
+              {{ languageService.translate('description') }}
+              <span class="font-normal text-slate-400">({{ languageService.translate('optional') }})</span>
+            </label>
+
+            <textarea
+              id="quizDescription"
+              name="quizDescription"
+              [(ngModel)]="quizDescription"
+              rows="3"
+              [placeholder]="languageService.translate('quizDescriptionPlaceholder')"
+              class="w-full resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="quizType" class="mb-2 block text-sm font-semibold">
+              {{ languageService.translate('quizType') }}
+            </label>
+
+            <select
+              id="quizType"
+              name="quizType"
+              [(ngModel)]="quizType"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+            >
+              <option value="EndOfLesson">{{ languageService.translate('endOfLessonQuiz') }}</option>
+              <option value="Prerequisite">{{ languageService.translate('prerequisiteQuiz') }}</option>
+            </select>
+
+            <div class="mt-3 rounded-xl bg-[#F3F6FB] p-3 text-xs leading-5 text-slate-600">
+              @if (quizType === 'EndOfLesson') {
+                <span class="font-bold text-[#29456E]">{{ languageService.translate('endOfLesson') }}:</span>
+                {{ languageService.translate('endOfLessonQuizDescription') }}
+              } @else {
+                <span class="font-bold text-[#29456E]">{{ languageService.translate('prerequisite') }}:</span>
+                {{ languageService.translate('prerequisiteQuizDescription') }}
+              }
+            </div>
+          </div>
+
+          <div>
+            <label for="questionCount" class="mb-2 block text-sm font-semibold">
+              {{ languageService.translate('numberOfQuestions') }}
+            </label>
+
+            <select
+              id="questionCount"
+              name="questionCount"
+              [(ngModel)]="questionCount"
+              (ngModelChange)="onQuestionCountChange()"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+            >
+              <option [ngValue]="10">10 {{ languageService.translate('questions') }}</option>
+              <option [ngValue]="15">15 {{ languageService.translate('questions') }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Questions Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-lg font-bold">{{ languageService.translate('questionsAndAnswers') }}</h2>
+            <p class="mt-1 text-sm text-slate-500">
+              {{ languageService.translate('addAtLeastTwoOptionsAndMarkCorrect') }}
+            </p>
+          </div>
+
+          <span class="rounded-lg bg-[#F3F6FB] px-3 py-2 text-xs font-bold text-[#29456E]">
+            {{ questions.length }} {{ languageService.translate('questions') }}
+          </span>
+        </div>
+
+        <!-- Question Cards -->
+        @for (question of questions; track $index; let i = $index) {
+          <article class="rounded-2xl border border-slate-200 p-4 sm:p-5">
+            <div class="mb-5 flex items-center gap-3">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#182f57] text-sm font-bold text-white">
+                {{ i + 1 }}
+              </span>
+
+              <div>
+                <h3 class="font-bold">
+                  {{ languageService.translate('question') }} {{ i + 1 }}
+                </h3>
+                <p class="text-xs text-slate-400">
+                  {{ languageService.translate('questionDetailsAndOptions') }}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label [for]="'question-' + i" class="mb-2 block text-sm font-semibold">
+                {{ languageService.translate('questionText') }}
+              </label>
+
+              <textarea
+                [id]="'question-' + i"
+                [name]="'question-' + i"
+                [(ngModel)]="question.text"
+                [ngModelOptions]="{ standalone: true }"
+                rows="2"
+                [placeholder]="languageService.translate('writeQuestionHere')"
+                class="w-full resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+              ></textarea>
+            </div>
+
+            <div class="mb-3 mt-5 flex flex-wrap items-center justify-between gap-2">
+              <label class="text-sm font-semibold">{{ languageService.translate('answerOptions') }}</label>
+              <span class="text-xs text-slate-400">
+                {{ languageService.translate('chooseCorrectAnswer') }}
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              @for (option of question.options; track $index; let j = $index) {
+                <div
+                  class="flex items-center gap-3 rounded-xl border p-3 transition"
+                  [ngClass]="question.correctOptionIndex === j
+                    ? 'border-[#41a6b1] bg-[#49DCEB]/10'
+                    : 'border-slate-200 bg-white'"
+                >
+                  <input
+                    type="radio"
+                    [name]="'correct-' + i"
+                    [checked]="question.correctOptionIndex === j"
+                    (change)="setCorrectOption(i, j)"
+                    [attr.aria-label]="languageService.translate('markOptionCorrect').replace('{number}', (j + 1).toString())"
+                    class="h-4 w-4 shrink-0 accent-[#29456E]"
+                  />
+
+                  <input
+                    type="text"
+                    [name]="'option-' + i + '-' + j"
+                    [(ngModel)]="question.options[j]"
+                    [ngModelOptions]="{ standalone: true }"
+                    [placeholder]="languageService.translate('enterOption').replace('{number}', (j + 1).toString())"
+                    [attr.aria-label]="languageService.translate('questionOption').replace('{question}', (i + 1).toString()).replace('{option}', (j + 1).toString())"
+                    class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                  />
+
+                  @if (question.correctOptionIndex === j) {
+                    <span class="hidden text-xs font-bold text-[#29456E] sm:inline">
+                      {{ languageService.translate('correct') }}
+                    </span>
+                  }
+
+                  <button
+                    type="button"
+                    [disabled]="question.options.length <= 2"
+                    (click)="removeOption(i, j)"
+                    [attr.aria-label]="languageService.translate('removeOption').replace('{number}', (j + 1).toString())"
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-lg text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+            </div>
+
+            <button
+              type="button"
+              (click)="addOption(i)"
+              class="mt-4 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#29456E] transition hover:bg-[#F3F6FB] hover:text-[#41a6b1]"
+            >
+              <span class="text-lg">+</span>
+              {{ languageService.translate('addAnswerOption') }}
+            </button>
+          </article>
+        }
+
+        <!-- Feedback -->
+        @if (errorMessage) {
+          <div class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm leading-6 text-rose-700" role="alert">
+            {{ errorMessage }}
+          </div>
+        }
+
+        @if (successMessage) {
+          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-700" role="status">
+            {{ successMessage }}
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 pt-6 sm:flex-row">
+          <button
+            type="button"
+            (click)="resetForm()"
+            class="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+          >
+            {{ languageService.translate('resetForm') }}
+          </button>
+
+          <button
+            type="button"
+            (click)="createQuiz()"
+            [disabled]="saving"
+            class="rounded-xl bg-[#29456E] px-5 py-3 font-semibold text-white disabled:opacity-50"
+          >
+            {{ languageService.translate(saving ? 'creatingQuiz' : 'createQuiz') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>

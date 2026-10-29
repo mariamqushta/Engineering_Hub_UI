@@ -1,0 +1,206 @@
+
+<section class="min-h-screen bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
+  <div class="mx-auto max-w-7xl space-y-6">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+          {{ languageService.translate('administration') }}
+        </p>
+        <h1 class="mt-1 text-2xl font-bold text-[#182f57] sm:text-3xl">
+          {{ languageService.translate('interactiveActivities') }}
+        </h1>
+        <p class="mt-2 text-sm text-slate-500">
+          {{ languageService.translate('reviewScheduledOnlineActivities') }}
+        </p>
+      </div>
+
+      <button type="button"
+        (click)="loadActivities()"
+        [disabled]="isLoading"
+        class="rounded-xl bg-[#182f57] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#29456E] disabled:opacity-50">
+        {{ isLoading ? languageService.translate('loading') : languageService.translate('refreshActivities') }}
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="rounded-2xl border border-slate-200 bg-white p-5">
+        <p class="text-sm text-slate-500">{{ languageService.translate('totalActivities') }}</p>
+        <p class="mt-2 text-3xl font-bold text-[#182f57]">
+          {{ activities.length }}
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-5">
+        <p class="text-sm text-slate-500">{{ languageService.translate('studentBookings') }}</p>
+        <p class="mt-2 text-3xl font-bold text-[#182f57]">
+          {{ totalBookings }}
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+      <label for="activitySearch"
+        class="mb-2 block text-sm font-semibold text-[#182f57]">
+        {{ languageService.translate('searchActivities') }}
+      </label>
+      <input id="activitySearch" type="search"
+        [(ngModel)]="searchTerm"
+        [placeholder]="languageService.translate('searchActivitiesPlaceholder')"
+        class="w-full rounded-xl border border-slate-200 bg-[#F3F6FB] px-4 py-3 text-sm outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30">
+    </div>
+
+    <div *ngIf="errorMessage"
+      class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="isLoading"
+      class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+      {{ languageService.translate('loadingInteractiveActivities') }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && filteredActivities.length === 0"
+      class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+      <h2 class="font-semibold text-[#182f57]">
+        {{ languageService.translate('noActivitiesFound') }}
+      </h2>
+      <p class="mt-2 text-sm text-slate-500">
+        {{ languageService.translate('tryAnotherSearchOrRefresh') }}
+      </p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredActivities.length > 0"
+      class="space-y-4">
+
+      <article *ngFor="let activity of filteredActivities"
+        class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+
+        <div class="p-5 sm:p-6">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-lg font-bold text-[#182f57]">
+                  {{ activity.title }}
+                </h2>
+                <span class="rounded-full px-3 py-1 text-xs font-semibold"
+                  [ngClass]="statusClass(activity.status)">
+                  {{ activity.status }}
+                </span>
+              </div>
+
+              <p class="mt-2 text-sm text-slate-500">
+                {{ activity.description || languageService.translate('noDescriptionProvided') }}
+              </p>
+
+              <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 xl:grid-cols-3">
+                <div>
+                  <p class="text-slate-400">{{ languageService.translate('track') }}</p>
+                  <p class="mt-1 font-semibold text-slate-700">
+                    {{ activity.trackTitle || languageService.translate('notSpecified') }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-slate-400">{{ languageService.translate('instructorUsername') }}</p>
+                  <p class="mt-1 font-semibold text-slate-700">
+                    {{ activity.instructorUserName || languageService.translate('notAssigned') }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-slate-400">{{ languageService.translate('date') }}</p>
+                  <p class="mt-1 font-semibold text-slate-700">
+                    {{ activity.date | date:'mediumDate' }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-slate-400">{{ languageService.translate('time') }}</p>
+                  <p class="mt-1 font-semibold text-slate-700">
+                    {{ activity.startTime }} – {{ activity.endTime }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-slate-400">{{ languageService.translate('capacityBookedStudents') }}</p>
+                  <p class="mt-1 font-semibold text-slate-700">
+                    {{ activity.students.length }} / {{ activity.capacity }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-slate-400">{{ languageService.translate('meetingLink') }}</p>
+                  <a *ngIf="activity.meetingUrl"
+                    [href]="activity.meetingUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-1 inline-block break-all font-semibold text-[#268995] hover:underline">
+                    {{ languageService.translate('openMeetingLink') }}
+                  </a>
+                  <p *ngIf="!activity.meetingUrl" class="mt-1 text-slate-500">
+                    {{ languageService.translate('notProvided') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button type="button"
+              (click)="toggleStudents(activity.id)"
+              class="shrink-0 rounded-xl border border-[#41a6b1] px-4 py-2.5 text-sm font-semibold text-[#29456E] transition hover:bg-cyan-50">
+              {{ expandedActivityId === activity.id ? languageService.translate('hideStudents') : languageService.translate('viewStudents') }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="expandedActivityId === activity.id"
+          class="border-t border-slate-200 bg-[#F8FAFD] p-5 sm:p-6">
+
+          <h3 class="font-bold text-[#182f57]">
+            {{ languageService.translate('bookedStudents') }}
+          </h3>
+
+          <div *ngIf="activity.students.length === 0"
+            class="mt-4 rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">
+            {{ languageService.translate('noStudentsListedForActivity') }}
+          </div>
+
+          <div *ngIf="activity.students.length > 0"
+            class="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <table class="w-full min-w-[600px] text-left text-sm">
+              <thead class="bg-[#182f57] text-white">
+                <tr>
+                  <th class="px-4 py-3 font-semibold">{{ languageService.translate('student') }}</th>
+                  <th class="px-4 py-3 font-semibold">{{ languageService.translate('username') }}</th>
+                  <th class="px-4 py-3 font-semibold">{{ languageService.translate('emailLabel') }}</th>
+                  <th class="px-4 py-3 font-semibold">{{ languageService.translate('bookingStatus') }}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr *ngFor="let student of activity.students">
+                  <td class="px-4 py-3 font-medium text-slate-700">
+                    {{ student.fullName || student.userName }}
+                  </td>
+                  <td class="px-4 py-3 text-slate-600">
+                    {{ student.userName }}
+                  </td>
+                  <td class="px-4 py-3 text-slate-600">
+                    {{ student.email || '—' }}
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="rounded-full px-3 py-1 text-xs font-semibold"
+                      [ngClass]="bookingStatusClass(student.bookingStatus)">
+                      {{ student.bookingStatus ?? languageService.translate('unknown') }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>
+

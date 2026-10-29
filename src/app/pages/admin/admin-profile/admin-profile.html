@@ -1,0 +1,163 @@
+
+<section class="min-h-screen bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
+  <div class="mx-auto max-w-5xl space-y-6">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+          {{ languageService.translate('administration') }}
+        </p>
+        <h1 class="mt-1 text-2xl font-bold text-[#182f57] sm:text-3xl">
+          {{ languageService.translate('myProfile') }}
+        </h1>
+        <p class="mt-2 text-sm text-slate-500">
+          {{ languageService.translate('viewAccountInformation') }}
+        </p>
+      </div>
+
+      <button type="button"
+        (click)="loadProfile()"
+        [disabled]="isLoading"
+        class="rounded-xl bg-[#182f57] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#29456E] disabled:opacity-50">
+        {{ isLoading ? languageService.translate('loading') : languageService.translate('refreshProfile') }}
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage"
+      class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="isLoading"
+      class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+      {{ languageService.translate('loadingProfile') }}
+    </div>
+
+    <ng-container *ngIf="!isLoading && profile">
+
+      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div class="h-32 bg-gradient-to-r from-[#182f57] via-[#29456E] to-[#41a6b1]"></div>
+
+        <div class="px-5 pb-6 sm:px-8">
+          <div class="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end">
+            <div class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-[#182f57] text-2xl font-bold text-[#49DCEB] shadow-sm">
+              <img *ngIf="profile.profileImageUrl"
+                [src]="profile.profileImageUrl"
+                [alt]="profile.fullName || languageService.translate('adminProfile')"
+                class="h-full w-full object-cover">
+
+              <span *ngIf="!profile.profileImageUrl">{{ initials }}</span>
+            </div>
+
+            <div class="min-w-0 flex-1 pb-1">
+              <h2 class="text-xl font-bold text-[#182f57]">
+                {{ profile.fullName || profile.userName || languageService.translate('admin') }}
+              </h2>
+              <p class="mt-1 text-sm text-slate-500">
+                @{{ profile.userName || languageService.translate('unknownUsername') }}
+              </p>
+            </div>
+
+            <span class="w-fit rounded-full bg-cyan-50 px-4 py-2 text-sm font-semibold text-[#268995]">
+              {{ languageService.translate('administrator') }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8">
+        <div class="mb-6">
+          <h2 class="text-lg font-bold text-[#182f57]">
+            {{ languageService.translate('personalInformation') }}
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            {{ languageService.translate('informationAssociatedWithAccount') }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+          <div>
+            <p class="text-sm text-slate-400">{{ languageService.translate('fullName') }}</p>
+            <p class="mt-2 break-words font-semibold text-slate-700">
+              {{ profile.fullName || languageService.translate('notProvided') }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-slate-400">{{ languageService.translate('username') }}</p>
+            <p class="mt-2 break-words font-semibold text-slate-700">
+              {{ profile.userName || languageService.translate('notProvided') }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-slate-400">{{ languageService.translate('emailAddress') }}</p>
+            <p class="mt-2 break-words font-semibold text-slate-700">
+              {{ profile.email || languageService.translate('notProvided') }}
+            </p>
+            <span *ngIf="profile.emailConfirmed === true"
+              class="mt-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+              {{ languageService.translate('emailConfirmed') }}
+            </span>
+            <span *ngIf="profile.emailConfirmed === false"
+              class="mt-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+              {{ languageService.translate('emailNotConfirmed') }}
+            </span>
+          </div>
+
+          <div>
+            <p class="text-sm text-slate-400">{{ languageService.translate('phoneNumber') }}</p>
+            <p class="mt-2 break-words font-semibold text-slate-700">
+              {{ profile.phoneNumber || languageService.translate('notProvided') }}
+            </p>
+            <span *ngIf="profile.phoneNumberConfirmed === true"
+              class="mt-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+              {{ languageService.translate('phoneConfirmed') }}
+            </span>
+          </div>
+
+          <div class="sm:col-span-2">
+            <p class="text-sm text-slate-400">{{ languageService.translate('bio') }}</p>
+            <p class="mt-2 whitespace-pre-wrap break-words text-slate-700">
+              {{ profile.bio || languageService.translate('noBioAdded') }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-slate-400">{{ languageService.translate('accountStatus') }}</p>
+            <span *ngIf="profile.isActive === true"
+              class="mt-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+              {{ languageService.translate('active') }}
+            </span>
+            <span *ngIf="profile.isActive === false"
+              class="mt-2 inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+              {{ languageService.translate('inactive') }}
+            </span>
+            <span *ngIf="profile.isActive === undefined"
+              class="mt-2 inline-block text-sm text-slate-500">
+              {{ languageService.translate('notAvailable') }}
+            </span>
+          </div>
+
+          <div>
+            <p class="text-sm text-slate-400">{{ languageService.translate('memberSince') }}</p>
+            <p class="mt-2 font-semibold text-slate-700">
+              {{ profile.createdAt ? (profile.createdAt | date:'mediumDate') : languageService.translate('notAvailable') }}
+            </p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <p class="text-sm text-slate-400">{{ languageService.translate('accountId') }}</p>
+            <p class="mt-2 break-all font-mono text-sm text-slate-600">
+              {{ profile.id || languageService.translate('notAvailable') }}
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+</section>
+

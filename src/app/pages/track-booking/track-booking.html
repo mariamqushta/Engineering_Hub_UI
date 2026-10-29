@@ -1,0 +1,293 @@
+<div class="min-h-screen bg-gray-50 px-6 py-10">
+  <div class="mx-auto max-w-7xl">
+    @if (track) {
+      <div class="mb-10 text-center">
+        <h1 class="text-3xl font-bold text-[#182f57]">
+          {{ languageService.translate('book') }} {{ track.title }}
+        </h1>
+        <p class="mx-auto mt-3 max-w-2xl text-gray-600">
+          {{ languageService.translate('chooseBookingOption') }}
+        </p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-4">
+
+        <!-- Track Only: type 0 -->
+        <div class="flex flex-col rounded-2xl bg-white p-6 shadow-md">
+          <div class="mb-5">
+            <h2 class="text-xl font-bold text-[#182f57]">
+              {{ languageService.translate('trackOnly') }}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+              {{ languageService.translate('trackOnlyDescription') }}
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <span class="text-3xl font-bold text-[#182f57]">{{ trackOnlyPrice }}</span>
+            <span class="ml-1 text-gray-500">{{ languageService.translate('egp') }}</span>
+          </div>
+
+          <div class="mb-6 flex-1">
+            <p class="mb-3 font-semibold text-gray-800">
+              {{ languageService.translate('includes') }}
+            </p>
+            <ul class="space-y-2 text-gray-600">
+              <li>✓ {{ languageService.translate('allTrackLessons') }}</li>
+              <li>✓ {{ languageService.translate('trackProgress') }}</li>
+              <li>✓ {{ languageService.translate('certificateAfterCompletion') }}</li>
+            </ul>
+          </div>
+
+          <ng-container *ngIf="bookingStatuses[0] as status; else trackOnlyBookButton">
+            <div *ngIf="status === 'Pending'"
+                 class="mt-auto rounded-xl bg-amber-50 px-4 py-3 text-center font-semibold text-amber-800">
+              {{ languageService.translate('bookingPending') }}
+            </div>
+
+            <div *ngIf="status === 'Approved'"
+                 class="mt-auto rounded-xl bg-green-100 px-4 py-3 text-center font-semibold text-green-800">
+              ✓ {{ languageService.translate('approved') }}
+            </div>
+
+            <ng-container *ngIf="status === 'Rejected'">
+              <div class="mt-auto mb-3 rounded-xl bg-red-100 px-4 py-3 text-center font-semibold text-red-800">
+                {{ languageService.translate('bookingRejected') }}
+              </div>
+              <button (click)="bookTrack(0)"
+                      [disabled]="bookingInProgress !== null"
+                      class="w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+                {{ bookingInProgress === 0
+                  ? languageService.translate('submitting')
+                  : languageService.translate('bookTrackAgain') }}
+              </button>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #trackOnlyBookButton>
+            <button (click)="bookTrack(0)"
+                    [disabled]="bookingInProgress !== null"
+                    class="mt-auto w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+              {{ bookingInProgress === 0
+                ? languageService.translate('submitting')
+                : languageService.translate('bookTrack') }}
+            </button>
+          </ng-template>
+        </div>
+
+        <!-- Track + Interactive: type 1 -->
+        <div class="flex flex-col rounded-2xl border-2 border-[#49DCEB] bg-white p-6 shadow-md">
+          <div class="mb-5">
+            <div class="mb-2 inline-block rounded-full bg-[#49DCEB]/20 px-3 py-1 text-xs font-semibold text-[#182f57]">
+              {{ languageService.translate('popular') }}
+            </div>
+            <h2 class="text-xl font-bold text-[#182f57]">
+              {{ languageService.translate('trackPlusInteractive') }}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+              {{ languageService.translate('trackInteractiveDescription') }}
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <span class="text-3xl font-bold text-[#182f57]">{{ interactivePrice }}</span>
+            <span class="ml-1 text-gray-500">{{ languageService.translate('egp') }}</span>
+            <p class="mt-1 text-xs text-gray-500">
+              {{ languageService.translate('packagePrice') }}
+            </p>
+          </div>
+
+          <div class="mb-6 flex-1">
+            <p class="mb-3 font-semibold text-gray-800">
+              {{ languageService.translate('includes') }}
+            </p>
+            <ul class="space-y-2 text-gray-600">
+              <li>✓ {{ languageService.translate('allTrackLessons') }}</li>
+              <li>✓ {{ languageService.translate('allInteractiveActivities') }}</li>
+              <li>✓ {{ languageService.translate('trackProgress') }}</li>
+              <li>✓ {{ languageService.translate('certificateAfterCompletion') }}</li>
+            </ul>
+          </div>
+
+          <ng-container *ngIf="bookingStatuses[1] as status; else interactiveBookButton">
+            <div *ngIf="status === 'Pending'"
+                 class="mt-auto rounded-xl bg-amber-50 px-4 py-3 text-center font-semibold text-amber-800">
+              {{ languageService.translate('bookingPending') }}
+            </div>
+
+            <div *ngIf="status === 'Approved'"
+                 class="mt-auto rounded-xl bg-green-100 px-4 py-3 text-center font-semibold text-green-800">
+              ✓ {{ languageService.translate('approved') }}
+            </div>
+
+            <ng-container *ngIf="status === 'Rejected'">
+              <div class="mt-auto mb-3 rounded-xl bg-red-100 px-4 py-3 text-center font-semibold text-red-800">
+                {{ languageService.translate('bookingRejected') }}
+              </div>
+              <button (click)="bookTrack(1)"
+                      [disabled]="bookingInProgress !== null"
+                      class="w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+                {{ bookingInProgress === 1
+                  ? languageService.translate('submitting')
+                  : languageService.translate('bookAgain') }}
+              </button>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #interactiveBookButton>
+            <button (click)="bookTrack(1)"
+                    [disabled]="bookingInProgress !== null"
+                    class="mt-auto w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+              {{ bookingInProgress === 1
+                ? languageService.translate('submitting')
+                : languageService.translate('bookTrackPlusInteractive') }}
+            </button>
+          </ng-template>
+        </div>
+
+        <!-- Complete Package: type 2 -->
+        <div class="flex flex-col rounded-2xl bg-white p-6 shadow-md">
+          <div class="mb-5">
+            <h2 class="text-xl font-bold text-[#182f57]">
+              {{ languageService.translate('completePackage') }}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+              {{ languageService.translate('completePackageDescription') }}
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <span class="text-3xl font-bold text-[#182f57]">{{ completePackagePrice }}</span>
+            <span class="ml-1 text-gray-500">{{ languageService.translate('egp') }}</span>
+            <p class="mt-1 text-xs text-gray-500">
+              {{ languageService.translate('packagePrice') }}
+            </p>
+          </div>
+
+          <div class="mb-6 flex-1">
+            <p class="mb-3 font-semibold text-gray-800">
+              {{ languageService.translate('includes') }}
+            </p>
+            <ul class="space-y-2 text-gray-600">
+              <li>✓ {{ languageService.translate('allTrackLessons') }}</li>
+              <li>✓ {{ languageService.translate('allInteractiveActivities') }}</li>
+              <li>✓ {{ languageService.translate('allWorkshops') }}</li>
+              <li>✓ {{ languageService.translate('trackProgress') }}</li>
+              <li>✓ {{ languageService.translate('certificateAfterCompletion') }}</li>
+            </ul>
+          </div>
+
+          <ng-container *ngIf="bookingStatuses[2] as status; else completePackageBookButton">
+            <div *ngIf="status === 'Pending'"
+                 class="mt-auto rounded-xl bg-amber-50 px-4 py-3 text-center font-semibold text-amber-800">
+              {{ languageService.translate('bookingPending') }}
+            </div>
+
+            <div *ngIf="status === 'Approved'"
+                 class="mt-auto rounded-xl bg-green-100 px-4 py-3 text-center font-semibold text-green-800">
+              ✓ {{ languageService.translate('approved') }}
+            </div>
+
+            <ng-container *ngIf="status === 'Rejected'">
+              <div class="mt-auto mb-3 rounded-xl bg-red-100 px-4 py-3 text-center font-semibold text-red-800">
+                {{ languageService.translate('bookingRejected') }}
+              </div>
+              <button (click)="bookTrack(2)"
+                      [disabled]="bookingInProgress !== null"
+                      class="w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+                {{ bookingInProgress === 2
+                  ? languageService.translate('submitting')
+                  : languageService.translate('bookAgain') }}
+              </button>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #completePackageBookButton>
+            <button (click)="bookTrack(2)"
+                    [disabled]="bookingInProgress !== null"
+                    class="mt-auto w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+              {{ bookingInProgress === 2
+                ? languageService.translate('submitting')
+                : languageService.translate('bookCompletePackage') }}
+            </button>
+          </ng-template>
+        </div>
+
+        <!-- Track + Coaching: type 3 -->
+        <div class="flex flex-col rounded-2xl bg-white p-6 shadow-md">
+          <div class="mb-5">
+            <h2 class="text-xl font-bold text-[#182f57]">
+              {{ languageService.translate('trackPlusCoaching') }}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+              {{ languageService.translate('trackCoachingDescription') }}
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <span class="text-3xl font-bold text-[#182f57]">{{ coachingPrice }}</span>
+            <span class="ml-1 text-gray-500">{{ languageService.translate('egp') }}</span>
+            <p class="mt-1 text-xs text-gray-500">
+              {{ languageService.translate('trackPlusCoaching') }}
+            </p>
+          </div>
+
+          <div class="mb-6 flex-1">
+            <p class="mb-3 font-semibold text-gray-800">
+              {{ languageService.translate('includes') }}
+            </p>
+            <ul class="space-y-2 text-gray-600">
+              <li>✓ {{ languageService.translate('allTrackLessons') }}</li>
+              <li>✓ {{ languageService.translate('trackProgress') }}</li>
+              <li>✓ {{ languageService.translate('coachingSupport') }}</li>
+              <li>✓ {{ languageService.translate('certificateAfterCompletion') }}</li>
+            </ul>
+          </div>
+
+          <ng-container *ngIf="bookingStatuses[3] as status; else coachingBookButton">
+            <div *ngIf="status === 'Pending'"
+                 class="mt-auto rounded-xl bg-amber-50 px-4 py-3 text-center font-semibold text-amber-800">
+              {{ languageService.translate('bookingPending') }}
+            </div>
+
+            <div *ngIf="status === 'Approved'"
+                 class="mt-auto rounded-xl bg-green-100 px-4 py-3 text-center font-semibold text-green-800">
+              ✓ {{ languageService.translate('approved') }}
+            </div>
+
+            <ng-container *ngIf="status === 'Rejected'">
+              <div class="mt-auto mb-3 rounded-xl bg-red-100 px-4 py-3 text-center font-semibold text-red-800">
+                {{ languageService.translate('bookingRejected') }}
+              </div>
+              <button (click)="bookTrack(3)"
+                      [disabled]="bookingInProgress !== null"
+                      class="w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+                {{ bookingInProgress === 3
+                  ? languageService.translate('submitting')
+                  : languageService.translate('bookAgain') }}
+              </button>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #coachingBookButton>
+            <button (click)="bookTrack(3)"
+                    [disabled]="bookingInProgress !== null"
+                    class="mt-auto w-full rounded-xl bg-[#182f57] px-4 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60">
+              {{ bookingInProgress === 3
+                ? languageService.translate('submitting')
+                : languageService.translate('bookTrackPlusCoaching') }}
+            </button>
+          </ng-template>
+        </div>
+      </div>
+    }
+
+    <p *ngIf="bookingMessage" class="mt-6 text-green-600">
+      {{ bookingMessage }}
+    </p>
+
+    <p *ngIf="bookingError" class="mt-2 text-red-600">
+      {{ bookingError }}
+    </p>
+  </div>
+</div>

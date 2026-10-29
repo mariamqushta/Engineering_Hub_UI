@@ -1,0 +1,50 @@
+
+.lesson-management {
+  padding: 28px;
+  color: #182f57;
+}
+
+.back-button {
+  margin-bottom: 28px;
+  padding: 10px 14px;
+  border: 1px solid #dce5ef;
+  border-radius: 9px;
+  background: #fff;
+  color: #29456e;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.eyebrow {
+  color: #41a6b1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+h1 {
+  margin: 8px 0;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.placeholder {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #e5ebf3;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.placeholder h2 {
+  margin-top: 0;
+}
+
+.placeholder p {
+  color: #64748b;
+  line-height: 1.7;
+}

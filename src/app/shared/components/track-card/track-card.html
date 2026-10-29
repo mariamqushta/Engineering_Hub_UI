@@ -1,0 +1,27 @@
+<div class="h-full w-100 max-w-sm overflow-hidden rounded-2xl bg-[#0D2348] border-2 border-[#49DCEB] shadow-md">
+  <div class="flex h-full min-h-64 flex-col p-5">
+
+    <h2 class="text-xl font-bold text-[#5fcfdb]">
+      {{ track.title }}
+    </h2>
+
+    <p class="mt-2 text-[#49DCEB]">
+      {{ track.description }}
+    </p>
+
+    <div class="mt-auto flex gap-3 pt-5">
+      <button
+        [routerLink]="['/track', track.id]"
+        class="rounded-lg bg-[#49DCEB] px-4 py-2 text-white hover:bg-[#59c5d1]">
+        {{ languageService.translate('viewTrack') }}
+      </button>
+
+      <button
+        (click)="bookTrack()"
+        class="rounded-lg border border-[#49DCEB] px-4 py-2 text-[#49DCEB] hover:bg-blue-50">
+        {{ languageService.translate('bookTrack') }}
+      </button>
+    </div>
+
+  </div>
+</div>

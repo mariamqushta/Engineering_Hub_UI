@@ -1,0 +1,309 @@
+<div class="min-h-screen bg-[#F3F6FB] px-4 py-8 md:px-8">
+  <div class="mx-auto max-w-5xl">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <a
+        routerLink="/"
+        class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-[#29456E] hover:text-[#41a6b1]"
+      >
+        <span aria-hidden="true">←</span>
+        {{ languageService.translate('backToHome') }}
+      </a>
+
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('learningSpace') }}
+      </p>
+
+      <h1 class="text-3xl font-bold text-[#182f57] md:text-4xl">
+        {{ languageService.translate('lessonAssignments') }}
+      </h1>
+
+      <p class="mt-2 text-gray-600">
+        {{ languageService.translate('lessonAssignmentsDescription') }}
+      </p>
+    </div>
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+      <div
+        role="alert"
+        class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+      >
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Success Message -->
+    @if (successMessage) {
+      <div
+        role="status"
+        class="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700"
+      >
+        {{ successMessage }}
+      </div>
+    }
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="rounded-2xl bg-white p-10 text-center shadow-sm">
+        <p class="font-medium text-[#29456E]">
+          {{ languageService.translate('loadingAssignments') }}
+        </p>
+      </div>
+    } @else if (assignments.length === 0 && !errorMessage) {
+      <!-- No Assignments -->
+      <div class="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+        <div class="mb-4 text-4xl" aria-hidden="true">📚</div>
+
+        <h2 class="text-xl font-bold text-[#182f57]">
+          {{ languageService.translate('noAssignmentsYet') }}
+        </h2>
+
+        <p class="mt-2 text-gray-600">
+          {{ languageService.translate('noAssignmentsForLesson') }}
+        </p>
+      </div>
+    } @else {
+      <!-- Assignment List -->
+      <div class="space-y-6">
+        @for (assignment of assignments; track assignment.id) {
+          <article class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+
+            <!-- Assignment Header -->
+            <div class="border-b border-gray-100 p-5 md:p-6">
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-[#41a6b1]">
+                    {{ languageService.translate('assignmentNumber') }} #{{ assignment.id }}
+                  </p>
+
+                  <h2 class="text-xl font-bold text-[#182f57] md:text-2xl">
+                    {{ assignment.title }}
+                  </h2>
+
+                  @if (assignment.dueDate) {
+                    <p class="mt-3 text-sm text-gray-500">
+                      <span class="font-semibold">
+                        {{ languageService.translate('dueDate') }}:
+                      </span>
+                      {{ assignment.dueDate | date:'medium' }}
+                    </p>
+                  }
+                </div>
+
+                <!-- Submission Status -->
+                <div class="shrink-0">
+                  @if (assignment.checkingSubmission) {
+                    <span class="inline-flex rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-600">
+                      {{ languageService.translate('checkingStatus') }}
+                    </span>
+                  } @else if (assignment.submission && isGraded(assignment)) {
+                    <span class="inline-flex rounded-full bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700">
+                      {{ languageService.translate('graded') }}
+                    </span>
+                  } @else if (assignment.submission) {
+                    <span class="inline-flex rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700">
+                      {{ languageService.translate('submittedPendingReview') }}
+                    </span>
+                  } @else {
+                    <span class="inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-700">
+                      {{ languageService.translate('notSubmitted') }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Description -->
+              @if (assignment.description) {
+                <div class="mt-5">
+                  <h3 class="mb-2 font-semibold text-[#29456E]">
+                    {{ languageService.translate('instructions') }}
+                  </h3>
+
+                  <p class="whitespace-pre-line leading-7 text-gray-700">
+                    {{ assignment.description }}
+                  </p>
+                </div>
+              }
+
+              <!-- Reference Attachment -->
+              @if (assignment.hasAttachment) {
+                <div class="mt-4 rounded-xl bg-[#F3F6FB] p-4">
+                  <p class="font-semibold text-[#29456E]">
+                    {{ languageService.translate('referenceAttachment') }}
+                  </p>
+
+                  <p class="mt-1 break-all text-sm text-gray-600">
+                    {{ assignment.attachmentOriginalFileName || languageService.translate('assignmentAttachment') }}
+                  </p>
+
+                  <a
+                    [href]="'https://localhost:7109/api/Assignment/' + assignment.id + '/attachment'"
+                    class="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#29456E] px-4 py-2 text-sm font-semibold text-white hover:bg-[#182f57]"
+                  >
+                    {{ languageService.translate('downloadAttachment') }}
+                  </a>
+                </div>
+              }
+            </div>
+
+            <!-- Submission Area -->
+            <div class="p-5 md:p-6">
+              @if (assignment.submission) {
+                <!-- Existing Submission -->
+                <div class="mb-6 rounded-xl border border-[#49DCEB]/40 bg-[#F3F6FB] p-4 md:p-5">
+                  <h3 class="font-bold text-[#182f57]">
+                    {{ languageService.translate('yourSubmission') }}
+                  </h3>
+
+                  <p class="mt-2 text-sm text-gray-500">
+                    {{ languageService.translate('submittedOn') }}:
+                    {{ assignment.submission.submittedAt | date:'medium' }}
+                  </p>
+
+                  @if (assignment.submission.content) {
+                    <div class="mt-4">
+                      <p class="mb-1 text-sm font-semibold text-[#29456E]">
+                        {{ languageService.translate('yourAnswer') }}
+                      </p>
+
+                      <p class="whitespace-pre-line leading-7 text-gray-700">
+                        {{ assignment.submission.content }}
+                      </p>
+                    </div>
+                  }
+
+                  @if (assignment.submission.hasFile || assignment.submission.originalFileName) {
+                    <div class="mt-4">
+                      <p class="mb-2 text-sm font-semibold text-[#29456E]">
+                        {{ languageService.translate('submittedFile') }}
+                      </p>
+
+                      <p class="break-all text-sm text-gray-600">
+                        {{ assignment.submission.originalFileName || languageService.translate('fileAttached') }}
+                      </p>
+
+                      @if (assignment.submission.id) {
+                        <a
+                          [href]="'https://localhost:7109/api/Assignment/submissions/' + assignment.submission.id + '/file'"
+                          class="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#29456E] px-4 py-2 text-sm font-semibold text-white hover:bg-[#182f57]"
+                        >
+                          {{ languageService.translate('downloadMyFile') }}
+                        </a>
+                      }
+                    </div>
+                  }
+
+                  @if (isGraded(assignment)) {
+                    <div class="mt-5 border-t border-gray-200 pt-4">
+                      <p class="text-sm font-semibold text-[#29456E]">
+                        {{ languageService.translate('yourGrade') }}
+                      </p>
+
+                      <p class="mt-1 text-2xl font-bold text-[#182f57]">
+                        {{ assignment.submission!.grade }}
+                      </p>
+
+                      @if (assignment.submission!.feedback) {
+                        <div class="mt-4">
+                          <p class="mb-1 text-sm font-semibold text-[#29456E]">
+                            {{ languageService.translate('instructorFeedback') }}
+                          </p>
+
+                          <p class="whitespace-pre-line leading-7 text-gray-700">
+                            {{ assignment.submission!.feedback }}
+                          </p>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="mt-4 text-sm text-amber-700">
+                      {{ languageService.translate('submissionWaitingForReview') }}
+                    </p>
+                  }
+                </div>
+              }
+
+              <!-- Submission Form -->
+              @if (!assignment.submission && !assignment.checkingSubmission) {
+                <form (ngSubmit)="submitAssignment(assignment)" class="space-y-5">
+                  <div>
+                    <label
+                      [for]="'answer-' + assignment.id"
+                      class="mb-2 block font-semibold text-[#182f57]"
+                    >
+                      {{ languageService.translate('yourAnswer') }}
+                    </label>
+
+                    <textarea
+                      [id]="'answer-' + assignment.id"
+                      name="answer-{{ assignment.id }}"
+                      [(ngModel)]="answers[assignment.id]"
+                      rows="6"
+                      [placeholder]="languageService.translate('writeYourAnswer')"
+                      class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+                    ></textarea>
+                  </div>
+
+                  <div>
+                    <label
+                      [for]="'file-' + assignment.id"
+                      class="mb-2 block font-semibold text-[#182f57]"
+                    >
+                      {{ languageService.translate('attachAFile') }}
+                      <span class="font-normal text-gray-500">
+                        ({{ languageService.translate('optional') }})
+                      </span>
+                    </label>
+
+                    <input
+                      [id]="'file-' + assignment.id"
+                      type="file"
+                      [attr.title]="languageService.translate('chooseFileForAssignment') + ' ' + assignment.id"
+                      [attr.aria-label]="languageService.translate('chooseFileToSubmit')"
+                      accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg"
+                      (change)="onFileSelected(assignment.id, $event)"
+                      class="block w-full rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-700 file:mr-4 file:rounded-lg file:border-0 file:bg-[#29456E] file:px-4 file:py-2 file:font-medium file:text-white hover:file:bg-[#182f57]"
+                    />
+
+                    @if (selectedFiles[assignment.id]; as file) {
+                      <p class="mt-2 text-sm text-gray-600">
+                        {{ languageService.translate('selected') }}: {{ file.name }}
+                        <span class="text-gray-400">
+                          ({{ (file.size / 1024 / 1024).toFixed(2) }} MB)
+                        </span>
+                      </p>
+                    }
+
+                    <p class="mt-2 text-xs text-gray-500">
+                      {{ languageService.translate('maximumFileSize') }}: 20 MB.
+                    </p>
+                  </div>
+
+                  <div class="flex justify-end">
+                    <button
+                      type="submit"
+                      [disabled]="submittingAssignmentId !== null"
+                      class="inline-flex items-center justify-center rounded-xl bg-[#29456E] px-6 py-3 font-semibold text-white transition hover:bg-[#182f57] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      @if (submittingAssignmentId === assignment.id) {
+                        {{ languageService.translate('submitting') }}
+                      } @else {
+                        {{ languageService.translate('submitAssignment') }}
+                      }
+                    </button>
+                  </div>
+                </form>
+              } @else if (assignment.checkingSubmission && !loading) {
+                <p class="text-sm text-gray-500">
+                  {{ languageService.translate('checkingSubmissionStatus') }}
+                </p>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</div>

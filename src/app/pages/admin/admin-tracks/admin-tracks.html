@@ -1,0 +1,199 @@
+
+<div class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-[#182f57]">
+        {{ languageService.translate('tracks') }}
+      </h2>
+      <p class="mt-1 text-sm text-gray-500">
+        {{ languageService.translate('manageLearningTracks') }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreateForm()"
+      class="rounded-xl bg-[#182f57] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#29456E]">
+      + {{ languageService.translate('createTrack') }}
+    </button>
+  </div>
+
+  @if (message) {
+    <div
+      role="status"
+      class="rounded-xl border px-4 py-3 text-sm"
+      [class.border-green-200]="messageType === 'success'"
+      [class.bg-green-50]="messageType === 'success'"
+      [class.text-green-700]="messageType === 'success'"
+      [class.border-red-200]="messageType === 'error'"
+      [class.bg-red-50]="messageType === 'error'"
+      [class.text-red-700]="messageType === 'error'">
+      {{ message }}
+    </div>
+  }
+
+  @if (formVisible) {
+    <section class="rounded-2xl border border-gray-200 bg-white p-6">
+      <div class="mb-5 flex items-center justify-between gap-3">
+        <h3 class="text-lg font-bold text-[#182f57]">
+          {{ languageService.translate(editingId === null ? 'createTrack' : 'editTrack') }}
+        </h3>
+
+        <button
+          type="button"
+          (click)="formVisible = false"
+          class="rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100">
+          {{ languageService.translate('cancel') }}
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveTrack()" class="space-y-5">
+        <div>
+          <label for="trackTitle" class="mb-2 block text-sm font-medium text-gray-700">
+            {{ languageService.translate('trackTitle') }}
+          </label>
+          <input
+            id="trackTitle"
+            name="title"
+            [(ngModel)]="form.title"
+            required
+            maxlength="200"
+            [placeholder]="languageService.translate('trackTitlePlaceholder')"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <div>
+          <label for="trackDescription" class="mb-2 block text-sm font-medium text-gray-700">
+            {{ languageService.translate('description') }}
+          </label>
+          <textarea
+            id="trackDescription"
+            name="description"
+            [(ngModel)]="form.description"
+            rows="4"
+            [placeholder]="languageService.translate('trackDescriptionPlaceholder')"
+            class="w-full resize-y rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"></textarea>
+        </div>
+
+        <div>
+          <label for="trackPrice" class="mb-2 block text-sm font-medium text-gray-700">
+            {{ languageService.translate('priceEGP') }}
+          </label>
+          <input
+            id="trackPrice"
+            name="price"
+            type="number"
+            [(ngModel)]="form.price"
+            required
+            min="0"
+            step="0.01"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30" />
+        </div>
+
+        <button
+          type="submit"
+          class="rounded-xl bg-[#182f57] px-6 py-3 font-semibold text-white transition hover:bg-[#29456E]">
+          {{ languageService.translate(editingId === null ? 'createTrack' : 'saveChanges') }}
+        </button>
+      </form>
+    </section>
+  }
+
+  <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+      <h3 class="font-semibold text-[#182f57]">
+        {{ languageService.translate('allTracks') }}
+      </h3>
+      <span class="rounded-full bg-[#F3F6FB] px-3 py-1 text-sm font-medium text-[#29456E]">
+        {{ tracks.length }} {{ languageService.translate('tracks') }}
+      </span>
+    </div>
+
+    @if (loading) {
+      <div class="px-6 py-14 text-center text-sm text-gray-500">
+        {{ languageService.translate('loadingTracks') }}
+      </div>
+    } @else if (tracks.length === 0) {
+      <div class="px-6 py-14 text-center">
+        <h3 class="font-semibold text-[#182f57]">
+          {{ languageService.translate('noTracksFound') }}
+        </h3>
+        <p class="mt-2 text-sm text-gray-500">
+          {{ languageService.translate('createFirstTrack') }}
+        </p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[700px] text-left">
+          <thead class="bg-[#F3F6FB] text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('track') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('price') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('status') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('actions') }}
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100">
+            @for (track of tracks; track track.id) {
+              <tr class="transition hover:bg-gray-50">
+                <td class="max-w-md px-5 py-4">
+                  <p class="font-semibold text-[#182f57]">
+                    {{ track.title }}
+                  </p>
+                  <p class="mt-1 line-clamp-2 text-sm text-gray-500">
+                    {{ track.description || languageService.translate('noDescriptionProvided') }}
+                  </p>
+                </td>
+
+                <td class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-700">
+                  {{ track.price | number:'1.2-2' }} {{ languageService.translate('currencyEGP') }}
+                </td>
+
+                <td class="px-5 py-4">
+                  @if (track.isActive === false) {
+                    <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                      {{ languageService.translate('inactive') }}
+                    </span>
+                  } @else {
+                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                      {{ languageService.translate('active') }}
+                    </span>
+                  }
+                </td>
+
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      (click)="openEditForm(track)"
+                      class="rounded-lg bg-[#F3F6FB] px-3 py-2 text-sm font-medium text-[#29456E] hover:bg-[#e5ebf5]">
+                      {{ languageService.translate('edit') }}
+                    </button>
+
+                    @if (track.isActive !== false) {
+                      <button
+                        type="button"
+                        (click)="deactivateTrack(track)"
+                        class="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100">
+                        {{ languageService.translate('deactivate') }}
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

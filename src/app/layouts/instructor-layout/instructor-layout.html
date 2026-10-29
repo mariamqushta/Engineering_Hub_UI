@@ -1,0 +1,53 @@
+
+<div class="instructor-layout">
+  <app-instructor-sidebar></app-instructor-sidebar>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div>
+        <h1>{{ activePage }}</h1>
+        <p>{{ languageService.translate('teachingWorkspace') }}</p>
+      </div>
+
+      <div class="profile">
+
+   <button
+  type="button"
+  class="profile-avatar profile-avatar-button"
+  (click)="openProfile()"
+  [attr.aria-label]="languageService.translate('openMyProfile')"
+  [attr.title]="languageService.translate('openMyProfile')"
+>
+      @if (isProfileLoading) {
+        <span>...</span>
+      } @else if (profileImageUrl) {
+        <img
+          [src]=" languageService.translate('profileImage') "
+          alt=""
+          class="rounded-full w-10 h-10 object-cover"
+          [alt]="fullName || username || 'Profile image'"
+          (error)="profileImageUrl = null"
+        />
+      } @else {
+        <span>{{ avatarLetter }}</span>
+      }
+    </button>
+
+
+        <div class="profile-info">
+          <strong>
+            @if (isProfileLoading) {
+              Loading...
+            } @else {
+              {{ fullName || username || languageService.translate('instructor')  }}
+            }
+          </strong>
+
+          <span>{{ languageService.translate('engineeringHub') }}</span>
+        </div>
+      </div>
+    </header>
+
+    <router-outlet></router-outlet>
+  </main>
+</div>

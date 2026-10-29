@@ -1,0 +1,199 @@
+<div class="min-h-full bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
+
+  <!-- Page Header -->
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-[#182f57] sm:text-3xl">
+        {{ languageService.translate('myTracks') }}
+      </h1>
+      <p class="mt-2 text-sm text-gray-600 sm:text-base">
+        {{ languageService.translate('manageAssignedTrackLessons') }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="loadMyTracks()"
+      [disabled]="isLoading"
+      class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#29456E] px-5 py-3 font-semibold text-white transition hover:bg-[#182f57] disabled:cursor-not-allowed disabled:opacity-60">
+
+      <svg
+        *ngIf="isLoading"
+        class="h-5 w-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24">
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4">
+        </circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+        </path>
+      </svg>
+
+      {{ languageService.translate(isLoading ? 'loading' : 'refreshTracks') }}
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div
+    *ngIf="isLoading"
+    class="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center shadow-sm">
+
+    <div class="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-[#49DCEB]"></div>
+
+    <h2 class="text-lg font-semibold text-[#182f57]">
+      {{ languageService.translate('loadingYourTracks') }}
+    </h2>
+
+    <p class="mt-2 text-sm text-gray-500">
+      {{ languageService.translate('pleaseWaitForAssignedTracks') }}
+    </p>
+  </div>
+
+  <!-- Error State -->
+  <div
+    *ngIf="!isLoading && errorMessage"
+    class="rounded-2xl border border-red-200 bg-white p-6 text-center shadow-sm sm:p-8">
+
+    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+      <svg
+        class="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 2.6h17a2 2 0 001.7-2.6l-8.5-14.1a2 2 0 00-3.4 0z">
+        </path>
+      </svg>
+    </div>
+
+    <h2 class="text-lg font-bold text-[#182f57]">
+      {{ languageService.translate('unableToLoadTracks') }}
+    </h2>
+
+    <p class="mt-2 text-sm text-gray-600">
+      {{ errorMessage }}
+    </p>
+
+    <button
+      type="button"
+      (click)="loadMyTracks()"
+      [disabled]="isLoading"
+      class="mt-5 rounded-xl bg-[#29456E] px-6 py-3 font-semibold text-white transition hover:bg-[#182f57] disabled:opacity-60">
+      {{ languageService.translate('tryAgain') }}
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!isLoading && !errorMessage && tracks.length === 0"
+    class="rounded-2xl border border-gray-200 bg-white px-6 py-14 text-center shadow-sm">
+
+    <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F3F6FB] text-[#29456E]">
+      <svg
+        class="h-8 w-8"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          d="M12 6.5l-8 4.2 8 4.2 8-4.2-8-4.2zM4 15l8 4.2 8-4.2M4 11v4">
+        </path>
+      </svg>
+    </div>
+
+    <h2 class="text-xl font-bold text-[#182f57]">
+      {{ languageService.translate('noTracksAssignedYet') }}
+    </h2>
+
+    <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
+      {{ languageService.translate('tracksAppearAfterAdminAccess') }}
+    </p>
+
+    <button
+      type="button"
+      (click)="loadMyTracks()"
+      [disabled]="isLoading"
+      class="mt-6 rounded-xl border border-[#29456E] px-5 py-2.5 font-semibold text-[#29456E] transition hover:bg-[#29456E] hover:text-white disabled:opacity-60">
+      {{ languageService.translate('checkAgain') }}
+    </button>
+  </div>
+
+  <!-- Tracks Grid -->
+  <div
+    *ngIf="!isLoading && !errorMessage && tracks.length > 0"
+    class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+    <article
+      *ngFor="let track of tracks"
+      class="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-[#49DCEB] hover:shadow-lg">
+
+      <!-- Card Accent -->
+      <div class="h-1.5 bg-gradient-to-r from-[#29456E] to-[#49DCEB]"></div>
+
+      <div class="flex flex-1 flex-col p-6">
+
+        <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3F6FB] text-[#29456E] transition group-hover:bg-[#49DCEB]/20">
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              d="M12 6.5l-8 4.2 8 4.2 8-4.2-8-4.2zM4 15l8 4.2 8-4.2">
+            </path>
+          </svg>
+        </div>
+
+        <h2 class="text-lg font-bold leading-7 text-[#182f57]">
+          {{ track.title }}
+        </h2>
+
+        <p class="mt-3 flex-1 text-sm leading-6 text-gray-600">
+          {{ track.description || languageService.translate('noDescriptionProvided') }}
+        </p>
+
+        <div class="mt-6 border-t border-gray-100 pt-5">
+          <button
+            type="button"
+            (click)="manageLessons(track.id)"
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#29456E] px-4 py-3 font-semibold text-white transition hover:bg-[#182f57] focus:outline-none focus:ring-2 focus:ring-[#49DCEB] focus:ring-offset-2">
+
+            {{ languageService.translate('manageLessons') }}
+
+            <svg
+              class="h-4 w-4 transition-transform group-hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 12h14m-7-7l7 7-7 7">
+              </path>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </article>
+  </div>
+
+</div>

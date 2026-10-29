@@ -1,0 +1,220 @@
+<div class="min-h-screen p-4 md:p-8">
+
+  <!-- Back button -->
+  <button
+    (click)="goBack()"
+    class="mb-6 rounded-lg bg-[#49DCEB] px-4 py-2 text-white hover:bg-[#59c5d1]">
+    ← {{ languageService.translate('back') }}
+  </button>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="py-10 text-center text-[#41a6b1]">
+    {{ languageService.translate('loadingLesson') }}
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loading && errorMessage"
+       class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Lesson information -->
+  <div *ngIf="!loading && lesson && !errorMessage"
+       class="mx-auto max-w-5xl">
+
+    <div
+      class="mb-6 flex flex-col gap-5 rounded-2xl border-2 border-[#49DCEB] bg-[#0D2348] p-4 shadow-md sm:flex-row sm:items-start sm:justify-between">
+
+      <!-- Lesson Information -->
+      <div class="min-w-0 flex-1">
+        <p class="mb-2 text-sm text-[#41a6b1]">
+          {{ languageService.translate('lesson') }} {{ lesson.order }}
+        </p>
+
+        <h1 class="mb-3 break-words text-2xl font-bold text-[#49DCEB] md:text-3xl">
+          {{ lesson.title }}
+        </h1>
+
+        <p *ngIf="lesson.description" class="text-[#41a6b1]">
+          {{ lesson.description }}
+        </p>
+      </div>
+
+      <!-- Assignment Button -->
+      <div class="shrink-0 sm:ml-auto">
+        <button
+          type="button"
+          (click)="openAssignmentPage()"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#49DCEB] px-5 py-3 font-semibold text-[#0D2348] transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-white">
+          <span>{{ languageService.translate('assignment') }}</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lesson content navigation -->
+    <div class="mt-6 grid gap-6 md:grid-cols-[240px_minmax(0,1fr)]">
+
+      <!-- Content list -->
+      <aside class="h-fit rounded-2xl bg-[#0D2348] border-2 p-3 border-[#49DCEB] shadow-md">
+        <h2 class="mb-4 text-lg font-bold text-[#49DCEB]">
+          {{ languageService.translate('lessonContent') }}
+        </h2>
+
+        <div *ngIf="contents.length === 0"
+             class="text-sm text-[#41a6b1]">
+          {{ languageService.translate('noLessonContentAvailable') }}
+        </div>
+
+        <button
+          *ngFor="let item of contents; let i = index"
+          (click)="currentContentIndex = i"
+          class="mb-2 flex w-full items-center gap-3 rounded-lg border-2 border-[#49DCEB] p-3 text-left transition-all duration-200"
+          [ngClass]="currentContentIndex === i
+            ? 'border-[#29456E] bg-blue-50 text-[#49DCEB] shadow-sm'
+            : 'border-[#0D2348] text-[#41a6b1] hover:border-gray-300 hover:bg-gray-50'">
+
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+            [ngClass]="currentContentIndex === i
+              ? 'bg-[#29456E] text-[#49DCEB]'
+              : 'bg-[#0D2348] text-white'">
+            {{ i + 1 }}
+          </span>
+
+          <span class="min-w-0 flex-1">
+            <span class="block truncate font-semibold">
+              {{ item.lessonTypeName }}
+            </span>
+            <span class="block text-xs text-[#41a6b1]">
+              {{ languageService.translate('content') }} {{ i + 1 }}
+            </span>
+          </span>
+
+          <span *ngIf="currentContentIndex === i"
+                class="text-xl font-bold"
+                [attr.aria-label]="languageService.translate('currentlySelected')">
+            ›
+          </span>
+        </button>
+
+        <!-- End-of-Lesson Quiz -->
+        <button
+          type="button"
+          (click)="openEndOfLessonQuiz()"
+          class="mb-2 flex w-full items-center gap-3 rounded-lg border-2 border-[#49DCEB] p-3 text-left text-[#41a6b1] transition-all duration-200 hover:bg-[#182f57]">
+
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#29456E] text-white">
+            ✓
+          </span>
+
+          <span class="min-w-0 flex-1">
+            <span class="block font-semibold">
+              {{ languageService.translate('endOfLessonQuiz') }}
+            </span>
+            <span class="block text-xs">
+              {{ languageService.translate('finalLessonActivity') }}
+            </span>
+          </span>
+        </button>
+      </aside>
+
+      <!-- Only the selected content -->
+      <section class="min-w-0">
+        <div *ngIf="currentContent as content"
+             class="content-enter rounded-2xl bg-[#0D2348] border-2 border-[#49DCEB] shadow-md md:p-6">
+
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="text-sm text-[#41a6b1]">
+                {{ languageService.translate('content') }}
+                {{ currentContentIndex + 1 }}
+                {{ languageService.translate('of') }}
+                {{ totalContents }}
+              </p>
+              <h2 class="mt-1 text-xl font-bold text-[#49DCEB]">
+                {{ content.lessonTypeName }}
+              </h2>
+            </div>
+
+            <span class="rounded-full bg-blue-50 px-3 py-1 text-sm text-[#49DCEB]">
+              {{ currentContentIndex + 1 }} / {{ totalContents }}
+            </span>
+          </div>
+
+          <!-- Video -->
+          <video
+            *ngIf="content.lessonTypeName === 'Video' && content.contentUrl"
+            controls
+            class="w-full rounded-lg bg-black">
+            <source
+              [src]="getContentUrl(content.contentUrl)"
+              [type]="content.contentType || 'video/mp4'">
+            {{ languageService.translate('browserDoesNotSupportVideo') }}
+          </video>
+
+          <!-- PDF -->
+          <iframe
+            *ngIf="content.lessonTypeName === 'PDF' && content.contentUrl"
+            [src]="getPdfUrl(content.contentUrl)"
+            class="h-[500px] w-full rounded-lg border border-gray-200 bg-gray-100 md:h-[700px]"
+            [title]="languageService.translate('lessonPdf')">
+          </iframe>
+
+          <!-- Other downloadable content -->
+          <div
+            *ngIf="content.contentUrl &&
+              content.lessonTypeName !== 'Video' &&
+              content.lessonTypeName !== 'PDF'"
+            class="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-gray-50 p-4">
+
+            <span class="min-w-0 break-words text-gray-700">
+              {{ content.originalFileName || content.lessonTypeName }}
+            </span>
+
+            <a
+              [href]="getContentUrl(content.contentUrl)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="rounded-lg bg-[#29456E] px-4 py-2 text-white hover:opacity-90">
+              {{ languageService.translate('openContent') }}
+            </a>
+          </div>
+
+          <!-- Workshop / interactive references -->
+          <div *ngIf="content.workshopId || content.interactiveActivityId"
+               class="mt-4 space-y-2 text-[#41a6b1]">
+            <p *ngIf="content.workshopId">
+              {{ languageService.translate('workshopReference') }}:
+              {{ content.workshopId }}
+            </p>
+            <p *ngIf="content.interactiveActivityId">
+              {{ languageService.translate('interactiveActivityReference') }}:
+              {{ content.interactiveActivityId }}
+            </p>
+          </div>
+
+          <!-- Previous / Next -->
+          <div class="mt-6 flex items-center justify-between gap-3 border-t border-gray-100 pt-5">
+
+            <button
+              (click)="previousContent()"
+              [disabled]="currentContentIndex === 0"
+              class="rounded-lg border border-gray-200 px-4 py-2 font-semibold text-[#49DCEB] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40">
+              ← {{ languageService.translate('previous') }}
+            </button>
+
+            <button
+              (click)="nextContent()"
+              [disabled]="currentContentIndex >= totalContents - 1"
+              class="rounded-lg bg-[#29456E] px-5 py-2 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40">
+              {{ languageService.translate('next') }} →
+            </button>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

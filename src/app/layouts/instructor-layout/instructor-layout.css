@@ -1,0 +1,13 @@
+
+
+.profile-avatar-button {
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.profile-avatar-button:focus-visible {
+  outline: 2px solid #49DCEB;
+  outline-offset: 3px;
+}

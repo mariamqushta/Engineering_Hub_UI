@@ -1,1 +1,381 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+body{
+  background-color: #0b224b !important;
+}
+
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #eaf2ff;
+  background: #081a3a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.instructor-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #081a3a;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 265px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  background: #102448;
+  border-right: 1px solid #24416c;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 30px;
+  border-bottom: 1px solid #29456e;
+}
+
+.brand-logo {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border: 2px solid #49dceb;
+  border-radius: 14px;
+  background: #24416c;
+  color: #fcd34d;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.brand h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.brand p {
+  margin: 6px 0 0;
+  color: #49dceb;
+  font-size: 12px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #d5e2f7;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.menu-item:hover {
+  background: #1a355e;
+  color: #49dceb;
+}
+
+.menu-item.active {
+  border-color: #29456e;
+  background: #24416c;
+  color: #49dceb;
+}
+
+.menu-icon {
+  width: 20px;
+  color: #49dceb;
+  text-align: center;
+  font-size: 19px;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: auto;
+  padding: 20px 8px 0;
+  color: #a7bad7;
+  font-size: 12px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #49dceb;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 30px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #24416c;
+}
+
+.topbar h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 27px;
+}
+
+.topbar p {
+  margin: 7px 0 0;
+  color: #a7bad7;
+  font-size: 14px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #49dceb;
+  border-radius: 50%;
+  background: #24416c;
+  color: #49dceb;
+  font-weight: 700;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-info strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.profile-info span {
+  color: #a7bad7;
+  font-size: 11px;
+}
+
+.welcome-section {
+  margin: 30px 0;
+  padding: 28px;
+  border: 1px solid #29456e;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #102448, #182f57);
+}
+
+.welcome-section h2 {
+  margin: 0 0 12px;
+  color: #49dceb;
+  font-size: 24px;
+}
+
+.welcome-section p,
+.activity-section p,
+.placeholder-section p {
+  max-width: 700px;
+  margin: 0;
+  color: #b7c7df;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* Overview cards */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.overview-card {
+  padding: 24px;
+  border: 1px solid #24416c;
+  border-radius: 14px;
+  background: #102448;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.overview-card:hover {
+  transform: translateY(-3px);
+  border-color: #49dceb;
+}
+
+.card-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #24416c;
+  color: #49dceb;
+  font-size: 23px;
+}
+
+.overview-card h3 {
+  margin: 18px 0 8px;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.overview-card p {
+  min-height: 42px;
+  margin: 0 0 18px;
+  color: #a7bad7;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.overview-card button,
+.placeholder-section button {
+  padding: 10px 14px;
+  border: 1px solid #49dceb;
+  border-radius: 8px;
+  background: transparent;
+  color: #49dceb;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.overview-card button:hover,
+.placeholder-section button:hover {
+  background: #24416c;
+}
+
+.activity-section {
+  margin-top: 26px;
+  padding: 24px;
+  border: 1px solid #24416c;
+  border-radius: 14px;
+  background: #102448;
+}
+
+.activity-section h2 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.placeholder-section {
+  margin-top: 30px;
+  padding: 35px;
+  border: 1px solid #24416c;
+  border-radius: 14px;
+  background: #102448;
+}
+
+.placeholder-section h2 {
+  color: #49dceb;
+}
+
+.placeholder-icon {
+  color: #49dceb;
+  font-size: 28px;
+}
+
+.placeholder-section button {
+  margin-top: 24px;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+    padding: 20px 12px;
+  }
+
+  .main-content {
+    padding: 22px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .instructor-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .brand {
+    padding-bottom: 16px;
+  }
+
+  .sidebar-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .menu-item {
+    gap: 8px;
+    padding: 11px 8px;
+    font-size: 12px;
+  }
+
+  .sidebar-footer {
+    margin-top: 18px;
+  }
+
+  .main-content {
+    padding: 18px 14px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar h1 {
+    font-size: 22px;
+  }
+
+  .profile-info {
+    display: none;
+  }
+
+  .welcome-section {
+    padding: 20px;
+  }
+
+  .welcome-section h2 {
+    font-size: 20px;
+  }
+}

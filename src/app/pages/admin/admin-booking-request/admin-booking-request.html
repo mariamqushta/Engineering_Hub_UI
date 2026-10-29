@@ -1,0 +1,291 @@
+<div class="min-h-full space-y-6">
+  <div>
+    <h2 class="text-2xl font-bold text-[#182f57]">
+      {{ languageService.translate('bookingRequests') }}
+    </h2>
+    <p class="mt-1 text-sm text-gray-500">
+      {{ languageService.translate('reviewManageBookings') }}
+    </p>
+  </div>
+
+  @if (message) {
+    <div
+      class="rounded-xl border px-4 py-3 text-sm"
+      [class.border-green-200]="messageType === 'success'"
+      [class.bg-green-50]="messageType === 'success'"
+      [class.text-green-700]="messageType === 'success'"
+      [class.border-red-200]="messageType === 'error'"
+      [class.bg-red-50]="messageType === 'error'"
+      [class.text-red-700]="messageType === 'error'"
+      role="status">
+      {{ message }}
+    </div>
+  }
+
+  <div class="flex flex-wrap gap-3">
+    <button
+      type="button"
+      (click)="changeTab('tracks')"
+      class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
+      [class.border-[#49DCEB]]="activeTab === 'tracks'"
+      [class.bg-[#182f57]]="activeTab === 'tracks'"
+      [class.text-white]="activeTab === 'tracks'"
+      [class.border-gray-200]="activeTab !== 'tracks'"
+      [class.bg-white]="activeTab !== 'tracks'"
+      [class.text-[#182f57]]="activeTab !== 'tracks'">
+      {{ languageService.translate('trackPackage') }}
+      <span class="ml-2 rounded-full px-2 py-1 text-xs"
+        [class.bg-white]="activeTab === 'tracks'"
+        [class.text-[#182f57]]="activeTab === 'tracks'"
+        [class.bg-gray-100]="activeTab !== 'tracks'">
+        {{ requests.length }}
+      </span>
+    </button>
+
+    <button
+      type="button"
+      (click)="changeTab('interactive')"
+      class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
+      [class.border-[#49DCEB]]="activeTab === 'interactive'"
+      [class.bg-[#182f57]]="activeTab === 'interactive'"
+      [class.text-white]="activeTab === 'interactive'"
+      [class.border-gray-200]="activeTab !== 'interactive'"
+      [class.bg-white]="activeTab !== 'interactive'"
+      [class.text-[#182f57]]="activeTab !== 'interactive'">
+      {{ languageService.translate('interactiveActivities') }}
+      <span class="ml-2 rounded-full px-2 py-1 text-xs"
+        [class.bg-white]="activeTab === 'interactive'"
+        [class.text-[#182f57]]="activeTab === 'interactive'"
+        [class.bg-gray-100]="activeTab !== 'interactive'">
+        {{ interactiveRequests.length }}
+      </span>
+    </button>
+
+    <button
+      type="button"
+      (click)="changeTab('workshops')"
+      class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
+      [class.border-[#49DCEB]]="activeTab === 'workshops'"
+      [class.bg-[#182f57]]="activeTab === 'workshops'"
+      [class.text-white]="activeTab === 'workshops'"
+      [class.border-gray-200]="activeTab !== 'workshops'"
+      [class.bg-white]="activeTab !== 'workshops'"
+      [class.text-[#182f57]]="activeTab !== 'workshops'">
+      {{ languageService.translate('workshops') }}
+      <span class="ml-2 rounded-full px-2 py-1 text-xs"
+        [class.bg-white]="activeTab === 'workshops'"
+        [class.text-[#182f57]]="activeTab === 'workshops'"
+        [class.bg-gray-100]="activeTab !== 'workshops'">
+        {{ workshopRequests.length }}
+      </span>
+    </button>
+  </div>
+
+  <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
+      <h3 class="font-semibold text-[#182f57]">
+        @if (activeTab === 'tracks') {
+          {{ languageService.translate('pendingTrackPackageRequests') }}
+        } @else if (activeTab === 'interactive') {
+          {{ languageService.translate('pendingInteractiveRequests') }}
+        } @else {
+          {{ languageService.translate('pendingWorkshopRequests') }}
+        }
+      </h3>
+
+      <div class="flex items-center gap-3">
+        <span class="rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700">
+          {{ currentRequests.length }}
+          {{ languageService.translate('pending') }}
+        </span>
+
+        <button
+          type="button"
+          (click)="getPendingRequests()"
+          [disabled]="loading"
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-[#182f57] hover:bg-gray-50 disabled:opacity-50">
+          {{ loading
+            ? languageService.translate('loading')
+            : languageService.translate('refresh') }}
+        </button>
+      </div>
+    </div>
+
+    @if (loading && currentRequests.length === 0) {
+      <div class="px-6 py-14 text-center text-sm text-gray-500">
+        {{ languageService.translate('loadingBookingRequests') }}
+      </div>
+    } @else if (currentRequests.length === 0) {
+      <div class="px-6 py-14 text-center">
+        <h3 class="text-lg font-semibold text-[#182f57]">
+          {{ languageService.translate('noPendingRequests') }}
+        </h3>
+        <p class="mt-2 text-sm text-gray-500">
+          {{ languageService.translate('newBookingRequestsAppear') }}
+        </p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[850px] text-left">
+          <thead class="bg-[#F3F6FB] text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('student') }}
+              </th>
+
+              @if (activeTab === 'tracks') {
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('track') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('package') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('requestedPrice') }}
+                </th>
+              } @else if (activeTab === 'interactive') {
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('activity') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('track') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('sessionDate') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('time') }}
+                </th>
+              } @else {
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('workshop') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('track') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('sessionDate') }}
+                </th>
+                <th class="px-5 py-4 font-semibold">
+                  {{ languageService.translate('place') }}
+                </th>
+              }
+
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('requestedOn') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('actions') }}
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100">
+            @for (request of currentRequests; track request.id) {
+              <tr class="transition hover:bg-gray-50">
+                <td class="px-5 py-4">
+                  <p class="font-medium text-[#182f57]">
+                    {{
+                      request.student?.fullName ||
+                      request.student?.userName ||
+                      languageService.translate('student')
+                    }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500">
+                    {{ request.student?.email || request.studentId }}
+                  </p>
+                </td>
+
+                @if (activeTab === 'tracks') {
+                  <td class="px-5 py-4 text-sm text-gray-700">
+                    {{
+                      request.track?.title ||
+                      request.trackTitle ||
+                      (languageService.translate('track') + ' #' + request.trackId)
+                    }}
+                  </td>
+
+                  <td class="px-5 py-4 text-sm text-gray-700">
+                    {{ getBookingType(request.bookingType) }}
+                  </td>
+
+                  <td class="whitespace-nowrap px-5 py-4 font-semibold text-[#182f57]">
+                    {{ request.requestedPrice | number:'1.2-2' }}
+                    {{ languageService.translate('currencyEGP') }}
+                  </td>
+                } @else if (activeTab === 'interactive') {
+                  <td class="px-5 py-4 text-sm font-medium text-[#182f57]">
+                    {{
+                      request.activityTitle ||
+                      languageService.translate('interactiveActivity')
+                    }}
+                  </td>
+
+                  <td class="px-5 py-4 text-sm text-gray-700">
+                    {{ request.trackTitle || '—' }}
+                  </td>
+
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
+                    {{ request.date | date:'mediumDate' }}
+                  </td>
+
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
+                    {{ formatTime(request.startTime) }} –
+                    {{ formatTime(request.endTime) }}
+                  </td>
+                } @else {
+                  <td class="px-5 py-4 text-sm font-medium text-[#182f57]">
+                    {{
+                      request.workshopTitle ||
+                      languageService.translate('workshop')
+                    }}
+                  </td>
+
+                  <td class="px-5 py-4 text-sm text-gray-700">
+                    {{ request.trackTitle || '—' }}
+                  </td>
+
+                  <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
+                    {{ request.date | date:'mediumDate' }}
+                  </td>
+
+                  <td class="px-5 py-4 text-sm text-gray-700">
+                    {{ request.place || '—' }}
+                  </td>
+                }
+
+                <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
+                  {{ request.requestedAt | date:'mediumDate' }}
+                </td>
+
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      (click)="approveRequest(request.id)"
+                      class="rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700">
+                      {{ languageService.translate('approve') }}
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="rejectRequest(request.id)"
+                      class="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100">
+                      {{ languageService.translate('reject') }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <p class="text-sm text-gray-500">
+    {{ totalPendingRequests }}
+    {{ languageService.translate('pendingRequestsAcrossCategories') }}
+  </p>
+</div>
+

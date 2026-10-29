@@ -1,0 +1,200 @@
+<div class="min-h-screen bg-[#F3F6FB] px-4 py-8 sm:px-8">
+  <div class="mx-auto max-w-4xl">
+
+    <button
+      type="button"
+      (click)="goBack()"
+      class="mb-6 text-sm font-medium text-[#29456E] hover:underline">
+      ← {{ languageService.translate('back') }}
+    </button>
+
+    <div
+      *ngIf="downloadErrorMessage"
+      class="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+      role="alert">
+      {{ downloadErrorMessage }}
+    </div>
+
+    <div class="mb-8">
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        Engineering Hub
+      </p>
+
+      <h1 class="text-3xl font-bold text-[#182f57]">
+        {{ languageService.translate(trackId !== null ? 'trackCertificate' : 'myCertificates') }}
+      </h1>
+
+      <p class="mt-2 text-gray-600">
+        {{ languageService.translate('earnedCertificatesDescription') }}
+      </p>
+    </div>
+
+    <!-- Loading -->
+    <div
+      *ngIf="loading"
+      class="rounded-xl bg-white p-8 text-center shadow-sm">
+      <p class="text-gray-600">
+        {{ languageService.translate('loadingCertificates') }}
+      </p>
+    </div>
+
+    <!-- Error -->
+    <div
+      *ngIf="!loading && errorMessage"
+      class="rounded-xl border border-red-200 bg-white p-6">
+      <p class="text-red-600">{{ errorMessage }}</p>
+
+      <button
+        type="button"
+        (click)="loadCertificates()"
+        class="mt-4 rounded-lg bg-[#29456E] px-5 py-2 text-white hover:bg-[#182f57]">
+        {{ languageService.translate('tryAgain') }}
+      </button>
+    </div>
+
+    <!-- Certificate for a specific track -->
+    <ng-container *ngIf="!loading && !errorMessage && trackId !== null">
+      <div
+        *ngIf="selectedCertificate as certificate; else certificateUnavailable"
+        class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#F3F6FB]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#29456E"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true">
+              <circle cx="12" cy="8" r="6"></circle>
+              <path d="m8.2 13-1.2 8 5-3 5 3-1.2-8"></path>
+            </svg>
+          </div>
+
+          <div class="flex-1">
+            <h2 class="text-xl font-bold text-[#182f57]">
+              {{ languageService.translate('trackCertificate') }}
+            </h2>
+
+            <p class="mt-1 text-gray-600">
+              {{ languageService.translate('trackId') }}: {{ certificate.trackId }}
+            </p>
+
+            <p class="mt-1 text-sm text-gray-500">
+              {{ languageService.translate('issuedOn') }}
+              {{ certificate.issuedAt | date:'mediumDate' }}
+            </p>
+
+            <p class="mt-1 text-sm text-gray-500">
+              {{ languageService.translate('certificateId') }}: {{ certificate.id }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 border-t border-gray-100 pt-6">
+          <button
+            type="button"
+            (click)="downloadCertificate(certificate)"
+            [disabled]="downloadingCertificateId !== null"
+            class="rounded-lg bg-[#29456E] px-6 py-3 font-semibold text-white transition hover:bg-[#182f57] disabled:cursor-not-allowed disabled:opacity-60">
+            {{
+              downloadingCertificateId === certificate.id
+                ? languageService.translate('downloading')
+                : languageService.translate('downloadCertificate')
+            }}
+          </button>
+        </div>
+      </div>
+
+      <ng-template #certificateUnavailable>
+        <div class="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3F6FB]">
+            <span class="text-3xl" aria-hidden="true">🔒</span>
+          </div>
+
+          <h2 class="text-xl font-bold text-[#182f57]">
+            {{ languageService.translate('certificateNotAvailableYet') }}
+          </h2>
+
+          <p class="mx-auto mt-3 max-w-lg text-gray-600">
+            {{ languageService.translate('noCertificateIssuedForTrack') }}
+            {{ languageService.translate('certificateMayBecomeAvailableAfterCompletion') }}
+          </p>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <!-- All certificates -->
+    <div
+      *ngIf="!loading && !errorMessage && trackId === null">
+
+      <div
+        *ngIf="certificates.length === 0"
+        class="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <h2 class="text-xl font-semibold text-[#182f57]">
+          {{ languageService.translate('noCertificatesYet') }}
+        </h2>
+
+        <p class="mt-2 text-gray-600">
+          {{ languageService.translate('earnedCertificatesWillAppearHere') }}
+        </p>
+      </div>
+
+      <div *ngIf="certificates.length > 0" class="grid gap-4 sm:grid-cols-2">
+        <div
+          *ngFor="let certificate of certificates"
+          class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+
+          <div class="mb-4 flex items-center gap-3">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3F6FB]">
+              <span class="text-2xl" aria-hidden="true">🏅</span>
+            </div>
+
+            <div>
+              <h2 class="font-bold text-[#182f57]">
+                {{ languageService.translate('trackCertificate') }}
+              </h2>
+
+              <p class="text-sm text-gray-500">
+                {{ languageService.translate('trackId') }}: {{ certificate.trackId }}
+              </p>
+            </div>
+          </div>
+
+          <p class="text-sm text-gray-600">
+            {{ languageService.translate('issuedOn') }}
+            {{ certificate.issuedAt | date:'mediumDate' }}
+          </p>
+
+          <p class="mt-1 text-sm text-gray-500">
+            {{ languageService.translate('certificateId') }}: {{ certificate.id }}
+          </p>
+
+          <button
+            type="button"
+            (click)="downloadCertificate(certificate)"
+            [disabled]="downloadingCertificateId !== null"
+            class="mt-5 w-full rounded-lg bg-[#29456E] px-4 py-2.5 font-medium text-white hover:bg-[#182f57] disabled:cursor-not-allowed disabled:opacity-60">
+            {{
+              downloadingCertificateId === certificate.id
+                ? languageService.translate('downloading')
+                : languageService.translate('downloadCertificate')
+            }}
+          </button>
+
+          <p
+            *ngIf="!certificate.certificateUrl"
+            class="mt-4 text-sm text-gray-500">
+            {{ languageService.translate('certificateFileUnavailable') }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

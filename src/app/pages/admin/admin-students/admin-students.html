@@ -1,0 +1,369 @@
+
+<div class="min-h-full bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
+  <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('administration') }}
+      </p>
+      <h1 class="text-2xl font-bold text-[#182f57] sm:text-3xl">
+        {{ languageService.translate('students') }}
+      </h1>
+      <p class="mt-2 text-sm text-slate-500">
+        {{ languageService.translate('viewStudentAccountsEnrollmentsBookingsStatuses') }}
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white px-5 py-3">
+      <p class="text-sm text-slate-500">{{ languageService.translate('totalStudents') }}</p>
+      <p class="text-2xl font-bold text-[#182f57]">
+        {{ students.length }}
+      </p>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ errorMessage }}
+      <button
+        type="button"
+        (click)="loadStudents()"
+        class="ml-3 font-semibold underline">
+        {{ languageService.translate('tryAgain') }}
+      </button>
+    </div>
+  }
+
+  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div class="relative flex-1">
+      <label for="student-search" class="sr-only">
+        {{ languageService.translate('searchStudents') }}
+      </label>
+      <input
+        id="student-search"
+        type="search"
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value"
+        [placeholder]="languageService.translate('searchStudentsPlaceholder')"
+        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-[#182f57] outline-none placeholder:text-slate-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-cyan-100"
+      />
+    </div>
+
+    <button
+      type="button"
+      (click)="loadStudents()"
+      [disabled]="isLoading"
+      class="rounded-xl bg-[#182f57] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#29456E] disabled:opacity-50">
+      {{ isLoading ? languageService.translate('loading') : languageService.translate('refreshStudents') }}
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+      {{ languageService.translate('loadingStudentsAndBookings') }}
+    </div>
+  } @else {
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[1050px] text-left">
+          <thead class="bg-[#182f57] text-sm text-white">
+            <tr>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('student') }}</th>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('contact') }}</th>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('account') }}</th>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('trackEnrollments') }}</th>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('workshopBookings') }}</th>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('interactiveBookings') }}</th>
+              <th class="px-5 py-4 font-semibold">{{ languageService.translate('details') }}</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-100">
+            @for (student of filteredStudents; track student.id) {
+              <tr class="align-top transition hover:bg-slate-50">
+                <td class="px-5 py-5">
+                  <div class="flex items-center gap-3">
+                    @if (student.profileImageUrl) {
+                      <img
+                        [src]="student.profileImageUrl"
+                        [alt]="student.fullName || languageService.translate('student')"
+                        class="h-11 w-11 rounded-full border border-slate-200 object-cover"
+                      />
+                    } @else {
+                      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#182f57] font-bold text-[#49DCEB]">
+                        {{ (student.fullName || student.userName || 'S').charAt(0).toUpperCase() }}
+                      </div>
+                    }
+
+                    <div>
+                      <p class="font-semibold text-[#182f57]">
+                        {{ student.fullName || languageService.translate('nameNotProvided') }}
+                      </p>
+                      <p class="mt-1 text-sm text-slate-500">
+                        @{{ student.userName }}
+                      </p>
+                      <p class="mt-1 text-xs text-slate-400">
+                        {{ languageService.translate('idLabel') }}: {{ student.id }}
+                      </p>
+                    </div>
+                  </div>
+
+                  @if (student.bio) {
+                    <p class="mt-3 max-w-xs text-sm text-slate-500">
+                      {{ student.bio }}
+                    </p>
+                  }
+                </td>
+
+                <td class="px-5 py-5 text-sm">
+                  <p class="break-all text-slate-700">
+                    {{ student.email || languageService.translate('noEmail') }}
+                  </p>
+                  <p class="mt-2 text-slate-500">
+                    {{ student.phoneNumber || languageService.translate('noPhoneNumber') }}
+                  </p>
+                  <p class="mt-2 text-xs text-slate-500">
+                    {{ languageService.translate('emailConfirmed') }}:
+                    {{ languageService.translate(student.emailConfirmed ? 'yes' : 'no') }}
+                  </p>
+                  <p class="mt-1 text-xs text-slate-500">
+                    {{ languageService.translate('phoneConfirmed') }}:
+                    {{ languageService.translate(student.phoneNumberConfirmed ? 'yes' : 'no') }}
+                  </p>
+                </td>
+
+                <td class="px-5 py-5">
+                  <span
+                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [class.bg-emerald-100]="student.isActive"
+                    [class.text-emerald-700]="student.isActive"
+                    [class.bg-red-100]="!student.isActive"
+                    [class.text-red-700]="!student.isActive">
+                    {{ languageService.translate(student.isActive ? 'active' : 'inactive') }}
+                  </span>
+
+                  <p class="mt-3 text-xs text-slate-500">
+                    {{ languageService.translate('registered') }}:
+                    {{ student.createdAt ? (student.createdAt | date:'mediumDate') : languageService.translate('unknown') }}
+                  </p>
+
+                  <p class="mt-2 text-xs text-slate-500">
+                    {{ languageService.translate('totalBookings') }}: {{ getBookingCount(student) }}
+                  </p>
+                </td>
+
+                <td class="px-5 py-5">
+                  <span class="inline-flex rounded-lg bg-cyan-50 px-3 py-2 text-sm font-semibold text-[#182f57]">
+                    {{ student.totalTrackBookings }}
+                  </span>
+                </td>
+
+                <td class="px-5 py-5">
+                  <span class="inline-flex rounded-lg bg-cyan-50 px-3 py-2 text-sm font-semibold text-[#182f57]">
+                    {{ student.totalWorkshopBookings }}
+                  </span>
+                </td>
+
+                <td class="px-5 py-5">
+                  <span class="inline-flex rounded-lg bg-cyan-50 px-3 py-2 text-sm font-semibold text-[#182f57]">
+                    {{ student.totalInteractiveBookings }}
+                  </span>
+                </td>
+
+                <td class="px-5 py-5">
+                  <button
+                    type="button"
+                    (click)="toggleDetails(student.id)"
+                    class="whitespace-nowrap rounded-xl border border-[#41a6b1] px-3 py-2 text-sm font-semibold text-[#182f57] transition hover:bg-cyan-50">
+                    {{ expandedStudentId === student.id ? languageService.translate('hideDetails') : languageService.translate('viewBookings') }}
+                  </button>
+                </td>
+              </tr>
+
+              @if (expandedStudentId === student.id) {
+                <tr>
+                  <td colspan="7" class="bg-slate-50 px-5 py-6">
+                    <div class="space-y-6">
+                      <div>
+                        <h3 class="mb-3 font-bold text-[#182f57]">
+                          {{ languageService.translate('trackEnrollments') }}
+                        </h3>
+
+                        @if (student.trackBookings.length > 0) {
+                          <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                            <table class="w-full min-w-[750px] text-sm">
+                              <thead class="bg-slate-100 text-slate-600">
+                                <tr>
+                                  <th class="p-3 text-left">{{ languageService.translate('track') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('bookingType') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('approval') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('sessionStatus') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('approvedPrice') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('enrolled') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('completed') }}</th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-slate-100">
+                                @for (booking of student.trackBookings; track booking.id) {
+                                  <tr>
+                                    <td class="p-3 font-medium text-[#182f57]">
+                                      {{ booking.trackTitle }}
+                                    </td>
+                                    <td class="p-3">{{ booking.bookingType }}</td>
+                                    <td class="p-3">
+                                      <span class="rounded-full px-2 py-1 text-xs"
+                                        [ngClass]="getBookingStatusClass(booking.approvalStatus)">
+                                        {{ booking.approvalStatus }}
+                                      </span>
+                                    </td>
+                                    <td class="p-3">{{ booking.status }}</td>
+                                    <td class="p-3">{{ booking.approvedPrice }}</td>
+                                    <td class="p-3">{{ booking.enrolledAt | date:'mediumDate' }}</td>
+                                    <td class="p-3">
+                                      {{ booking.completedAt ? (booking.completedAt | date:'mediumDate') : languageService.translate('notCompleted') }}
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        } @else {
+                          <p class="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
+                            {{ languageService.translate('noTrackEnrollments') }}
+                          </p>
+                        }
+                      </div>
+
+                      <div>
+                        <h3 class="mb-3 font-bold text-[#182f57]">
+                          {{ languageService.translate('workshopBookings') }}
+                        </h3>
+
+                        @if (student.workshopBookings.length > 0) {
+                          <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                            <table class="w-full min-w-[700px] text-sm">
+                              <thead class="bg-slate-100 text-slate-600">
+                                <tr>
+                                  <th class="p-3 text-left">{{ languageService.translate('workshop') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('track') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('approval') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('sessionStatus') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('bookingSource') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('date') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('place') }}</th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-slate-100">
+                                @for (booking of student.workshopBookings; track booking.id) {
+                                  <tr>
+                                    <td class="p-3 font-medium text-[#182f57]">
+                                      {{ booking.workshopTitle }}
+                                    </td>
+                                    <td class="p-3">{{ booking.trackTitle }}</td>
+                                    <td class="p-3">
+                                      <span class="rounded-full px-2 py-1 text-xs"
+                                        [ngClass]="getBookingStatusClass(booking.approvalStatus)">
+                                        {{ booking.approvalStatus }}
+                                      </span>
+                                    </td>
+                                    <td class="p-3">{{ booking.status }}</td>
+                                    <td class="p-3">{{ booking.source }}</td>
+                                    <td class="p-3">
+                                      {{ booking.date | date:'mediumDate' }}
+                                      <p class="mt-1 text-xs text-slate-500">
+                                        {{ booking.startTime }} – {{ booking.endTime }}
+                                      </p>
+                                    </td>
+                                    <td class="p-3">{{ booking.place }}</td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        } @else {
+                          <p class="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
+                            {{ languageService.translate('noWorkshopBookings') }}
+                          </p>
+                        }
+                      </div>
+
+                      <div>
+                        <h3 class="mb-3 font-bold text-[#182f57]">
+                          {{ languageService.translate('interactiveActivityBookings') }}
+                        </h3>
+
+                        @if (student.interactiveBookings.length > 0) {
+                          <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                            <table class="w-full min-w-[700px] text-sm">
+                              <thead class="bg-slate-100 text-slate-600">
+                                <tr>
+                                  <th class="p-3 text-left">{{ languageService.translate('activity') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('track') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('approval') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('sessionStatus') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('bookingSource') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('date') }}</th>
+                                  <th class="p-3 text-left">{{ languageService.translate('time') }}</th>
+                                </tr>
+                              </thead>
+                              <tbody class="divide-y divide-slate-100">
+                                @for (booking of student.interactiveBookings; track booking.id) {
+                                  <tr>
+                                    <td class="p-3 font-medium text-[#182f57]">
+                                      {{ booking.activityTitle }}
+                                    </td>
+                                    <td class="p-3">{{ booking.trackTitle }}</td>
+                                    <td class="p-3">
+                                      <span class="rounded-full px-2 py-1 text-xs"
+                                        [ngClass]="getBookingStatusClass(booking.approvalStatus)">
+                                        {{ booking.approvalStatus }}
+                                      </span>
+                                    </td>
+                                    <td class="p-3">{{ booking.status }}</td>
+                                    <td class="p-3">{{ booking.source }}</td>
+                                    <td class="p-3">
+                                      {{ booking.date | date:'mediumDate' }}
+                                    </td>
+                                    <td class="p-3">
+                                      {{ booking.startTime }} – {{ booking.endTime }}
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        } @else {
+                          <p class="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
+                            {{ languageService.translate('noInteractiveActivityBookings') }}
+                          </p>
+                        }
+                      </div>
+
+                      @if (getBookingCount(student) === 0) {
+                        <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4 text-sm text-[#182f57]">
+                          {{ languageService.translate('studentHasNoBookingsOrEnrollments') }}
+                          {{ languageService.translate('accountRemainsVisibleToAdmin') }}
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr>
+                <td colspan="7" class="px-5 py-14 text-center">
+                  <p class="font-semibold text-[#182f57]">
+                    {{ languageService.translate(searchTerm ? 'noMatchingStudents' : 'noStudentsFound') }}
+                  </p>
+                  <p class="mt-2 text-sm text-slate-500">
+                    {{ languageService.translate(searchTerm ? 'tryAnotherStudentSearch' : 'checkStudentRole') }}
+                  </p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+

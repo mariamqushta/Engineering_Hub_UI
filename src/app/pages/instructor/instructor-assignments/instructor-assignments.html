@@ -1,0 +1,608 @@
+<div class="min-h-screen bg-[#F3F6FB] p-4 md:p-8">
+  <div class="mx-auto max-w-4xl">
+
+    <!-- Page Heading -->
+    <div class="mb-6">
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('instructorWorkspace') }}
+      </p>
+
+      <h1 class="text-3xl font-bold text-[#182f57]">
+        {{
+          activeView === 'create'
+            ? languageService.translate('assignments')
+            : languageService.translate('reviewSubmissions')
+        }}
+      </h1>
+
+      <p class="mt-2 text-gray-600">
+        {{ languageService.translate('assignmentsPageDescription') }}
+      </p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="mb-6 flex flex-wrap gap-3">
+      <button
+        type="button"
+        (click)="setView('create')"
+        [class.bg-[#182f57]]="activeView === 'create'"
+        [class.text-white]="activeView === 'create'"
+        [class.bg-white]="activeView !== 'create'"
+        [class.text-[#182f57]]="activeView !== 'create'"
+        class="rounded-lg border border-gray-200 px-5 py-3 font-semibold transition hover:border-[#41a6b1]"
+      >
+        {{ languageService.translate('createAssignment') }}
+      </button>
+
+      <button
+        type="button"
+        (click)="setView('review')"
+        [class.bg-[#182f57]]="activeView === 'review'"
+        [class.text-white]="activeView === 'review'"
+        [class.bg-white]="activeView !== 'review'"
+        [class.text-[#182f57]]="activeView !== 'review'"
+        class="rounded-lg border border-gray-200 px-5 py-3 font-semibold transition hover:border-[#41a6b1]"
+      >
+        {{ languageService.translate('reviewSubmissions') }}
+      </button>
+    </div>
+
+    <!-- Success Message -->
+    <div
+      *ngIf="successMessage"
+      role="status"
+      class="mb-5 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800"
+    >
+      {{ successMessage }}
+    </div>
+
+    <!-- Error Message -->
+    <div
+      *ngIf="errorMessage"
+      role="alert"
+      class="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <!-- CREATE ASSIGNMENT -->
+    <form
+      *ngIf="activeView === 'create'"
+      (ngSubmit)="createAssignment()"
+      class="space-y-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-8"
+    >
+
+      <!-- Track Selection -->
+      <div>
+        <label
+          for="track"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('track') }}
+          <span class="text-red-500">*</span>
+        </label>
+
+        <select
+          id="track"
+          name="track"
+          [(ngModel)]="selectedTrackId"
+          (ngModelChange)="onTrackChange()"
+          required
+          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+        >
+          <option [ngValue]="null">
+            {{
+              loadingTracks
+                ? languageService.translate('loadingTracks')
+                : languageService.translate('selectTrack')
+            }}
+          </option>
+
+          <option
+            *ngFor="let track of tracks"
+            [ngValue]="track.id ?? track.trackId"
+          >
+            {{ track.title ?? track.name ?? (languageService.translate('track') + ' ' + (track.id ?? track.trackId)) }}
+          </option>
+        </select>
+
+        <p
+          *ngIf="!loadingTracks && tracks.length === 0"
+          class="mt-2 text-sm text-gray-500"
+        >
+          {{ languageService.translate('noTracksForAccount') }}
+        </p>
+      </div>
+
+      <!-- Lesson Selection -->
+      <div>
+        <label
+          for="lesson"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('lesson') }}
+          <span class="text-red-500">*</span>
+        </label>
+
+        <select
+          id="lesson"
+          name="lesson"
+          [(ngModel)]="selectedLessonId"
+          required
+          [disabled]="selectedTrackId === null || loadingLessons"
+          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30 disabled:cursor-not-allowed disabled:bg-gray-100"
+        >
+          <option [ngValue]="null">
+            {{
+              loadingLessons
+                ? languageService.translate('loadingLessons')
+                : selectedTrackId === null
+                  ? languageService.translate('selectTrackFirst')
+                  : languageService.translate('selectLesson')
+            }}
+          </option>
+
+          <option
+            *ngFor="let lesson of lessons"
+            [ngValue]="lesson.id ?? lesson.lessonId"
+          >
+            {{ lesson.title ?? lesson.name ?? (languageService.translate('lesson') + ' ' + (lesson.id ?? lesson.lessonId)) }}
+          </option>
+        </select>
+
+        <p
+          *ngIf="selectedTrackId !== null && !loadingLessons && lessons.length === 0"
+          class="mt-2 text-sm text-gray-500"
+        >
+          {{ languageService.translate('noLessonsForTrack') }}
+        </p>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Assignment Title -->
+      <div>
+        <label
+          for="title"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('assignmentTitle') }}
+          <span class="text-red-500">*</span>
+        </label>
+
+        <input
+          id="title"
+          name="title"
+          type="text"
+          [(ngModel)]="title"
+          required
+          maxlength="200"
+          [placeholder]="languageService.translate('assignmentTitlePlaceholder')"
+          class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+        />
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label
+          for="description"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('instructions') }}
+        </label>
+
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="description"
+          rows="5"
+          [placeholder]="languageService.translate('assignmentInstructionsPlaceholder')"
+          class="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+        ></textarea>
+      </div>
+
+      <!-- Due Date -->
+      <div>
+        <label
+          for="dueDate"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('dueDate') }}
+        </label>
+
+        <input
+          id="dueDate"
+          name="dueDate"
+          type="datetime-local"
+          [(ngModel)]="dueDate"
+          class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+        />
+
+        <p class="mt-2 text-xs text-gray-500">
+          {{ languageService.translate('optionalNoDeadline') }}
+        </p>
+      </div>
+
+      <!-- Reference Attachment -->
+      <div>
+        <label
+          for="assignmentFile"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('referenceAttachment') }}
+        </label>
+
+        <label
+          for="assignmentFile"
+          class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-5 py-8 text-center transition hover:border-[#41a6b1] hover:bg-cyan-50/40"
+        >
+          <span class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#182f57] text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 16V4" />
+              <path d="m7 9 5-5 5 5" />
+              <path d="M20 16.5v2A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5v-2" />
+            </svg>
+          </span>
+
+          <span class="font-semibold text-[#182f57]">
+            {{ languageService.translate('chooseFile') }}
+          </span>
+
+          <span class="mt-1 text-sm text-gray-500">
+            {{ languageService.translate('supportedAttachmentFormats') }}
+          </span>
+
+          <span class="mt-1 text-xs text-gray-400">
+            {{ languageService.translate('maximumSize20MB') }}
+          </span>
+        </label>
+
+        <input
+          id="assignmentFile"
+          name="attachment"
+          type="file"
+          [attr.aria-label]="languageService.translate('chooseReferenceAttachment')"
+          accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.zip,.cs,.js,.ts,.html,.css,.py,.java,.cpp,.c,.sql,.json,.xml"
+          (change)="onFileSelected($event)"
+          class="sr-only"
+        />
+
+        <!-- Selected File -->
+        <div
+          *ngIf="selectedFile"
+          class="mt-3 flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-3"
+        >
+          <div class="min-w-0">
+            <p class="truncate text-sm font-medium text-[#182f57]">
+              {{ selectedFile.name }}
+            </p>
+
+            <p class="text-xs text-gray-500">
+              {{ (selectedFile.size / 1024 / 1024).toFixed(2) }}
+              {{ languageService.translate('mbUnit') }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="removeSelectedFile()"
+            class="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+          >
+            {{ languageService.translate('remove') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Create Button -->
+      <div class="flex justify-end border-t border-gray-100 pt-5">
+        <button
+          type="submit"
+          [disabled]="submitting || loadingTracks || loadingLessons"
+          class="w-full rounded-lg bg-[#182f57] px-6 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        >
+          {{
+            submitting
+              ? languageService.translate('creatingAssignment')
+              : languageService.translate('createAssignment')
+          }}
+        </button>
+      </div>
+
+    </form>
+
+    <!-- REVIEW STUDENT SUBMISSIONS -->
+    <section
+      *ngIf="activeView === 'review'"
+      class="space-y-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-8"
+    >
+      <div>
+        <h2 class="text-xl font-bold text-[#182f57]">
+          {{ languageService.translate('studentSubmissions') }}
+        </h2>
+
+        <p class="mt-1 text-sm text-gray-500">
+          {{ languageService.translate('reviewSubmissionsDescription') }}
+        </p>
+      </div>
+
+      <!-- Review Track -->
+      <div>
+        <label
+          for="reviewTrack"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('track') }}
+        </label>
+
+        <select
+          id="reviewTrack"
+          name="reviewTrack"
+          [(ngModel)]="selectedTrackId"
+          (ngModelChange)="onTrackChange()"
+          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3"
+        >
+          <option [ngValue]="null">
+            {{ languageService.translate('selectTrack') }}
+          </option>
+
+          <option
+            *ngFor="let track of tracks"
+            [ngValue]="track.id ?? track.trackId"
+          >
+            {{ track.title ?? track.name ?? (languageService.translate('track') + ' ' + (track.id ?? track.trackId)) }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Review Lesson -->
+      <div>
+        <label
+          for="reviewLesson"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('lesson') }}
+        </label>
+
+        <select
+          id="reviewLesson"
+          name="reviewLesson"
+          [(ngModel)]="selectedLessonId"
+          (ngModelChange)="onLessonChange()"
+          [disabled]="selectedTrackId === null || loadingLessons"
+          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 disabled:bg-gray-100"
+        >
+          <option [ngValue]="null">
+            {{
+              loadingLessons
+                ? languageService.translate('loadingLessons')
+                : languageService.translate('selectLesson')
+            }}
+          </option>
+
+          <option
+            *ngFor="let lesson of lessons"
+            [ngValue]="lesson.id ?? lesson.lessonId"
+          >
+            {{ lesson.title ?? lesson.name ?? (languageService.translate('lesson') + ' ' + (lesson.id ?? lesson.lessonId)) }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Review Assignment -->
+      <div>
+        <label
+          for="reviewAssignment"
+          class="mb-2 block text-sm font-semibold text-[#182f57]"
+        >
+          {{ languageService.translate('assignment') }}
+        </label>
+
+        <select
+          id="reviewAssignment"
+          name="reviewAssignment"
+          [ngModel]="selectedAssignmentId"
+          (ngModelChange)="onReviewAssignmentChange($event)"
+          [disabled]="selectedLessonId === null || loadingAssignments"
+          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 disabled:bg-gray-100"
+        >
+          <option [ngValue]="null">
+            {{
+              loadingAssignments
+                ? languageService.translate('loadingAssignments')
+                : languageService.translate('selectAssignment')
+            }}
+          </option>
+
+          <option
+            *ngFor="let assignment of assignments"
+            [ngValue]="assignment.id"
+          >
+            {{ assignment.title }}
+          </option>
+        </select>
+
+        <p
+          *ngIf="!loadingAssignments && selectedLessonId !== null && assignments.length === 0"
+          class="mt-2 text-sm text-gray-500"
+        >
+          {{ languageService.translate('noAssignmentsForLesson') }}
+        </p>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Loading -->
+      <div
+        *ngIf="loadingSubmissions"
+        class="py-8 text-center text-gray-500"
+      >
+        {{ languageService.translate('loadingSubmissions') }}
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!loadingSubmissions && selectedAssignmentId !== null && submissions.length === 0"
+        class="rounded-xl border border-dashed border-gray-300 p-8 text-center"
+      >
+        <h3 class="font-semibold text-[#182f57]">
+          {{ languageService.translate('noSubmissionsYet') }}
+        </h3>
+
+        <p class="mt-2 text-sm text-gray-500">
+          {{ languageService.translate('submissionsWillAppearHere') }}
+        </p>
+      </div>
+
+      <!-- Submission Cards -->
+      <div
+        *ngFor="let submission of submissions"
+        class="space-y-5 rounded-xl border border-gray-200 p-5"
+      >
+        <!-- Student Information -->
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-[#182f57]">
+              {{ languageService.translate('studentSubmission') }}
+            </h3>
+
+            <p class="mt-1 break-all text-sm text-gray-500">
+              {{ languageService.translate('studentId') }}: {{ submission.studentId }}
+            </p>
+
+            <p class="mt-1 text-sm text-gray-500">
+              {{ languageService.translate('submitted') }}:
+              {{ submission.submittedAt | date:'medium' }}
+            </p>
+          </div>
+
+          <span
+            class="rounded-full px-3 py-1 text-sm font-medium"
+            [class.bg-green-100]="submission.grade !== null && submission.grade !== undefined"
+            [class.text-green-800]="submission.grade !== null && submission.grade !== undefined"
+            [class.bg-amber-100]="submission.grade === null || submission.grade === undefined"
+            [class.text-amber-800]="submission.grade === null || submission.grade === undefined"
+          >
+            {{
+              submission.grade !== null && submission.grade !== undefined
+                ? languageService.translate('graded')
+                : languageService.translate('awaitingGrade')
+            }}
+          </span>
+        </div>
+
+        <!-- Student Answer -->
+        <div>
+          <h4 class="mb-2 text-sm font-semibold text-[#182f57]">
+            {{ languageService.translate('studentAnswer') }}
+          </h4>
+
+          <div
+            *ngIf="submission.content; else noTextAnswer"
+            class="whitespace-pre-wrap break-words rounded-lg bg-[#F3F6FB] p-4 text-sm text-gray-700"
+          >
+            {{ submission.content }}
+          </div>
+
+          <ng-template #noTextAnswer>
+            <p class="text-sm text-gray-500">
+              {{ languageService.translate('noTextAnswerProvided') }}
+            </p>
+          </ng-template>
+        </div>
+
+        <!-- Submitted File Details -->
+        <div *ngIf="submission.hasFile || submission.fileUrl || submission.originalFileName">
+          <h4 class="mb-2 text-sm font-semibold text-[#182f57]">
+            {{ languageService.translate('attachedFile') }}
+          </h4>
+
+          <p class="break-all text-sm text-gray-600">
+            {{ submission.originalFileName || languageService.translate('studentSubmissionFile') }}
+          </p>
+
+          <p *ngIf="submission.fileSize" class="mt-1 text-xs text-gray-500">
+            {{ (submission.fileSize / 1024 / 1024).toFixed(2) }}
+            {{ languageService.translate('mbUnit') }}
+          </p>
+
+          <a
+            *ngIf="submission.id"
+            [href]="'https://localhost:7109/api/Assignment/submissions/' + submission.id + '/file'"
+            class="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#29456E] px-4 py-2 text-sm font-semibold text-white hover:bg-[#182f57]"
+          >
+            {{ languageService.translate('downloadStudentFile') }}
+          </a>
+        </div>
+
+        <!-- Grade -->
+        <div>
+          <label
+            [for]="'grade-' + submission.id"
+            class="mb-2 block text-sm font-semibold text-[#182f57]"
+          >
+            {{ languageService.translate('grade') }} (0–100)
+          </label>
+
+          <input
+            [id]="'grade-' + submission.id"
+            [name]="'grade-' + submission.id"
+            type="number"
+            min="0"
+            max="100"
+            step="0.5"
+            [placeholder]="languageService.translate('enterGradePlaceholder')"
+            [(ngModel)]="gradeInputs[submission.id]"
+            class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+          />
+        </div>
+
+        <!-- Feedback -->
+        <div>
+          <label
+            [for]="'feedback-' + submission.id"
+            class="mb-2 block text-sm font-semibold text-[#182f57]"
+          >
+            {{ languageService.translate('feedbackForStudent') }}
+          </label>
+
+          <textarea
+            [id]="'feedback-' + submission.id"
+            [name]="'feedback-' + submission.id"
+            rows="3"
+            [(ngModel)]="feedbackInputs[submission.id]"
+            [placeholder]="languageService.translate('feedbackPlaceholder')"
+            class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+          ></textarea>
+        </div>
+
+        <!-- Save Grade -->
+        <div class="flex justify-end border-t border-gray-100 pt-4">
+          <button
+            type="button"
+            (click)="saveGrade(submission.id)"
+            [disabled]="gradingSubmissionId !== null"
+            class="w-full rounded-lg bg-[#182f57] px-5 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            {{
+              gradingSubmissionId === submission.id
+                ? languageService.translate('saving')
+                : languageService.translate('saveGradeFeedback')
+            }}
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+</div>

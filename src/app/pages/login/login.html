@@ -1,0 +1,48 @@
+<div class="flex min-h-screen items-center justify-center">
+  <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+
+    <h1 class="mb-6 text-2xl font-bold">
+      {{ languageService.translate('login') }}
+    </h1>
+
+    <form (ngSubmit)="login()" #loginForm="ngForm" class="grid gap-4">
+
+      <input
+        type="text"
+        name="userName"
+        [(ngModel)]="userName"
+        [placeholder]="languageService.translate('username')"
+        class="rounded-lg border p-3"
+        autocomplete="username"
+        required
+      >
+
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        [placeholder]="languageService.translate('password')"
+        class="rounded-lg border p-3"
+        autocomplete="current-password"
+        required
+      >
+
+      @if (errorMessage) {
+        <p class="text-sm text-red-600" role="alert">
+          {{ errorMessage }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+        class="rounded-lg bg-[#29456E] p-3 text-white disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isLoading
+          ? languageService.translate('loggingIn')
+          : languageService.translate('login') }}
+      </button>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+
+@if (isAuthorizing) {
+  <div class="admin-loading">
+    {{ languageService.translate('adminVerifyingAccess') }}
+  </div>
+} @else if (authorizationError) {
+  <div class="admin-loading">
+    <p>{{ authorizationError }}</p>
+    <button type="button" (click)="retryAuthorization()">
+      {{ languageService.translate('tryAgain') }}
+    </button>
+    <button type="button" (click)="goToLogin()">
+      {{ languageService.translate('goToLogin') }}
+    </button>
+  </div>
+
+  <!-- Keep your existing admin-layout content here unchanged. -->
+}
+ @else if (isAuthorized) {
+  <div class="admin-layout">
+    <app-admin-sidebar></app-admin-sidebar>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="page-heading">
+          <h1>{{ activePage }}</h1>
+          <p>{{ languageService.translate('manageWorkspace') }}</p>
+        </div>
+
+        <div class="profile">
+          <button
+            type="button"
+            class="profile-avatar profile-avatar-button"
+            (click)="openProfile()"
+            aria-label="Open my profile"
+            title="Open my profile"
+          >
+            @if (isProfileLoading) {
+              <span>...</span>
+            } @else if (profileImageUrl) {
+              <img
+                [src]="languageService.translate('profileImage')"
+                [alt]="fullName || username || 'Profile image'"
+                (error)="profileImageUrl = null"
+                alt=""
+              />
+            } @else {
+              <span>{{ avatarLetter }}</span>
+            }
+          </button>
+
+          <div class="profile-info">
+            <strong>{{ isProfileLoading ? languageService.translate('loading') : (fullName || username || languageService.translate('admin')) }}</strong>
+            <span>{{ languageService.translate('administrator') }}</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <router-outlet></router-outlet>
+      </section>
+    </main>
+  </div>
+}

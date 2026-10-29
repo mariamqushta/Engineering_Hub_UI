@@ -1,0 +1,63 @@
+<div class="flex min-h-screen items-center justify-center">
+
+  <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+
+    <h1 class="mb-6 text-2xl font-bold">
+      {{ languageService.translate('register') }}
+    </h1>
+
+    <form (ngSubmit)="register()" class="grid gap-4">
+
+      <input
+        type="text"
+        name="fullName"
+        [(ngModel)]="fullName"
+        [placeholder]="languageService.translate('fullName')"
+        class="rounded-lg border p-3"
+        required
+      >
+
+      <input
+        type="text"
+        name="userName"
+        [(ngModel)]="userName"
+        [placeholder]="languageService.translate('username')"
+        class="rounded-lg border p-3"
+        required
+      >
+
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        [placeholder]="languageService.translate('password')"
+        class="rounded-lg border p-3"
+        required
+      >
+
+      <select
+        name="role"
+        [(ngModel)]="role"
+        class="rounded-lg border p-3">
+
+        <option value="Student">
+          {{ languageService.translate('student') }}
+        </option>
+
+        <option value="Instructor">
+          {{ languageService.translate('instructor') }}
+        </option>
+
+      </select>
+
+      <button
+        type="submit"
+        class="rounded-lg bg-[#29456E] p-3 text-white">
+        {{ languageService.translate('register') }}
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

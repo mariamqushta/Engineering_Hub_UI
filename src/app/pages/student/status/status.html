@@ -1,0 +1,242 @@
+<div class="min-h-screen bg-[#F3F6FB] px-4 py-8 sm:px-8">
+  <div class="mx-auto max-w-6xl">
+
+    <!-- Page heading -->
+    <div class="mb-8">
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('studentDashboard') }}
+      </p>
+
+      <h1 class="text-3xl font-bold text-[#182f57] sm:text-4xl">
+        {{ languageService.translate('bookingStatus') }}
+      </h1>
+
+      <p class="mt-3 text-gray-600">
+        {{ languageService.translate('bookingStatusDescription') }}
+      </p>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+      <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">
+          {{ languageService.translate('pendingRequests') }}
+        </p>
+        <p class="mt-2 text-3xl font-bold text-amber-600">
+          {{ pendingCount }}
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">
+          {{ languageService.translate('approvedBookings') }}
+        </p>
+        <p class="mt-2 text-3xl font-bold text-green-600">
+          {{ approvedCount }}
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">
+          {{ languageService.translate('rejectedRequests') }}
+        </p>
+        <p class="mt-2 text-3xl font-bold text-red-600">
+          {{ rejectedCount }}
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 rounded-xl bg-white p-5 shadow-sm">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+        <div>
+          <label
+            for="bookingType"
+            class="mb-2 block text-sm font-semibold text-[#182f57]"
+          >
+            {{ languageService.translate('bookingType') }}
+          </label>
+
+          <select
+            id="bookingType"
+            [(ngModel)]="selectedType"
+            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+          >
+            <option value="All">{{ languageService.translate('allTypes') }}</option>
+            <option value="Track">{{ languageService.translate('track') }}</option>
+            <option value="Workshop">{{ languageService.translate('workshop') }}</option>
+            <option value="Interactive">{{ languageService.translate('interactive') }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="approvalStatus"
+            class="mb-2 block text-sm font-semibold text-[#182f57]"
+          >
+            {{ languageService.translate('approvalStatus') }}
+          </label>
+
+          <select
+            id="approvalStatus"
+            [(ngModel)]="selectedStatus"
+            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-[#49DCEB]/30"
+          >
+            <option value="All">{{ languageService.translate('allStatuses') }}</option>
+            <option value="Pending">{{ languageService.translate('pending') }}</option>
+            <option value="Approved">{{ languageService.translate('approved') }}</option>
+            <option value="Rejected">{{ languageService.translate('rejected') }}</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div
+      *ngIf="isLoading"
+      class="rounded-xl bg-white px-6 py-12 text-center shadow-sm"
+    >
+      <p class="font-medium text-[#182f57]">
+        {{ languageService.translate('loadingYourBookings') }}
+      </p>
+    </div>
+
+    <!-- Error -->
+    <div
+      *ngIf="!isLoading && errorMessage"
+      class="rounded-xl border border-red-200 bg-red-50 p-6 text-center"
+    >
+      <p class="text-red-700">{{ errorMessage }}</p>
+
+      <button
+        type="button"
+        (click)="loadBookings()"
+        class="mt-4 rounded-lg bg-[#29456E] px-5 py-2.5 font-semibold text-white transition hover:bg-[#182f57]"
+      >
+        {{ languageService.translate('tryAgain') }}
+      </button>
+    </div>
+
+    <!-- Booking table -->
+    <div
+      *ngIf="!isLoading && !errorMessage"
+      class="overflow-hidden rounded-xl bg-white shadow-sm"
+    >
+      <div class="border-b border-gray-100 px-5 py-5 sm:px-6">
+        <h2 class="text-xl font-bold text-[#182f57]">
+          {{ languageService.translate('myBookings') }}
+        </h2>
+
+        <p class="mt-1 text-sm text-gray-500">
+          {{ filteredBookings.length }}
+          {{ languageService.translate('bookingsFound') }}
+        </p>
+      </div>
+
+      <div *ngIf="filteredBookings.length > 0" class="overflow-x-auto">
+        <table class="w-full min-w-[760px] text-left">
+          <thead class="bg-[#29456E] text-sm text-white">
+            <tr>
+              <th class="px-6 py-4 font-semibold">{{ languageService.translate('booking') }}</th>
+              <th class="px-6 py-4 font-semibold">{{ languageService.translate('type') }}</th>
+              <th class="px-6 py-4 font-semibold">{{ languageService.translate('requestDate') }}</th>
+              <th class="px-6 py-4 font-semibold">{{ languageService.translate('approval') }}</th>
+              <th class="px-6 py-4 font-semibold">{{ languageService.translate('session') }}</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100">
+            <tr
+              *ngFor="let booking of filteredBookings"
+              class="transition hover:bg-[#F3F6FB]"
+            >
+              <td class="px-6 py-4">
+                <p class="font-semibold text-[#182f57]">
+                  {{ booking.name }}
+                </p>
+
+                <p
+                  *ngIf="booking.source"
+                  class="mt-1 text-xs text-gray-500"
+                >
+                  {{ booking.source }}
+                </p>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="rounded-full bg-[#49DCEB]/15 px-3 py-1 text-sm font-medium text-[#29456E]">
+                  {{ languageService.translate(booking.type) }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4 text-sm text-gray-600">
+                {{
+                  booking.requestedAt
+                    ? (booking.requestedAt | date:'mediumDate')
+                    : '—'
+                }}
+              </td>
+
+              <td class="px-6 py-4">
+                <span
+                  class="rounded-full px-3 py-1 text-sm font-semibold"
+                  [ngClass]="getApprovalClass(booking.approvalStatus)"
+                >
+                  {{ languageService.translate(booking.approvalStatus) }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4">
+                <span
+                  *ngIf="booking.sessionStatus"
+                  class="rounded-full px-3 py-1 text-sm font-semibold"
+                  [ngClass]="getSessionClass(booking.sessionStatus)"
+                >
+                  {{ languageService.translate(booking.sessionStatus) }}
+                </span>
+
+                <span
+                  *ngIf="!booking.sessionStatus"
+                  class="text-sm text-gray-400"
+                >
+                  —
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div
+        *ngIf="filteredBookings.length === 0"
+        class="px-6 py-14 text-center"
+      >
+        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#49DCEB]/15">
+          <span class="text-2xl text-[#29456E]">⌕</span>
+        </div>
+
+        <h3 class="text-lg font-bold text-[#182f57]">
+          {{ languageService.translate('noBookingsFound') }}
+        </h3>
+
+        <p class="mt-2 text-sm text-gray-500">
+          {{ languageService.translate('noBookingsMatchingFilters') }}
+        </p>
+
+        <button
+          type="button"
+          (click)="selectedType = 'All'; selectedStatus = 'All'"
+          class="mt-5 rounded-lg border border-[#29456E] px-5 py-2.5 font-semibold text-[#29456E] transition hover:bg-[#29456E] hover:text-white"
+        >
+          {{ languageService.translate('clearFilters') }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

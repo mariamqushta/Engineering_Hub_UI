@@ -1,0 +1,228 @@
+
+<div class="min-h-full bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
+  <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('administration') }}
+      </p>
+      <h1 class="text-2xl font-bold text-[#182f57] sm:text-3xl">
+        {{ languageService.translate('instructors') }}
+      </h1>
+      <p class="mt-2 text-sm text-slate-500">
+        {{ languageService.translate('viewManageInstructors') }}
+      </p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white px-5 py-3">
+      <p class="text-sm text-slate-500">
+        {{ languageService.translate('totalInstructors') }}
+      </p>
+      <p class="text-2xl font-bold text-[#182f57]">
+        {{ instructors.length }}
+      </p>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+      {{ successMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+      {{ languageService.translate('loadingInstructorsTracks') }}
+    </div>
+  } @else {
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[1050px] text-left">
+          <thead class="bg-[#182f57] text-sm text-white">
+            <tr>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('instructor') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('contact') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('accountDetails') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('assignedTracks') }}
+              </th>
+              <th class="px-5 py-4 font-semibold">
+                {{ languageService.translate('manageTracks') }}
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-100">
+            @for (instructor of instructors; track instructor.id) {
+              <tr class="align-top transition hover:bg-slate-50">
+                <td class="px-5 py-5">
+                  <div class="flex items-center gap-3">
+                    @if (instructor.profileImageUrl) {
+                      <img
+                        [src]="instructor.profileImageUrl"
+                        [alt]="instructor.fullName"
+                        class="h-12 w-12 rounded-full border border-slate-200 object-cover"
+                      />
+                    } @else {
+                      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#182f57] font-bold text-[#49DCEB]">
+                        {{ (instructor.fullName || instructor.userName || 'I').charAt(0).toUpperCase() }}
+                      </div>
+                    }
+
+                    <div>
+                      <p class="font-semibold text-[#182f57]">
+                        {{ instructor.fullName || languageService.translate('nameNotProvided') }}
+                      </p>
+                      <p class="mt-1 text-sm text-slate-500">
+                        @{{ instructor.userName }}
+                      </p>
+                      <p class="mt-1 text-xs text-slate-400">
+                        {{ languageService.translate('idLabel') }}: {{ instructor.id }}
+                      </p>
+                    </div>
+                  </div>
+
+                  @if (instructor.bio) {
+                    <p class="mt-3 max-w-xs text-sm leading-5 text-slate-500">
+                      {{ instructor.bio }}
+                    </p>
+                  }
+                </td>
+
+                <td class="px-5 py-5 text-sm">
+                  <p class="break-all text-slate-700">
+                    {{ instructor.email || languageService.translate('noEmail') }}
+                  </p>
+                  <p class="mt-2 text-slate-500">
+                    {{ instructor.phoneNumber || languageService.translate('noPhoneNumber') }}
+                  </p>
+                  <p class="mt-2 text-xs"
+                    [class.text-emerald-600]="instructor.emailConfirmed"
+                    [class.text-amber-600]="!instructor.emailConfirmed">
+                    {{ languageService.translate('emailLabel') }}:
+                    {{ languageService.translate(instructor.emailConfirmed ? 'confirmed' : 'unconfirmed') }}
+                  </p>
+                </td>
+
+                <td class="px-5 py-5 text-sm">
+                  <span
+                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [class.bg-emerald-100]="instructor.isActive"
+                    [class.text-emerald-700]="instructor.isActive"
+                    [class.bg-red-100]="!instructor.isActive"
+                    [class.text-red-700]="!instructor.isActive">
+                    {{ languageService.translate(instructor.isActive ? 'active' : 'inactive') }}
+                  </span>
+
+                  <p class="mt-3 text-xs text-slate-500">
+                    {{ languageService.translate('phoneConfirmed') }}:
+                    {{ languageService.translate(instructor.phoneNumberConfirmed ? 'yes' : 'no') }}
+                  </p>
+
+                  <p class="mt-2 text-xs text-slate-500">
+                    {{ languageService.translate('registered') }}:
+                    {{ instructor.createdAt ? (instructor.createdAt | date:'mediumDate') : languageService.translate('unknown') }}
+                  </p>
+                </td>
+
+                <td class="px-5 py-5">
+                  @if (instructor.tracks.length > 0) {
+                    <div class="flex max-w-xs flex-wrap gap-2">
+                      @for (track of instructor.tracks; track track.id) {
+                        <span class="rounded-lg border border-cyan-100 bg-cyan-50 px-3 py-2 text-sm font-medium text-[#182f57]">
+                          {{ track.title }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="text-sm text-slate-400">
+                      {{ languageService.translate('noTracksAssigned') }}
+                    </p>
+                  }
+                </td>
+
+                <td class="px-5 py-5">
+                  <div class="min-w-52 space-y-3">
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      {{ languageService.translate('assignATrack') }}
+                    </label>
+
+                    <select
+                      [(ngModel)]="instructor.selectedTrackId"
+                      [ngModelOptions]="{standalone: true}"
+                      [disabled]="isSaving || getAvailableTracks(instructor).length === 0"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-[#182f57] outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-cyan-100">
+                      <option [ngValue]="null">
+                        {{ languageService.translate(getAvailableTracks(instructor).length ? 'chooseATrack' : 'allTracksAssigned') }}
+                      </option>
+
+                      @for (track of getAvailableTracks(instructor); track track.id) {
+                        <option [ngValue]="track.id">
+                          {{ track.title }}
+                        </option>
+                      }
+                    </select>
+
+                    <button
+                      type="button"
+                      (click)="assignInstructor(instructor)"
+                      [disabled]="isSaving || instructor.selectedTrackId === null"
+                      class="w-full rounded-xl bg-[#182f57] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-50">
+                      {{ languageService.translate(isSaving ? 'saving' : 'assignTrack') }}
+                    </button>
+
+                    @if (instructor.tracks.length > 0) {
+                      <div class="border-t border-slate-100 pt-3">
+                        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          {{ languageService.translate('removeAccess') }}
+                        </p>
+
+                        @for (track of instructor.tracks; track track.id) {
+                          <div class="mb-2 flex items-center justify-between gap-2">
+                            <span class="truncate text-sm text-slate-600">
+                              {{ track.title }}
+                            </span>
+                            <button
+                              type="button"
+                              (click)="removeInstructor(instructor, track)"
+                              [disabled]="isSaving"
+                              class="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50">
+                              {{ languageService.translate('remove') }}
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-5 py-14 text-center">
+                  <p class="font-semibold text-[#182f57]">
+                    {{ languageService.translate('noInstructorsFound') }}
+                  </p>
+                  <p class="mt-2 text-sm text-slate-500">
+                    {{ languageService.translate('checkInstructorRole') }}
+                  </p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+

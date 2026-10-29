@@ -1,0 +1,333 @@
+<div class="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+
+  <!-- Page Heading -->
+  <div class="mb-8">
+    <div class="mb-3 flex items-center gap-3">
+      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#182f57] text-[#49DCEB] shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 7v14m0-14C10.5 5.7 8.4 5 6 5S2 5.7 2 7v12c0-1.3 2-2 4-2s4 .7 6 2m0-12c1.5-1.3 3.6-2 6-2s4 .7 4 2v12c0-1.3-2-2-4-2s-4 .7-6 2" />
+        </svg>
+      </div>
+
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#41a6b1]">
+          Engineering Hub
+        </p>
+        <h1 class="text-2xl font-extrabold tracking-tight text-[#49DCEB] sm:text-3xl">
+          {{ languageService.translate('trackLearningSpace') }}
+        </h1>
+      </div>
+    </div>
+
+    <p class="max-w-2xl text-sm leading-6 text-[#41a6b1] sm:text-base">
+      {{ languageService.translate('trackLearningSpaceDescription') }}
+    </p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+
+      <!-- Lessons Tab -->
+      <button
+        type="button"
+        (click)="selectedTab = 'lessons'"
+        [class]="selectedTab === 'lessons'
+          ? 'bg-[#182f57] text-white shadow-md'
+          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+        class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 7v14m0-14C10.5 5.7 8.4 5 6 5S2 5.7 2 7v12c0-1.3 2-2 4-2s4 .7 6 2m0-12c1.5-1.3 3.6-2 6-2s4 .7 4 2v12c0-1.3-2-2-4-2s-4 .7-6 2" />
+        </svg>
+        <span>{{ languageService.translate('lessons') }}</span>
+      </button>
+
+      <!-- Interactive Tab -->
+      <button
+        type="button"
+        (click)="selectedTab = 'interactive'"
+        [class]="selectedTab === 'interactive'
+          ? 'bg-[#182f57] text-white shadow-md'
+          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+        class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="4" width="18" height="13" rx="2" />
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 21h8m-4-4v4m-5-9 3-3 2 2 3-4" />
+        </svg>
+        <span>{{ languageService.translate('interactive') }}</span>
+      </button>
+
+      <!-- Workshop Tab -->
+      <button
+        type="button"
+        (click)="selectedTab = 'workshop'"
+        [class]="selectedTab === 'workshop'
+          ? 'bg-[#182f57] text-white shadow-md'
+          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+        class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1" />
+          <circle cx="12" cy="12" r="5" />
+        </svg>
+        <span>{{ languageService.translate('workshops') }}</span>
+      </button>
+
+      <!-- Coaching Tab -->
+      <button
+        type="button"
+        (click)="selectedTab = 'coaching'"
+        [class]="selectedTab === 'coaching'
+          ? 'bg-[#182f57] text-white shadow-md'
+          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+        class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
+
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 10h8m-8 4h5m-9 6 1.5-4.5A8 8 0 1 1 20 12a8 8 0 0 1-12.5 6.5L4 20Z" />
+        </svg>
+        <span>{{ languageService.translate('coachingChat') }}</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Lessons -->
+  @if (selectedTab === 'lessons') {
+    <section class="mt-8">
+
+      <div class="mb-5 flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-[#49DCEB]">
+            {{ languageService.translate('yourLessons') }}
+          </h2>
+          <p class="mt-1 text-sm text-[#469ba4]">
+            {{ languageService.translate('learnAtYourOwnPace') }}
+          </p>
+        </div>
+
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-[#2499a8]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="m9 12 2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="grid gap-4">
+        @for (lesson of lessons; track lesson.id) {
+          <article class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-lg sm:p-6">
+
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#182f57] text-lg font-bold text-[#49DCEB] transition group-hover:bg-[#24416c]">
+                {{ lesson.order }}
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <h3 class="text-lg font-bold text-[#182f57] transition group-hover:text-[#2499a8]">
+                  {{ lesson.title }}
+                </h3>
+                <p class="mt-2 text-sm leading-6 text-slate-500">
+                  {{ lesson.description }}
+                </p>
+              </div>
+
+              @if (lesson.isUnlocked) {
+                <button
+                  type="button"
+                  (click)="openLesson(lesson.id)"
+                  class="inline-flex items-center gap-2 rounded-lg bg-[#29456E] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#182f57]">
+                  <span>{{ languageService.translate('viewLesson') }}</span>
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  (click)="openPrerequisiteQuiz(lesson.id)"
+                  class="inline-flex items-center gap-2 rounded-lg border border-[#29456E] px-4 py-2 text-sm font-semibold text-[#29456E] transition hover:bg-[#29456E] hover:text-white">
+                  <span>{{ languageService.translate('takePrerequisiteQuiz') }}</span>
+                </button>
+              }
+            </div>
+          </article>
+        } @empty {
+          <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-[#2499a8]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 7v14m0-14C10.5 5.7 8.4 5 6 5S2 5.7 2 7v12c0-1.3 2-2 4-2s4 .7 6 2m0-12c1.5-1.3 3.6-2 6-2s4 .7 4 2v12c0-1.3-2-2-4-2s-4 .7-6 2" />
+              </svg>
+            </div>
+            <h3 class="mt-4 font-bold text-[#182f57]">
+              {{ languageService.translate('noLessonsAvailableYet') }}
+            </h3>
+            <p class="mt-2 text-sm text-slate-500">
+              {{ languageService.translate('lessonsWillAppearHere') }}
+            </p>
+          </div>
+        }
+      </div>
+
+      <!-- Track Certificate -->
+      <article class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#F3F6FB] text-[#29456E]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-7 w-7"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.8">
+              <circle cx="12" cy="8" r="6"></circle>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.2 13-1.2 8 5-3 5 3-1.2-8">
+              </path>
+            </svg>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <h3 class="text-lg font-bold text-[#182f57]">
+              {{ languageService.translate('trackCertificate') }}
+            </h3>
+
+            <p class="text-sm text-gray-600">
+              {{ isTrackCompleted
+                ? languageService.translate('trackCertificateUnlockedMessage')
+                : languageService.translate('trackCertificateLockedMessage') }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            (click)="openCertificate()"
+            [disabled]="!isTrackCompleted"
+            class="rounded-xl px-5 py-3 font-semibold transition"
+            [class.bg-[#29456E]]="isTrackCompleted"
+            [class.text-white]="isTrackCompleted"
+            [class.hover:bg-[#182f57]]="isTrackCompleted"
+            [class.bg-gray-300]="!isTrackCompleted"
+            [class.text-gray-600]="!isTrackCompleted"
+            [class.cursor-not-allowed]="!isTrackCompleted">
+
+            {{ isTrackCompleted
+              ? languageService.translate('viewCertificate')
+              : languageService.translate('trackIncomplete') }}
+          </button>
+
+        </div>
+      </article>
+    </section>
+  }
+
+  @if (selectedTab === 'interactive') {
+    <app-interactive-booking
+      [activities]="interactiveActivities">
+    </app-interactive-booking>
+  }
+
+  @if (selectedTab === 'workshop') {
+    <app-workshop-booking [workshops]="workshops"></app-workshop-booking>
+  }
+
+  <!-- Coaching Chat -->
+  @if (selectedTab === 'coaching') {
+    <section class="mt-8">
+      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+        <div class="bg-gradient-to-r from-[#081A3A] to-[#24416c] px-6 py-8 sm:px-8">
+          <div class="flex items-center gap-4">
+
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[#49DCEB] ring-1 ring-white/20">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 10h8m-8 4h5m-9 6 1.5-4.5A8 8 0 1 1 20 12a8 8 0 0 1-12.5 6.5L4 20Z" />
+              </svg>
+            </div>
+
+            <div>
+              <p class="text-sm font-medium text-[#49DCEB]">
+                {{ languageService.translate('personalGuidance') }}
+              </p>
+              <h2 class="mt-1 text-xl font-bold text-white sm:text-2xl">
+                {{ languageService.translate('coachingChat') }}
+              </h2>
+              <p class="mt-1 text-sm text-slate-300">
+                {{ languageService.translate('connectWithInstructor') }}
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-8">
+          <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-50 text-[#2499a8]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 8v4l3 2m6-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+              </div>
+
+              <div>
+                <h3 class="font-bold text-[#182f57]">
+                  {{ languageService.translate('learningSupported') }}
+                </h3>
+                <p class="mt-1 max-w-lg text-sm leading-6 text-slate-500">
+                  {{ languageService.translate('coachingHelpDescription') }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              [disabled]="isCheckingBooking"
+              (click)="openCoachingChat()"
+              class="inline-flex items-center gap-2 rounded-xl bg-[#182f57] px-6 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-wait disabled:opacity-60">
+
+              <svg
+                class="h-5 w-5 text-[#49DCEB]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/>
+              </svg>
+
+              {{ isCheckingBooking
+                ? languageService.translate('checkingBooking')
+                : hasCoachingAccess
+                  ? languageService.translate('openChat')
+                  : languageService.translate('bookCoaching') }}
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  }
+
+</div>
