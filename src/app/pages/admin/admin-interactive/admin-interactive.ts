@@ -24,6 +24,7 @@ interface AdminInteractiveActivity {
   capacity: number;
   status: string | number;
   students: AdminActivityStudent[];
+  occurrences?: AdminInteractiveActivity[];
 }
 
 @Component({
@@ -59,14 +60,38 @@ private readonly apiUrl = `${environment.apiUrl}/api/Admin/interactive-activitie
       { activities: AdminInteractiveActivity[] }
     >(this.apiUrl, { withCredentials: true }).subscribe({
       next: response => {
+
         const items = Array.isArray(response)
           ? response
           : response?.activities ?? [];
 
-        this.activities = items.map(activity => ({
-          ...activity,
-          students: activity.students ?? []
-        }));
+     const groupedActivities = new Map<string, AdminInteractiveActivity>();
+
+      for (const activity of items) {
+        const isRecurring =
+          activity.title?.trim().toLowerCase() === 'weekly recurring session';
+
+        const key = isRecurring
+          ? `${activity.title}|${activity.trackTitle}|${activity.instructorUserName}`
+          : `activity-${activity.id}`;
+
+        const existing = groupedActivities.get(key);
+
+        if (existing) {
+          existing.occurrences = [
+            ...(existing.occurrences ?? [existing]),
+            activity
+          ];
+        } else {
+          groupedActivities.set(key, {
+            ...activity,
+            students: activity.students ?? [],
+            occurrences: [activity]
+          });
+        }
+      }
+
+      this.activities = Array.from(groupedActivities.values());
 
         this.isLoading = false;
          this.cdr.markForCheck();

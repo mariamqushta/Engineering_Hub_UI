@@ -21,6 +21,7 @@ export class LessonLearning implements OnInit {
   private location = inject(Location);
   contents: LessonContent[] = [];
 currentContentIndex = 0;
+trackId: number | null = null;
 
 get currentContent(): LessonContent | null {
   return this.contents[this.currentContentIndex] ?? null;
@@ -66,8 +67,9 @@ nextContent(): void {
 
     this.trackService.getLesson(lessonId).subscribe({
       next: (lesson) => {
+        console.log('Full lesson response:', lesson);
         this.lesson = lesson;
-
+        this.trackId = lesson.trackId;
         this.trackService.getLessonContents(lessonId).subscribe({
          next: (contents) => {
             this.contents = contents;
@@ -100,7 +102,11 @@ nextContent(): void {
   }
 
 goBack(): void {
-  this.location.back();
+  console.log('Track ID:', this.trackId);
+
+  if (this.trackId !== null) {
+    this.router.navigate(['/track', this.trackId]);
+  }
 }
 
   getPdfUrl(url: string | null): SafeResourceUrl {
@@ -119,95 +125,7 @@ openAssignmentPage(): void {
     'assignment'
   ]);
 }
-// loadEndOfLessonQuiz(lessonId: number): void {
-//   this.quizLoading = true;
-//   this.quizError = '';
 
-//   this.quizService.getStudentLessonQuizzes(lessonId).subscribe({
-//     next: (quizzes) => {
-//       this.endOfLessonQuiz =
-//         quizzes.find(
-//           quiz =>
-//             quiz.type === 0 ||
-//             quiz.type === '0' ||
-//             quiz.type === 'EndOfLesson'
-//         ) ?? null;
-
-//       if (!this.endOfLessonQuiz) {
-//         this.quizError = 'No End-of-Lesson Quiz is available yet.';
-//       }
-
-//       this.quizLoading = false;
-//       this.cdr.detectChanges();
-//     },
-//     error: (error) => {
-//       console.error('Could not load End-of-Lesson Quiz:', error);
-//       this.quizError = 'Could not load the quiz. Please try again.';
-//       this.quizLoading = false;
-//       this.cdr.detectChanges();
-//     }
-//   });
-// }
-// openEndOfLessonQuiz(): void {
-//   if (!this.endOfLessonQuiz) {
-//     if (this.lesson) {
-//       this.loadEndOfLessonQuiz(this.lesson.id);
-//     }
-//     return;
-//   }
-
-//   this.showEndOfLessonQuiz = true;
-// }
-
-// backToLastContent(): void {
-//   this.showEndOfLessonQuiz = false;
-//   this.quizResult = null;
-//   this.quizError = '';
-
-//   if (this.contents.length > 0) {
-//     this.currentContentIndex = this.contents.length - 1;
-//   }
-// }
-
-// selectAnswer(questionId: number, optionId: number): void {
-//   this.selectedAnswers[questionId] = optionId;
-// }
-
-// submitEndOfLessonQuiz(): void {
-//   if (!this.endOfLessonQuiz || this.quizSubmitting) {
-//     return;
-//   }
-
-//   const questions = this.endOfLessonQuiz.questions;
-
-//   if (questions.some(q => !this.selectedAnswers[q.id])) {
-//     this.quizError = 'Please answer every question before submitting.';
-//     return;
-//   }
-
-//   this.quizSubmitting = true;
-//   this.quizError = '';
-
-//   this.quizService.submitQuiz(this.endOfLessonQuiz.id, {
-//     answers: questions.map(question => ({
-//       questionId: question.id,
-//       selectedOptionId: this.selectedAnswers[question.id]
-//     }))
-//   }).subscribe({
-//     next: (response) => {
-//       this.quizResult = response;
-//       this.quizSubmitting = false;
-//       this.cdr.detectChanges();
-//     },
-//     error: (error) => {
-//       console.error('Could not submit quiz:', error);
-//       this.quizError =
-//         error.error?.message || 'Could not submit the quiz. Please try again.';
-//       this.quizSubmitting = false;
-//       this.cdr.detectChanges();
-//     }
-//   });
-// }
 openEndOfLessonQuiz(): void {
   if (!this.lesson) {
     return;

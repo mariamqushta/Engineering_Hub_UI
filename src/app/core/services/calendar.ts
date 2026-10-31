@@ -13,14 +13,14 @@ export interface CalendarEvent {
   endDateTime: string;
   status: string;
 }
-
+import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class CalendarService {
   private http = inject(HttpClient);
 
-  private apiUrl = 'https://localhost:7109/api/Calendar';
+  private apiUrl = `${environment.apiUrl}/api/Calendar`;
 
   getInstructorCalendar(): Observable<CalendarEvent[]> {
     return this.http.get<CalendarEvent[]>(

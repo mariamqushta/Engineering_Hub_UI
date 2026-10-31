@@ -10,7 +10,9 @@ import {
   throwError
 } from 'rxjs';
 
-const API_URL = 'https://localhost:7109/Account';
+import { environment } from '../../../environments/environment';
+
+const API_URL = `${environment.apiUrl}/Account`;
 
 let isRefreshing = false;
 const refreshResult = new BehaviorSubject<boolean | null>(null);

@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, of, timeout } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AssignmentService {
-  private readonly apiUrl = 'https://localhost:7109/api/Assignment';
+  private readonly apiUrl = `${environment.apiUrl}/api/Assignment`;
   private readonly requestTimeout = 15000;
 
   constructor(private http: HttpClient) {}

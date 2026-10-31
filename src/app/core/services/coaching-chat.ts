@@ -26,8 +26,8 @@ export interface InstructorConversation {
   providedIn: 'root'
 })
 export class CoachingService {
-  private apiUrl = `${environment.apiUrl}/Coaching`;
-  private hubUrl = `${environment}/coachingHub`;
+  private apiUrl = `${environment.apiUrl}/api/Coaching`;
+  private hubUrl = `${environment.apiUrl}/coachingHub`;
 
   private hubConnection?: HubConnection;
 

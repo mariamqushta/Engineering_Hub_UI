@@ -9,8 +9,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class TrackService {
-
-  private apiUrl = 'https://localhost:7109/api/Track';
+  private apiUrl = `${environment.apiUrl}/api/Track`;
 
   constructor(private http: HttpClient) {}
 

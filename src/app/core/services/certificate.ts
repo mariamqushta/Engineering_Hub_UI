@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from '../../../environments/environment';
 export interface Certificate {
   id: number;
   trackId: number;
@@ -14,7 +14,7 @@ export interface Certificate {
   providedIn: 'root'
 })
 export class CertificateService {
-  private readonly apiUrl = 'https://localhost:7109/api/Certificate';
+  private readonly apiUrl = `${environment.apiUrl}/api/Certificate`;
 
   constructor(private http: HttpClient) {}
 

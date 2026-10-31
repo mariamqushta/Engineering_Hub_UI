@@ -37,13 +37,36 @@ export class StudentCalendar implements OnInit {
     new Date().getMonth(),
     1
   );
+  get currentMonthLabel(): string {
+  const locale = this.languageService.currentLanguage === 'ar'
+    ? 'ar-EG'
+    : 'en-US';
+
+  return new Intl.DateTimeFormat(locale, {
+    month: 'long',
+    year: 'numeric'
+  }).format(this.currentMonth);
+}
 
   loading = true;
   errorMessage = '';
 
-  readonly weekdays = [
-    'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',
+  // readonly weekdays = [
+  //   'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',
+  // ];
+  get weekdays(): string[] {
+  const days = [
+    'mon',
+    'tue',
+    'wed',
+    'thu',
+    'fri',
+    'sat',
+    'sun'
   ];
+
+  return days.map(day => this.languageService.translate(day));
+}
   constructor(
      public languageService: LanguageService,
 

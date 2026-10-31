@@ -15,6 +15,8 @@ import {
 } from '../../core/services/workshop-booking.service';
 import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth';
 @Component({
   selector: 'app-workshop-booking',
   standalone: true,
@@ -29,14 +31,18 @@ export class WorkshopBooking implements OnChanges, OnInit {
 
   constructor(
     private workshopBookingService: WorkshopBookingService,
-         public languageService: LanguageService,
+    public languageService: LanguageService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
-  monthNames = [
-    'January', 'February', 'March', 'April',
-    'May', 'June', 'July', 'August',
-    'September', 'October', 'November', 'December'
-  ];
+get monthNames(): string[] {
+  return [
+    'january', 'february', 'march', 'april',
+    'may', 'june', 'july', 'august',
+    'september', 'october', 'november', 'december'
+  ].map(month => this.languageService.translate(month));
+}
 
   weekDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
@@ -245,55 +251,82 @@ export class WorkshopBooking implements OnChanges, OnInit {
     });
   }
 
-  bookWorkshop(workshop: Workshop): void {
-    this.clearBookingFeedback();
+bookWorkshop(workshop: Workshop): void {
+  this.clearBookingFeedback();
 
-    if (
-      this.bookingInProgress ||
-      !this.isWorkshopBookable(workshop)
-    ) {
-      return;
+  if (
+    this.bookingInProgress ||
+    !this.isWorkshopBookable(workshop)
+  ) {
+    return;
+  }
+
+  this.bookingInProgress = true;
+
+  // Check authentication before submitting the booking.
+  this.authService.getCurrentUser().subscribe({
+    next: () => {
+      this.submitWorkshopBooking(workshop);
+    },
+    error: (error) => {
+      this.bookingInProgress = false;
+
+      if (error.status === 401) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      this.bookingError =
+        this.languageService.translate('bookingRequestFailed');
+
+      console.error('Authentication check failed:', error);
+      this.cdr.markForCheck();
     }
+  });
+}
 
-    this.bookingInProgress = true;
+private submitWorkshopBooking(workshop: Workshop): void {
+  this.workshopBookingService
+    .bookWorkshop(workshop.id)
+    .subscribe({
+      next: (response) => {
+        this.bookingStatuses[workshop.id] = 'Pending';
 
-    this.workshopBookingService
-      .bookWorkshop(workshop.id)
-      .subscribe({
-        next: (response) => {
-          this.bookingStatuses[workshop.id] = 'Pending';
-
-          if (workshop.availableCapacity !== undefined) {
-            workshop.availableCapacity = Math.max(
-              0,
-              workshop.availableCapacity - 1
-            );
-          }
-
-          this.bookingMessage =
-            response.message ||
-            'Your workshop booking request was submitted and is awaiting approval.';
-
-          this.bookingInProgress = false;
-          this.cdr.markForCheck();
-        },
-
-        error: (error) => {
-          console.error(
-            'Workshop booking failed:',
-            error.status,
-            error.error
+        if (workshop.availableCapacity !== undefined) {
+          workshop.availableCapacity = Math.max(
+            0,
+            workshop.availableCapacity - 1
           );
+        }
 
+        this.bookingMessage =
+          response.message ||
+          this.languageService.translate('workshopBookingSubmitted');
+
+        this.bookingInProgress = false;
+        this.cdr.markForCheck();
+      },
+
+      error: (error) => {
+        console.error(
+          'Workshop booking failed:',
+          error.status,
+          error.error
+        );
+
+        if (error.status === 401) {
+          this.router.navigate(['/login']);
+        } else {
           this.bookingError =
             error.error?.message ||
-            'We could not submit your workshop booking request. Please try again.';
-
-          this.bookingInProgress = false;
-          this.cdr.markForCheck();
+            this.languageService.translate('bookingRequestFailed');
         }
-      });
-  }
+
+        this.bookingInProgress = false;
+        this.cdr.markForCheck();
+      }
+    });
+}
 
   private clearBookingFeedback(): void {
     this.bookingMessage = '';

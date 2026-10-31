@@ -100,16 +100,35 @@ export class AdminStudents implements OnInit {
       withCredentials: true
     }).subscribe({
       next: response => {
-        this.students = (response.students ?? []).map(student => ({
-          ...student,
-          trackBookings: student.trackBookings ?? [],
-          workshopBookings: student.workshopBookings ?? [],
-          interactiveBookings: student.interactiveBookings ?? [],
-          totalTrackBookings: student.totalTrackBookings ?? 0,
-          totalWorkshopBookings: student.totalWorkshopBookings ?? 0,
-          totalInteractiveBookings: student.totalInteractiveBookings ?? 0
+        this.students = (response.students ?? []).map(student => {
+          const trackBookings = student.trackBookings ?? [];
+          const workshopBookings = student.workshopBookings ?? [];
+          const interactiveBookings = Array.from(
+          new Map(
+            (student.interactiveBookings ?? []).map(booking => {
+              const key = [
+                booking.activityTitle?.trim().toLowerCase(),
+                booking.trackTitle?.trim().toLowerCase()
+              ].join('|');
 
-        }));
+              return [key, booking];
+            })
+          ).values()
+        );
+
+          return {
+            ...student,
+            trackBookings,
+            workshopBookings,
+            interactiveBookings,
+
+            totalTrackBookings: student.totalTrackBookings ?? 0,
+            totalWorkshopBookings: student.totalWorkshopBookings ?? 0,
+
+            // Count unique interactive activities, not recurring occurrences.
+            totalInteractiveBookings: interactiveBookings.length
+          };
+        });
 
         this.isLoading = false;
         this.cdr.markForCheck();

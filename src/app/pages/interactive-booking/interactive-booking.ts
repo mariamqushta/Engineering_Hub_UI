@@ -15,6 +15,8 @@ import {
 import { InteractiveActivity } from '../../core/models/InteractiveActivity';
 import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-interactive-booking',
   standalone: true,
@@ -25,13 +27,16 @@ import { environment } from '../../../environments/environment';
 export class InteractiveBooking implements OnChanges {
   @Input() activities: InteractiveActivity[] = [];
  private cdr = inject(ChangeDetectorRef);
-  monthNames = [
-    'January', 'February', 'March', 'April',
-    'May', 'June', 'July', 'August',
-    'September', 'October', 'November', 'December'
-  ];
+get monthNames(): string[] {
+  return [
+    'january', 'february', 'march', 'april',
+    'may', 'june', 'july', 'august',
+    'september', 'october', 'november', 'december'
+  ].map(month => this.languageService.translate(month));
+}
 
-  weekDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+weekDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
   currentMonth = new Date().getMonth();
   currentYear = new Date().getFullYear();
@@ -50,6 +55,9 @@ bookingStatuses: Record<number, 'Pending' | 'Approved' | 'Rejected'> = {};
   constructor(
   private interactiveBookingService: InteractiveBookingService,
      public languageService: LanguageService,
+       private authService: AuthService,
+  private router: Router
+
 ) {}
 
   ngOnChanges(): void {
@@ -256,17 +264,41 @@ bookActivity(activity: InteractiveActivity): void {
 
   if (availableCapacity === null) {
     this.bookingError =
-      'We could not confirm availability. Please try again later.';
+      this.languageService.translate('availabilityCheckFailed');
     return;
   }
 
   if (availableCapacity <= 0) {
-    this.bookingError = 'This session is fully booked.';
+    this.bookingError =
+      this.languageService.translate('sessionFullyBooked');
     return;
   }
 
   this.bookingInProgress = true;
 
+  // Check whether the user is logged in first
+  this.authService.getCurrentUser().subscribe({
+    next: () => {
+      this.submitBooking(activity);
+    },
+    error: (error) => {
+      this.bookingInProgress = false;
+
+      if (error.status === 401) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      this.bookingError =
+        this.languageService.translate('bookingRequestFailed');
+
+      console.error('Authentication check failed:', error);
+      this.cdr.markForCheck();
+    }
+  });
+}
+
+private submitBooking(activity: InteractiveActivity): void {
   this.interactiveBookingService
     .bookActivity(activity.id)
     .subscribe({
@@ -275,7 +307,7 @@ bookActivity(activity: InteractiveActivity): void {
 
         this.bookingMessage =
           response.message ||
-          'Your booking request was submitted and is awaiting approval.';
+          this.languageService.translate('bookingRequestSubmitted');
 
         this.bookingInProgress = false;
         this.cdr.markForCheck();
@@ -283,11 +315,16 @@ bookActivity(activity: InteractiveActivity): void {
       error: (error) => {
         console.error('Booking failed:', error.status, error.error);
 
-        this.bookingError =
-          error.error?.message ||
-          'We could not submit your booking request. Please try again.';
+        if (error.status === 401) {
+          this.router.navigate(['/login']);
+        } else {
+          this.bookingError =
+            error.error?.message ||
+            this.languageService.translate('bookingRequestFailed');
+        }
 
         this.bookingInProgress = false;
+        this.cdr.markForCheck();
       }
     });
 }

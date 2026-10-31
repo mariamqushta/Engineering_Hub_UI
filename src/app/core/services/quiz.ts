@@ -96,7 +96,7 @@ export interface SubmitQuizResponse {
   providedIn: 'root'
 })
 export class QuizService {
-  private readonly apiUrl = 'https://localhost:7109/api/Quiz';
+  private readonly apiUrl = `${environment.apiUrl}/api/Quiz`;
 
   constructor(private http: HttpClient) {}
 
