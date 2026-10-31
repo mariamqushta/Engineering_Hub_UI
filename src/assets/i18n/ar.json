@@ -527,7 +527,7 @@
   "next": "التالي",
   "password": "كلمة المرور",
   "loggingIn": "جارٍ تسجيل الدخول...",
-   "book": "احجز",
+  "book": "احجز",
   "chooseBookingOption": "اختر خيار الحجز الأنسب لك.",
   "trackOnly": "المسار فقط",
   "trackOnlyDescription": "تعلّم من خلال جميع الدروس الموجودة في هذا المسار.",
@@ -662,7 +662,8 @@
   "eventsThisMonth": "الفعاليات هذا الشهر",
   "scheduledLearningActivities": "أنشطة التعلم المجدولة",
   "noScheduledActivitiesYet": "لا توجد أنشطة مجدولة حتى الآن",
-  "bookedActivitiesAppearHere": "ستظهر هنا ورش العمل والأنشطة التفاعلية التي حجزتها.","studentAccount": "حساب الطالب",
+  "bookedActivitiesAppearHere": "ستظهر هنا ورش العمل والأنشطة التفاعلية التي حجزتها.",
+  "studentAccount": "حساب الطالب",
   "managePersonalInformation": "أدر معلوماتك الشخصية وصورة ملفك الشخصي.",
   "studentRole": "طالب",
   "updateUsernameAndPicture": "حدّث اسم المستخدم واختر صورة لملفك الشخصي.",
@@ -683,6 +684,7 @@
   "november": "نوفمبر",
   "december": "ديسمبر",
   "workshopBookingSubmitted": "تم إرسال طلب حجز الورشة بنجاح وهو في انتظار الموافقة."
+
 }
 
 
