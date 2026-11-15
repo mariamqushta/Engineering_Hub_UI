@@ -7,7 +7,7 @@
       <button
         type="button"
         routerLink="/"
-        class="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#29456E] transition hover:text-[#41a6b1]">
+        class="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#4a7c59] transition hover:text-[#D4AF37]">
 
         <svg class="h-5 w-5" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2">
@@ -19,7 +19,7 @@
       </button>
 
       <div class="flex items-center gap-4">
-        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#182f57] text-[#49DCEB] shadow-lg shadow-[#182f57]/20">
+        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003300] text-[#D4AF37] shadow-lg shadow-[#003300]/20">
           <svg class="h-7 w-7" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -28,10 +28,10 @@
         </div>
 
         <div>
-          <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#41a6b1]">
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
             {{ languageService.translate('engineeringHub') }}
           </p>
-          <h1 class="mt-1 text-2xl font-extrabold text-[#182f57] sm:text-3xl">
+          <h1 class="mt-1 text-2xl font-extrabold text-[#003300] sm:text-3xl">
             {{ languageService.translate('coachingChat') }}
           </h1>
           <p class="mt-1 text-sm text-slate-500">
@@ -45,7 +45,7 @@
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-[#182f57]/5">
 
       <!-- Chat Header -->
-      <div class="flex items-center justify-between gap-3 bg-gradient-to-r from-[#081A3A] to-[#29456E] px-5 py-5 sm:px-7">
+      <div class="flex items-center justify-between gap-3 bg-gradient-to-r from-[#002222] to-[#4a7c59] px-5 py-5 sm:px-7">
 
         <div class="flex min-w-0 items-center gap-3">
           <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg font-bold text-[#49DCEB]">
@@ -63,7 +63,7 @@
         </div>
 
         <div class="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2">
-          <span class="h-2 w-2 rounded-full bg-[#49DCEB]"></span>
+          <span class="h-2 w-2 rounded-full bg-[#D4AF37]"></span>
           <span class="text-xs font-medium text-white">
             {{ languageService.translate('chat') }}
           </span>
@@ -75,7 +75,7 @@
 
         <!-- Welcome Message -->
         <div class="flex items-start gap-3">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D9F3F5] text-sm font-bold text-[#29456E]">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F0E68C] text-sm font-bold text-[#003300]">
             I
           </div>
 
@@ -99,10 +99,10 @@
 
             <div
               class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
-              [class.bg-[#182f57]]="message.isMine"
+              [class.bg-[#003300]]="message.isMine"
               [class.text-white]="message.isMine"
-              [class.bg-[#D9F3F5]]="!message.isMine"
-              [class.text-[#29456E]]="!message.isMine">
+              [class.bg-[#F0E68C]]="!message.isMine"
+              [class.text-[#003300]]="!message.isMine">
 
               {{ message.isMine ? 'Y' : 'I' }}
             </div>
@@ -115,7 +115,7 @@
                 class="rounded-2xl px-4 py-3 shadow-sm"
                 [class.rounded-tr-sm]="message.isMine"
                 [class.rounded-tl-sm]="!message.isMine"
-                [class.bg-[#182f57]]="message.isMine"
+                [class.bg-[#003300]]="message.isMine"
                 [class.text-white]="message.isMine"
                 [class.bg-white]="!message.isMine"
                 [class.border]="!message.isMine"
@@ -152,7 +152,7 @@
               [(ngModel)]="newMessage"
               rows="2"
               [placeholder]="languageService.translate('writeMessagePlaceholder')"
-              class="w-full resize-none rounded-xl border border-slate-200 bg-[#F8FAFD] px-4 py-3 text-sm text-[#182f57] outline-none transition placeholder:text-slate-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-[#41a6b1]/20"
+              class="w-full resize-none rounded-xl border border-slate-200 bg-[#F8FAFD] px-4 py-3 text-sm text-[#003300] outline-none transition placeholder:text-slate-400 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20"
               required>
             </textarea>
           </div>
@@ -160,7 +160,7 @@
           <button
             type="submit"
             [disabled]="!newMessage.trim()"
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#182f57] text-[#49DCEB] shadow-md transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-40"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#003300] text-[#D4AF37] shadow-md transition hover:bg-[#4a7c59] disabled:cursor-not-allowed disabled:opacity-40"
             [attr.aria-label]="languageService.translate('sendMessage')">
 
             <svg class="h-5 w-5" viewBox="0 0 24 24"

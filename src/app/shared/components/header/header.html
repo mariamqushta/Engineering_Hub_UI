@@ -1,8 +1,8 @@
 
-<nav class="w-full bg-[#182f57] p-3 flex items-center text-amber-50">
+<nav class="w-full bg-[#003333] p-3 flex items-center text-[#D4AF37]">
   <div class="flex mx-2 items-center">
     <div
-      class="rounded-2xl text-amber-300 bg-[#24416c] border-2 border-[#49DCEB] p-2 px-4 mx-2 text-center"
+      class="rounded-2xl text-[#FFD700] bg-[#2d5a2d] border-2 border-[#D4AF37] p-2 px-4 mx-2 text-center"
     >
       E
     </div>
@@ -15,7 +15,7 @@
 
     <a
       routerLink="/"
-      class="text-white hover:text-[#49DCEB] cursor-pointer"
+      class="text-white hover:text-[#D4AF37] cursor-pointer"
     >
       {{ languageService.translate('home') }}
     </a>
@@ -24,16 +24,25 @@
   <li>
     <a
       routerLink="/student/calendar"
-      class="text-white hover:text-[#49DCEB] cursor-pointer"
+      class="text-white hover:text-[#D4AF37] cursor-pointer"
     >
       {{ languageService.translate('calendar') }}
     </a>
   </li>
-
+<!-- @if (isLoggedIn && isStudent) { -->
+  <li>
+    <a
+      routerLink="/student/admin-chat"
+      class="text-white hover:text-[#D4AF37] cursor-pointer"
+    >
+      {{ languageService.translate('adminChat') }}
+    </a>
+  </li>
+<!-- } -->
 <li>
   <a
     routerLink="/student/status"
-    class="text-white hover:text-[#49DCEB] cursor-pointer"
+    class="text-white hover:text-[#D4AF37] cursor-pointer"
   >
     {{ languageService.translate('status') }}
   </a>
@@ -43,7 +52,7 @@
     <li>
       <a
         routerLink="/student/profile"
-        class="text-white hover:text-[#49DCEB] cursor-pointer"
+        class="text-white hover:text-[#D4AF37] cursor-pointer"
       >
         {{ languageService.translate('myProfile') }}
       </a>
@@ -56,7 +65,7 @@
     <button
   type="button"
   (click)="languageService.toggleLanguage()"
-  class="rounded-lg border border-[#49DCEB] px-3 py-2 text-white hover:text-[#49DCEB]"
+  class="rounded-lg border border-[#D4AF37] px-3 py-2 text-white hover:text-[#D4AF37]"
   [attr.aria-label]="languageService.translate('language')"
 >
   {{ languageService.translate('language') }}
@@ -64,16 +73,16 @@
     @if (isLoggedIn) {
       <button
         (click)="logout()"
-        class="text-white hover:text-[#49DCEB] cursor-pointer"
+        class="text-white hover:text-[#D4AF37] cursor-pointer"
       >
         {{ languageService.translate('logout') }}
       </button>
     } @else {
-      <a routerLink="/login" class="text-white hover:text-[#49DCEB] cursor-pointer">
+      <a routerLink="/login" class="text-white hover:text-[#D4AF37] cursor-pointer">
         {{ languageService.translate('login') }}
       </a>
 
-      <a routerLink="/register" class="text-white hover:text-[#49DCEB] cursor-pointer">
+      <a routerLink="/register" class="text-white hover:text-[#D4AF37] cursor-pointer">
         {{ languageService.translate('register') }}
       </a>
     }
@@ -82,7 +91,7 @@
     <button
       type="button"
       (click)="openProfile()"
-      class="rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#49DCEB]"
+      class="rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
       aria-label="Open profile"
       title="Open profile"
     >
@@ -96,7 +105,7 @@
         />
       } @else {
         <span
-          class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#49DCEB] bg-[#24416c] font-bold text-amber-300"
+          class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#D4AF37] bg-[#2d5a2d] font-bold text-[#FFD700]"
         >
           {{ avatarLetter }}
         </span>

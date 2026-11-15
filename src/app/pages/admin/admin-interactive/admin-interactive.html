@@ -4,10 +4,10 @@
 
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p class="text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        <p class="text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">
           {{ languageService.translate('administration') }}
         </p>
-        <h1 class="mt-1 text-2xl font-bold text-[#182f57] sm:text-3xl">
+        <h1 class="mt-1 text-2xl font-bold text-[#003300] sm:text-3xl">
           {{ languageService.translate('interactiveActivities') }}
         </h1>
         <p class="mt-2 text-sm text-slate-500">
@@ -18,7 +18,7 @@
       <button type="button"
         (click)="loadActivities()"
         [disabled]="isLoading"
-        class="rounded-xl bg-[#182f57] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#29456E] disabled:opacity-50">
+        class="rounded-xl bg-[#003300] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#4a7c59] disabled:opacity-50">
         {{ isLoading ? languageService.translate('loading') : languageService.translate('refreshActivities') }}
       </button>
     </div>

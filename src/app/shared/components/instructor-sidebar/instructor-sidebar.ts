@@ -22,6 +22,7 @@ export class InstructorSidebar {
     { name: 'workshops', icon: '▣', route: 'workshops' },
     { name: 'quizzes', icon: '📝', route: 'quize' },
     { name: 'coachingChat', icon: '✉', route: 'chat' },
+    { name: 'adminChat', icon: '✉', route: 'admin-chat' },
     { name: 'myProfile', icon: '♙', route: 'profile' },
   ];
 

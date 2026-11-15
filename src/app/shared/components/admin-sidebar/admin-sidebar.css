@@ -9,7 +9,7 @@
   width: 260px;
   min-height: 100vh;
   padding: 26px 16px 18px;
-  background: #182f57;
+  background: #003333;
   color: #ffffff;
 }
 
@@ -30,8 +30,8 @@
   height: 42px;
   flex-shrink: 0;
   border-radius: 12px;
-  background: #49dceb;
-  color: #182f57;
+  background: #d4af37;
+  color: #003300;
   font-size: 15px;
   font-weight: 800;
 }
@@ -48,7 +48,7 @@
 }
 
 .brand-text small {
-  color: #a9bddb;
+  color: #d4c8a8;
   font-size: 10px;
   letter-spacing: 1.5px;
 }
@@ -61,7 +61,7 @@
 
 .section-label {
   margin: 18px 10px 8px;
-  color: #a9bddb;
+  color: #d4c8a8;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.4px;
@@ -77,7 +77,7 @@
   border: none;
   border-radius: 9px;
   background: transparent;
-  color: #d9e4f4;
+  color: #e8e8d0;
   font: inherit;
   font-size: 13px;
   text-align: left;
@@ -87,13 +87,13 @@
 }
 
 .nav-link:hover {
-  background: #29456e;
+  background: #004444;
   color: #ffffff;
 }
 
 .nav-link.active {
-  background: #29456e;
-  color: #49dceb;
+  background: #2d5a2d;
+  color: #d4af37;
   font-weight: 600;
 }
 
@@ -115,11 +115,11 @@
 }
 
 .logout-link {
-  color: #ffc5c5;
+  color: #ffd700;
 }
 
 .logout-link:hover {
-  background: #3a3652;
+  background: #004444;
 }
 
 @media (max-width: 768px) {

@@ -10,7 +10,14 @@
       <p>{{ languageService.translate('instructorPortal') }}</p>
     </div>
   </div>
-
+    <button
+  type="button"
+  (click)="languageService.toggleLanguage()"
+  class="rounded-lg border border-[#D4AF37] px-3 py-2 text-white hover:text-[#D4AF37]"
+  [attr.aria-label]="languageService.translate('language')"
+>
+  {{ languageService.translate('language') }}
+</button>
   <nav class="sidebar-menu">
     @for (item of menuItems; track item.name) {
       <button
@@ -30,7 +37,7 @@
     <button
       type="button"
       (click)="logout()"
-      class="mt-4 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-semibold text-white transition hover:bg-white/10 hover:text-[#49DCEB]"
+      class="mt-4 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-semibold text-white transition hover:bg-white/10 hover:text-[#D4AF37]"
     >
       <span class="menu-icon">↪</span>
       <span>{{ languageService.translate('logout') }}</span>

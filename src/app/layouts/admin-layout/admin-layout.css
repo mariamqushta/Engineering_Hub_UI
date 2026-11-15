@@ -6,7 +6,7 @@
 .admin-layout {
   display: flex;
   min-height: 100vh;
-  background: #f3f6fb;
+  background: #f0f5f0;
 }
 
 .main-content {
@@ -25,14 +25,14 @@
 
 .page-heading h1 {
   margin: 0;
-  color: #182f57;
+  color: #003300;
   font-size: 28px;
   font-weight: 700;
 }
 
 .page-heading p {
   margin: 8px 0 0;
-  color: #718096;
+  color: #6b8e6b;
   font-size: 14px;
 }
 
@@ -52,7 +52,7 @@
   overflow: hidden;
   border: 0;
   border-radius: 50%;
-  background: #29456e;
+  background: #4a7c59;
   color: #ffffff;
   font-size: 17px;
   font-weight: 600;
@@ -65,7 +65,7 @@
 }
 
 .profile-avatar-button:focus-visible {
-  outline: 2px solid #49dceb;
+  outline: 2px solid #d4af37;
   outline-offset: 3px;
 }
 
@@ -82,12 +82,12 @@
 }
 
 .profile-info strong {
-  color: #182f57;
+  color: #003300;
   font-size: 14px;
 }
 
 .profile-info span {
-  color: #718096;
+  color: #6b8e6b;
   font-size: 12px;
 }
 
@@ -119,5 +119,5 @@
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  color: #182f57;
+  color: #003300;
 }

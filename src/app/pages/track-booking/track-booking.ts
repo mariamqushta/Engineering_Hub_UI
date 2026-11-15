@@ -6,6 +6,7 @@ import { Track } from '../../core/models/track';
 import { CommonModule } from '@angular/common';
 import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth';
 interface TrackBookingRequest {
   id: number;
   trackId: number;
@@ -25,6 +26,10 @@ export class TrackBooking implements OnInit {
   private route = inject(ActivatedRoute);
   private trackService = inject(TrackService);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+
+accountType: number | null = null;
+isAccountTypeLoaded = false;
   bookingStatuses: Record<number, string> = {};
 
   trackId: number = 0;
@@ -54,6 +59,26 @@ export class TrackBooking implements OnInit {
     }
 
     this.trackId = id;
+
+    this.authService.getCurrentUser().subscribe({
+  next: (user) => {
+    const accountType = Number(user.accountType);
+
+    this.accountType =
+      accountType === 0 || accountType === 1
+        ? accountType
+        : null;
+
+    this.isAccountTypeLoaded = true;
+    this.cdr.markForCheck();
+  },
+  error: (error) => {
+    console.error('Could not determine student account type:', error);
+    this.accountType = null;
+    this.isAccountTypeLoaded = true;
+    this.cdr.markForCheck();
+  }
+});
 
     this.trackService.getTracks().subscribe({
       next: (tracks) => {
@@ -117,6 +142,9 @@ export class TrackBooking implements OnInit {
 
 
 bookTrack(bookingType: number): void {
+  if (bookingType === 1 && this.accountType === 1) {
+  return;
+}
   this.bookingMessage = '';
   this.bookingError = '';
 

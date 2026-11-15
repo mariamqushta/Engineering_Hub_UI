@@ -13,11 +13,13 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+
 register(data: {
   userName: string;
   password: string;
   fullName: string;
   role: string;
+  accountType: number;
 }): Observable<any> {
 
   return this.http.post(
@@ -29,6 +31,7 @@ register(data: {
     }
   );
 }
+
   login(data: {
   userName: string;
   password: string;

@@ -1,0 +1,178 @@
+
+<div class="min-h-screen bg-[#F3F6FB] px-4 py-6 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+
+    <div class="mb-6">
+      <p class="text-sm font-semibold uppercase tracking-widest text-[#D4AF37]">
+        {{ languageService.translate('engineeringHub') }}
+      </p>
+      <h1 class="mt-2 text-3xl font-extrabold text-[#003300]">
+        {{ languageService.translate('studentsChat') }}
+      </h1>
+      <p class="mt-2 text-slate-500">
+        {{ languageService.translate('communicateWithStudents') }}
+      </p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-start text-sm text-red-700">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="grid min-h-[600px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[320px_1fr]">
+
+      <aside class="border-b border-slate-200 lg:border-b-0 lg:border-e">
+        <div class="border-b border-slate-200 p-5">
+          <h2 class="font-bold text-[#182f57]">
+            {{ languageService.translate('studentConversations') }}
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            {{ conversations.length }}
+            {{ languageService.translate('conversations') }}
+          </p>
+        </div>
+
+        @for (conversation of conversations; track conversation.conversationId) {
+          <button
+            type="button"
+            (click)="selectConversation(conversation)"
+            class="flex w-full items-start gap-3 border-b border-slate-100 p-4 text-start transition hover:bg-cyan-50"
+            [class.bg-cyan-50]="selectedConversation?.conversationId === conversation.conversationId">
+
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#003300] font-bold text-[#D4AF37]">
+              {{ conversation.participantName.charAt(0).toUpperCase() }}
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate font-semibold text-[#003300]">
+                  {{ conversation.participantName }}
+                </span>
+
+                @if (conversation.unreadCount > 0) {
+                  <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#D4AF37] px-1.5 text-xs font-bold text-[#003300]">
+                    {{ conversation.unreadCount }}
+                  </span>
+                }
+              </div>
+
+              <div class="mt-1 text-xs text-[#41a6b1]">
+                @if (conversation.participantAccountType === 0) {
+                  {{ languageService.translate('groupStudent') }}
+                } @else if (conversation.participantAccountType === 1) {
+                  {{ languageService.translate('privateStudent') }}
+                } @else {
+                  {{ languageService.translate('student') }}
+                }
+              </div>
+
+              <p class="mt-2 truncate text-sm text-slate-500">
+                {{ conversation.lastMessage || languageService.translate('startConversation') }}
+              </p>
+            </div>
+          </button>
+        } @empty {
+          <div class="p-6 text-center">
+            <p class="font-semibold text-[#003300]">
+              {{ languageService.translate('noStudentConversations') }}
+            </p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              {{ languageService.translate('studentConversationsWillAppearHere') }}
+            </p>
+          </div>
+        }
+      </aside>
+
+      <section class="flex min-h-[600px] flex-col">
+        @if (selectedConversation) {
+          <header class="flex items-center gap-3 border-b border-slate-200 p-5">
+            <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#003300] font-bold text-[#D4AF37]">
+              {{ selectedConversation.participantName.charAt(0).toUpperCase() }}
+            </div>
+
+            <div>
+              <h2 class="font-bold text-[#003300]">
+                {{ selectedConversation.participantName }}
+              </h2>
+              <p class="text-sm text-slate-500">
+                @if (selectedConversation.participantAccountType === 0) {
+                  {{ languageService.translate('groupStudent') }}
+                } @else if (selectedConversation.participantAccountType === 1) {
+                  {{ languageService.translate('privateStudent') }}
+                } @else {
+                  {{ languageService.translate('student') }}
+                }
+              </p>
+            </div>
+          </header>
+
+          <div class="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-5 sm:p-6">
+            @if (isLoading) {
+              <p class="text-center text-sm text-slate-500">
+                {{ languageService.translate('loadingMessages') }}
+              </p>
+            } @else {
+              @for (message of messages; track message.id) {
+                <div class="flex" [class.justify-end]="message.isMine">
+                  <div
+                    class="max-w-[85%] rounded-2xl px-4 py-3 shadow-sm sm:max-w-[70%]"
+                    [class.bg-[#003300]]="message.isMine"
+                    [class.text-white]="message.isMine"
+                    [class.bg-white]="!message.isMine"
+                    [class.text-slate-700]="!message.isMine">
+
+                    <p class="whitespace-pre-wrap break-words">{{ message.text }}</p>
+
+                    <p class="mt-2 text-end text-xs"
+                      [class.text-slate-300]="message.isMine"
+                      [class.text-slate-400]="!message.isMine">
+                      {{ message.sentAt | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                    </p>
+                  </div>
+                </div>
+              } @empty {
+                <p class="py-10 text-center text-sm text-slate-500">
+                  {{ languageService.translate('noMessagesYet') }}
+                </p>
+              }
+            }
+          </div>
+
+          <form
+            (ngSubmit)="sendMessage()"
+            class="flex items-end gap-3 border-t border-slate-200 bg-white p-4 sm:p-5">
+
+            <textarea
+              name="newMessage"
+              [(ngModel)]="newMessage"
+              rows="2"
+              [placeholder]="languageService.translate('writeMessage')"
+              maxlength="5000"
+              class="min-h-12 flex-1 resize-none rounded-xl border border-slate-200 p-3 text-start text-sm outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+              required></textarea>
+
+            <button
+              type="submit"
+              [disabled]="!newMessage.trim() || isSending"
+              class="rounded-xl bg-[#003300] px-5 py-3 font-semibold text-white transition hover:bg-[#2d5a2d] disabled:cursor-not-allowed disabled:opacity-50">
+              {{ isSending ? languageService.translate('sending') : languageService.translate('send') }}
+            </button>
+          </form>
+        } @else {
+          <div class="flex flex-1 flex-col items-center justify-center p-8 text-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-50 text-3xl">
+              💬
+            </div>
+            <h2 class="mt-5 text-xl font-bold text-[#182f57]">
+              {{ languageService.translate('selectConversation') }}
+            </h2>
+            <p class="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+              {{ languageService.translate('selectStudentToViewMessages') }}
+            </p>
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+</div>

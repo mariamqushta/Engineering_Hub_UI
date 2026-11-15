@@ -1,0 +1,171 @@
+<div class="min-h-screen bg-[#F3F6FB] p-4 md:p-8">
+  <div class="mx-auto max-w-7xl">
+
+    <!-- Header -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#182f57] text-[#49DCEB] shadow-lg">
+          <span class="text-2xl">✉</span>
+        </div>
+
+        <div class="text-start">
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#41a6b1]">
+            {{ languageService.translate('engineeringHub') }}
+          </p>
+
+          <h1 class="mt-1 text-2xl font-extrabold text-[#182f57] sm:text-3xl">
+            {{ languageService.translate('contactAdmin') }}
+          </h1>
+
+          <p class="mt-1 text-sm text-slate-500">
+            {{ languageService.translate('contactAdminDescription') }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-start text-sm text-red-700">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-[#182f57]/5">
+
+      <!-- Chat header -->
+      <div class="flex items-center gap-3 bg-gradient-to-r from-[#002222] to-[#4a7c59] px-5 py-5 sm:px-7">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg font-bold text-[#D4AF37]">
+          {{ languageService.translate('adminShort') }}
+        </div>
+
+        <div class="min-w-0 text-start">
+          <h2 class="truncate font-bold text-white">
+            {{ languageService.translate('engineeringHubAdmin') }}
+          </h2>
+
+          <p class="mt-1 text-xs text-slate-300">
+            {{ languageService.translate('supportConversation') }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Messages area -->
+      <div class="flex min-h-[450px] flex-col gap-5 bg-[#F8FAFD] p-4 sm:min-h-[520px] sm:p-7">
+
+        @if (isLoading) {
+          <p class="py-10 text-center text-sm text-slate-500">
+            {{ languageService.translate('loadingConversation') }}
+          </p>
+        } @else {
+          @for (message of messages; track message.id) {
+            <div
+              class="flex items-start gap-3"
+              [class.flex-row-reverse]="message.isMine">
+
+              <!-- Message avatar -->
+              <div
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                [class.bg-[#182f57]]="message.isMine"
+                [class.text-white]="message.isMine"
+                [class.bg-[#D9F3F5]]="!message.isMine"
+                [class.text-[#29456E]]="!message.isMine">
+
+                {{ message.isMine
+                  ? languageService.translate('youShort')
+                  : languageService.translate('adminShort') }}
+              </div>
+
+              <!-- Message content -->
+              <div
+                class="max-w-[85%] sm:max-w-[70%]"
+                [class.text-end]="message.isMine">
+
+                <div
+                  class="rounded-2xl px-4 py-3 shadow-sm"
+                  [class.rounded-ss-sm]="message.isMine"
+                  [class.rounded-se-sm]="!message.isMine"
+                  [class.bg-[#182f57]]="message.isMine"
+                  [class.text-white]="message.isMine"
+                  [class.bg-white]="!message.isMine"
+                  [class.border]="!message.isMine"
+                  [class.border-slate-200]="!message.isMine"
+                  [class.text-slate-700]="!message.isMine">
+
+                  <p class="whitespace-pre-wrap break-words text-start text-sm leading-6">
+                    {{ message.text }}
+                  </p>
+                </div>
+
+                <p class="mt-2 text-xs text-slate-400">
+                  {{ message.sentAt | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                </p>
+              </div>
+            </div>
+          } @empty {
+            <div class="m-auto max-w-md py-10 text-center">
+              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-2xl">
+                💬
+              </div>
+
+              <h3 class="mt-4 font-bold text-[#182f57]">
+                {{ languageService.translate('startConversation') }}
+              </h3>
+
+              <p class="mt-2 text-sm leading-6 text-slate-500">
+                {{ languageService.translate('contactAdminHelp') }}
+              </p>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Message input -->
+      <div class="border-t border-slate-200 bg-white p-4 sm:p-5">
+        <form
+          (ngSubmit)="sendMessage()"
+          class="flex items-end gap-3">
+
+          <div class="flex-1">
+            <label
+              for="adminChatMessage"
+              class="mb-2 block text-start text-xs font-bold uppercase tracking-wider text-slate-500">
+
+              {{ languageService.translate('yourMessage') }}
+            </label>
+
+            <textarea
+              id="adminChatMessage"
+              name="newMessage"
+              [(ngModel)]="newMessage"
+              rows="2"
+              maxlength="5000"
+              [placeholder]="languageService.translate('writeMessage')"
+              class="w-full resize-none rounded-xl border border-slate-200 bg-[#F8FAFD] px-4 py-3 text-start text-sm text-[#182f57] outline-none transition placeholder:text-slate-400 focus:border-[#41a6b1] focus:ring-2 focus:ring-[#41a6b1]/20"
+              required>
+            </textarea>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="!newMessage.trim() || isSending || !conversation"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#182f57] text-[#49DCEB] shadow-md transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-40"
+            [attr.aria-label]="languageService.translate('sendMessage')">
+
+            <svg
+              class="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2">
+
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
