@@ -1,3 +1,4 @@
+
 <div class="flex min-h-screen items-center justify-center">
 
   <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
@@ -41,18 +42,31 @@
         class="rounded-lg border p-3">
 
         <option value="Student">
-          {{ languageService.translate('student') }}
+          Student
         </option>
 
         <option value="Instructor">
-          {{ languageService.translate('instructor') }}
-        </option>
-
-        <option value="Admin">
-          {{ languageService.translate('Admin') }}
+          Instructor
         </option>
 
       </select>
+
+      @if (role === 'Student') {
+        <select
+          name="accountType"
+          [(ngModel)]="accountType"
+          class="rounded-lg border p-3">
+
+          <option [ngValue]="0">
+            Group Student
+          </option>
+
+          <option [ngValue]="1">
+            Private Student
+          </option>
+
+        </select>
+      }
 
       <button
         type="submit"

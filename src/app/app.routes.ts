@@ -23,6 +23,7 @@ import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { Status } from './pages/student/status/status';
 import { AdminDashboard } from './pages/admin/admin-dashboard/admin-dashboard';
 import { AdminBookingRequest } from './pages/admin/admin-booking-request/admin-booking-request';
+import { AdminPrivateSessions } from './pages/admin/admin-private-sessions/admin-private-sessions';
 import { AdminTracks } from './pages/admin/admin-tracks/admin-tracks';
 import { AdminInstructors } from './pages/admin/admin-instructors/admin-instructors';
 import { AdminStudents } from './pages/admin/admin-students/admin-students';
@@ -33,6 +34,10 @@ import { InstructorQuize } from './pages/instructor/instructor-quize/instructor-
 import { EndOfLessonQuiz } from './pages/student/end-of-lesson-quiz/end-of-lesson-quiz';
 import { PrerequisiteQuiz } from './pages/student/prerequisite-quiz/prerequisite-quiz';
 import { CertificateComponent } from './pages/student/certificate/certificate';
+import { AdminChatStudent } from './pages/admin/admin-chatstudent/admin-chatstudent';
+import { AdminChatInstructor } from './pages/admin/admin-chatinstructor/admin-chatinstructor';
+import { InstructorAdmin } from './pages/instructor/instructor-admin/instructor-admin';
+import { StudentAdmin } from './pages/student/student-admin/student-admin';
 export const routes: Routes = [
   // Student/public pages
   {
@@ -44,7 +49,10 @@ export const routes: Routes = [
   {
     path: 'track/:id',
     component: TrackDetails
-  },
+  },{
+  path: 'student/admin-chat',
+  component: StudentAdmin
+},
   {
     path: 'register',
     component: Register
@@ -81,6 +89,7 @@ export const routes: Routes = [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     { path: 'dashboard', component: InstructorDashboard },
     { path: 'tracks', component: InstructorTracks },
+    { path: 'admin-chat', component: InstructorAdmin },
     { path: 'assignments', component: InstructorAssignments },
     { path: 'calendar', component: InstructorCalendar },
     { path: 'interactive', component: InstructorInteractive },
@@ -121,6 +130,9 @@ export const routes: Routes = [
     { path: 'students', component: AdminStudents },
     { path: 'workshops', component: AdminWorkshops },
     { path: 'interactive', component: AdminInteractive },
+    { path: 'private-sessions', component: AdminPrivateSessions },
+    { path: 'chat-students', component: AdminChatStudent },
+{ path: 'chat-instructors', component: AdminChatInstructor },
     { path: 'profile', component: AdminProfile }
   ]
 }

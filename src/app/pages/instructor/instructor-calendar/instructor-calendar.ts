@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit,
@@ -11,7 +10,7 @@ import {
   CalendarEvent,
 } from '../../../core/services/calendar';
 import { LanguageService } from '../../../core/services/language.service';
-import { environment } from '../../../../environments/environment';
+
 interface CalendarDay {
   date: Date;
   inCurrentMonth: boolean;
@@ -40,16 +39,54 @@ export class InstructorCalendar implements OnInit {
 
   loading = true;
   errorMessage = '';
+  selectedDay: Date | null = new Date();
 
-  readonly weekdays = [
-    'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',
-  ];
+  constructor(public languageService: LanguageService) {}
 
-  constructor(
-     public languageService: LanguageService,
-  ) {}
+  get weekdays(): string[] {
+    return ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+      .map(day => this.languageService.translate(day));
+  }
+
+  get currentMonthLabel(): string {
+    const locale = this.languageService.currentLanguage === 'ar'
+      ? 'ar-EG'
+      : 'en-US';
+
+    return new Intl.DateTimeFormat(locale, {
+      month: 'long',
+      year: 'numeric',
+    }).format(this.currentMonth);
+  }
+
+  get selectedDayKey(): string {
+    return this.selectedDay ? this.dateKey(this.selectedDay) : '';
+  }
+
+  get selectedDayEvents(): CalendarEvent[] {
+    if (!this.selectedDay) return [];
+
+    const key = this.dateKey(this.selectedDay);
+
+    return this.events
+      .filter(event => {
+        const start = new Date(event.startDateTime);
+        return !Number.isNaN(start.getTime()) &&
+          this.dateKey(start) === key;
+      })
+      .sort((a, b) =>
+        new Date(a.startDateTime).getTime() -
+        new Date(b.startDateTime).getTime()
+      );
+  }
+
+  get currentMonthEventCount(): number {
+    return this.calendarDays
+      .filter(day => day.inCurrentMonth)
+      .reduce((total, day) => total + day.events.length, 0);
+  }
+
   ngOnInit(): void {
-    // Show the calendar grid immediately, even before events load.
     this.buildCalendar();
     this.loadCalendar();
   }
@@ -60,22 +97,76 @@ export class InstructorCalendar implements OnInit {
     this.cdr.markForCheck();
 
     this.calendarService.getInstructorCalendar().subscribe({
-      next: (events) => {
+      next: events => {
         this.events = events ?? [];
         this.buildCalendar();
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: (error) => {
+      error: error => {
         console.error('Failed to load calendar:', error);
-
         this.errorMessage =
-          'Could not load your calendar. Please try again.';
-
+          this.languageService.translate('couldNotLoadYourCalendar');
         this.loading = false;
         this.cdr.markForCheck();
       },
     });
+  }
+
+  isCancelled(event: CalendarEvent): boolean {
+    const status = String(event.status).toLowerCase();
+    const title = (event.title ?? '').toLowerCase();
+
+    return status === 'cancelled' ||
+      status === '3' ||
+      title.includes('cancelled');
+  }
+
+  getEventTypeTranslationKey(event: CalendarEvent): string {
+    if (this.isCancelled(event)) return 'cancelledSession';
+
+    switch (event.eventType) {
+      case 'Workshop':
+        return 'workshops';
+      case 'Interactive':
+        return 'interactiveActivities';
+      case 'PrivateAvailability':
+        return 'privateAvailability';
+      case 'PrivateSession':
+        return 'privateSession';
+      default:
+        return 'unknown';
+    }
+  }
+
+  canJoinMeeting(event: CalendarEvent): boolean {
+    if (this.isCancelled(event)) return false;
+
+    if (
+      event.eventType !== 'Interactive' &&
+      event.eventType !== 'PrivateSession'
+    ) {
+      return false;
+    }
+
+    const meetingUrl = event.meetingUrl?.trim();
+
+    if (!meetingUrl) return false;
+
+    try {
+      const url = new URL(meetingUrl);
+      return url.protocol === 'https:' || url.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  }
+
+  openDay(day: CalendarDay): void {
+    this.selectedDay = new Date(day.date);
+  }
+
+  clearSelectedDay(): void {
+    this.selectedDay = null;
   }
 
   previousMonth(): void {
@@ -85,6 +176,7 @@ export class InstructorCalendar implements OnInit {
       1
     );
 
+    this.selectedDay = null;
     this.buildCalendar();
   }
 
@@ -95,6 +187,7 @@ export class InstructorCalendar implements OnInit {
       1
     );
 
+    this.selectedDay = null;
     this.buildCalendar();
   }
 
@@ -107,6 +200,7 @@ export class InstructorCalendar implements OnInit {
       1
     );
 
+    this.selectedDay = today;
     this.buildCalendar();
   }
 
@@ -117,12 +211,7 @@ export class InstructorCalendar implements OnInit {
     const firstDay = new Date(year, month, 1);
     const mondayOffset = (firstDay.getDay() + 6) % 7;
 
-    const gridStart = new Date(
-      year,
-      month,
-      1 - mondayOffset
-    );
-
+    const gridStart = new Date(year, month, 1 - mondayOffset);
     const todayKey = this.dateKey(new Date());
 
     this.calendarDays = Array.from(
@@ -134,18 +223,14 @@ export class InstructorCalendar implements OnInit {
         const key = this.dateKey(date);
 
         const dayEvents = this.events
-          .filter((event) => {
+          .filter(event => {
             const start = new Date(event.startDateTime);
-
-            return (
-              !Number.isNaN(start.getTime()) &&
-              this.dateKey(start) === key
-            );
+            return !Number.isNaN(start.getTime()) &&
+              this.dateKey(start) === key;
           })
-          .sort(
-            (a, b) =>
-              new Date(a.startDateTime).getTime() -
-              new Date(b.startDateTime).getTime()
+          .sort((a, b) =>
+            new Date(a.startDateTime).getTime() -
+            new Date(b.startDateTime).getTime()
           );
 
         return {
@@ -166,21 +251,11 @@ export class InstructorCalendar implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  get currentMonthEventCount(): number {
-    return this.calendarDays
-      .filter((day) => day.inCurrentMonth)
-      .reduce((total, day) => total + day.events.length, 0);
+  trackDay(index: number, day: CalendarDay): string {
+    return this.dateKey(day.date);
   }
 
-trackDay(index: number, day: CalendarDay): string {
-  const year = day.date.getFullYear();
-  const month = String(day.date.getMonth() + 1).padStart(2, '0');
-  const date = String(day.date.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${date}`;
-}
-
   trackEvent(index: number, event: CalendarEvent): string {
-    return `${event.eventType}-${event.title}-${event.startDateTime}`;
+    return `${event.eventType}-${event.id}-${event.startDateTime}`;
   }
 }

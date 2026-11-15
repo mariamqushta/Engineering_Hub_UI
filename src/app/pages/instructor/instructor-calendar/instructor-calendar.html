@@ -1,58 +1,394 @@
-<div class="grid grid-cols-7 min-w-[700px]">
 
-  <div *ngIf="loading" role="status" aria-live="polite">
-    <div class="mx-auto h-9 w-9 animate-spin rounded-full
-                border-4 border-[#d9e5ef]
-                border-t-[#41a6b1]">
-    </div>
+<div class="min-h-screen bg-[#F3F6FB] p-4 md:p-8">
+  <div class="mx-auto max-w-7xl">
 
-    <p class="mt-3 text-center text-sm text-gray-500">
-      {{ languageService.translate('loadingYourCalendar') }}
-    </p>
-  </div>
-
-  <div
-    *ngFor="let weekday of weekdays"
-    class="border-b border-r border-gray-200 bg-gray-50
-           p-3 text-center text-sm font-semibold text-gray-500">
-    {{ languageService.translate(weekday) }}
-  </div>
-
-  <div
-    *ngFor="let day of calendarDays; trackBy: trackDay"
-    class="min-h-[140px] border-b border-r border-gray-200
-           bg-white p-2 transition-colors hover:bg-gray-50"
-    [ngClass]="{
-      'bg-gray-50 text-gray-400': !day.inCurrentMonth,
-      'bg-cyan-50': day.isToday
-    }">
-
-    <div
-      class="mb-2 flex h-[30px] w-[30px] items-center
-             justify-center rounded-full text-sm font-semibold"
-      [ngClass]="day.isToday
-        ? 'bg-[#182f57] text-white'
-        : 'text-[#29456E]'">
-      {{ day.date | date:'d' }}
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <div
-        *ngFor="let event of day.events; trackBy: trackEvent"
-        class="rounded-md border-l-[3px] p-2 text-xs"
-        [ngClass]="event.eventType === 'Workshop'
-          ? 'border-orange-400 bg-orange-50 text-orange-800'
-          : 'border-[#41a6b1] bg-cyan-50 text-cyan-800'">
-
-        <p class="break-words font-semibold">
-          {{ event.title }}
-        </p>
-
-        <p class="mt-1">
-          {{ event.startDateTime | date:'shortTime' }}
-          – {{ event.endDateTime | date:'shortTime' }}
+    <!-- Header -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-[#182f57] md:text-3xl">
+          {{ languageService.translate('myCalendar') }}
+        </h1>
+        <p class="mt-2 text-sm text-gray-500">
+          {{ languageService.translate('manageCalendarDescription') }}
         </p>
       </div>
+
+      <div class="flex gap-3">
+        <div class="rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm">
+          <p class="text-xs font-medium text-gray-500">{{ languageService.translate('eventsThisMonth') }}</p>
+          <p class="mt-1 text-2xl font-bold text-[#182f57]">
+            {{ currentMonthEventCount }}
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm">
+          <p class="text-xs font-medium text-gray-500">{{ languageService.translate('selectedDay') }}</p>
+          <p class="mt-1 text-2xl font-bold text-[#41a6b1]">
+            {{ selectedDayEvents.length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+      <!-- Month navigation -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 p-4 md:p-5">
+        <div>
+          <h2 class="text-xl font-bold text-[#182f57]">
+            {{ currentMonthLabel }}
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ languageService.translate('yourMonthlySchedule') }}
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="goToToday()"
+            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-[#29456E] transition hover:bg-gray-100">
+            {{ languageService.translate('today') }}
+          </button>
+
+          <button
+            type="button"
+            (click)="previousMonth()"
+            [attr.aria-label]="languageService.translate('previousMonth')"
+            class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-[#29456E] transition hover:bg-gray-100">
+            <span [class.rotate-180]="languageService.currentLanguage === 'ar'">&#8592;</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="nextMonth()"
+            [attr.aria-label]="languageService.translate('nextMonth')"
+            class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-[#29456E] transition hover:bg-gray-100">
+            <span [class.rotate-180]="languageService.currentLanguage === 'ar'">&#8594;</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-gray-200 px-4 py-4">
+
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 rounded-sm bg-orange-400"></span>
+          <span class="text-xs font-medium text-gray-600">{{ languageService.translate('workshops') }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 rounded-sm bg-[#41a6b1]"></span>
+          <span class="text-xs font-medium text-gray-600">{{ languageService.translate('interactiveActivities') }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 rounded-sm bg-blue-500"></span>
+          <span class="text-xs font-medium text-gray-600">{{ languageService.translate('privateAvailability') }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 rounded-sm bg-purple-500"></span>
+          <span class="text-xs font-medium text-gray-600">{{ languageService.translate('privateSession') }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="h-3 w-3 rounded-sm bg-red-500"></span>
+          <span class="text-xs font-medium text-gray-600">{{ languageService.translate('cancelledSession') }}</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="flex min-h-64 flex-col items-center justify-center gap-3 p-8">
+          <div class="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-[#41a6b1]"></div>
+          <p class="text-sm text-gray-500">
+            {{ languageService.translate('loadingYourCalendar') }}
+          </p>
+        </div>
+      }
+
+      <!-- Error -->
+      @else if (errorMessage) {
+        <div class="flex min-h-64 flex-col items-center justify-center p-8 text-center">
+          <p class="font-semibold text-red-600">
+            {{ errorMessage }}
+          </p>
+
+          <button
+            type="button"
+            (click)="loadCalendar()"
+            class="mt-4 rounded-lg bg-[#182f57] px-5 py-2.5 font-semibold text-white transition hover:bg-[#29456E]">
+            {{ languageService.translate('tryAgain') }}
+          </button>
+        </div>
+      }
+
+      @else {
+
+        <!-- Monthly calendar -->
+        <div class="overflow-x-auto">
+          <div class="min-w-[750px]">
+
+            <!-- Weekdays -->
+            <div class="grid grid-cols-7">
+              @for (weekday of weekdays; track weekday) {
+                <div class="border-b border-e border-gray-200 bg-gray-50 p-3 text-center text-xs font-bold uppercase tracking-wide text-gray-500">
+                  {{ weekday }}
+                </div>
+              }
+            </div>
+
+            <!-- Days -->
+            <div class="grid grid-cols-7">
+              @for (day of calendarDays; track trackDay($index, day)) {
+                <button
+                  type="button"
+                  (click)="openDay(day)"
+                  class="min-h-[150px] border-b border-e border-gray-200 p-2 text-start transition-colors hover:bg-blue-50/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#41a6b1]"
+                  [ngClass]="{
+                    'bg-gray-50/70': !day.inCurrentMonth,
+                    'bg-cyan-50': day.isToday,
+                    'bg-blue-50': selectedDay && trackDay($index, day) === selectedDayKey
+                  }">
+
+                  <!-- Day number -->
+                  <div class="mb-3 flex items-center justify-between">
+                    <span
+                      class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
+                      [ngClass]="day.isToday
+                        ? 'bg-[#182f57] text-white'
+                        : day.inCurrentMonth
+                          ? 'text-[#29456E]'
+                          : 'text-gray-400'">
+                      {{ day.date | date:'d':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                    </span>
+
+                    @if (day.events.length > 0) {
+                      <span class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">
+                        {{ day.events.length }}
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Events -->
+                  <div class="flex flex-col gap-1.5">
+                    @for (event of day.events; track trackEvent($index, event)) {
+                      <div
+                        class="rounded-md border-s-[3px] p-2 text-start text-xs"
+                        [ngClass]="
+                          isCancelled(event)
+                            ? 'border-red-500 bg-red-50 text-red-800'
+                            : event.eventType === 'Workshop'
+                              ? 'border-orange-400 bg-orange-50 text-orange-800'
+                              : event.eventType === 'Interactive'
+                                ? 'border-[#41a6b1] bg-cyan-50 text-cyan-800'
+                                : event.eventType === 'PrivateAvailability'
+                                  ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                  : 'border-purple-500 bg-purple-50 text-purple-800'
+                        ">
+
+                        <p class="break-words font-semibold">
+                          {{ event.title }}
+                        </p>
+
+                        <p class="mt-1 opacity-80">
+                          {{ event.startDateTime | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                          – {{ event.endDateTime | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                        </p>
+                      </div>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily schedule -->
+        <div class="border-t border-gray-200 bg-gray-50/70 p-4 md:p-6">
+
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-[#41a6b1]">
+                {{ languageService.translate('dailyOverview') }}
+              </p>
+
+              <h3 class="mt-1 text-xl font-bold text-[#182f57]">
+                {{ selectedDay ? (selectedDay | date:'EEEE, d MMMM y':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US')) : languageService.translate('selectADay') }}
+              </h3>
+            </div>
+
+            @if (selectedDay) {
+              <button
+                type="button"
+                (click)="clearSelectedDay()"
+                class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100">
+                {{ languageService.translate('close') }}
+              </button>
+            }
+          </div>
+
+          @if (selectedDay) {
+
+            @if (selectedDayEvents.length > 0) {
+              <div class="space-y-3">
+
+                @for (event of selectedDayEvents; track trackEvent($index, event)) {
+                  <div
+                    class="flex flex-col gap-4 rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center"
+                    [ngClass]="
+                      isCancelled(event)
+                        ? 'border-red-200'
+                        : event.eventType === 'Workshop'
+                          ? 'border-orange-200'
+                          : event.eventType === 'Interactive'
+                            ? 'border-cyan-200'
+                            : event.eventType === 'PrivateAvailability'
+                              ? 'border-blue-200'
+                              : 'border-purple-200'
+                    ">
+
+                    <!-- Time -->
+                    <div class="min-w-[130px]">
+                      <p class="text-sm font-bold text-[#182f57]">
+                        {{ event.startDateTime | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                      </p>
+                      <p class="mt-1 text-xs text-gray-500">
+                        {{ languageService.translate('until') }}
+                        {{ event.endDateTime | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                      </p>
+                    </div>
+
+                    <!-- Event information -->
+                   <!-- Daily Overview Events -->
+<div class="space-y-4">
+  @for (event of selectedDayEvents; track trackEvent($index, event)) {
+    <!-- Event information -->
+    <div class="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+
+      <div class="flex flex-wrap items-center gap-2">
+        <h4 class="break-words font-bold text-[#182f57]">
+          {{ event.title }}
+        </h4>
+
+        <span
+          class="rounded-full px-2.5 py-1 text-[10px] font-bold"
+          [ngClass]="
+            isCancelled(event)
+              ? 'bg-red-100 text-red-700'
+              : event.eventType === 'Workshop'
+                ? 'bg-orange-100 text-orange-700'
+                : event.eventType === 'Interactive'
+                  ? 'bg-cyan-100 text-cyan-700'
+                  : event.eventType === 'PrivateAvailability'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-purple-100 text-purple-700'
+          ">
+          {{ languageService.translate(getEventTypeTranslationKey(event)) }}
+        </span>
+      </div>
+
+      @if (event.studentName) {
+        <p class="mt-2 text-sm text-gray-600">
+          <span class="font-semibold">
+            {{ languageService.translate('student') }}:
+          </span>
+          {{ event.studentName }}
+        </p>
+      }
+
+      @if (event.trackTitle) {
+        <p class="mt-1 text-sm text-gray-500">
+          <span class="font-semibold">
+            {{ languageService.translate('track') }}:
+          </span>
+          {{ event.trackTitle }}
+        </p>
+      }
+
+      @if (canJoinMeeting(event)) {
+        <a
+          [href]="event.meetingUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#182f57] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#29456E] focus:outline-none focus:ring-2 focus:ring-[#41a6b1] focus:ring-offset-2">
+          <span>↗</span>
+          {{ languageService.translate('joinMeeting') }}
+        </a>
+      }
+
+    </div>
+  } @empty {
+    <div class="rounded-xl border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500">
+      {{ languageService.translate('noEventsForThisDay') }}
+    </div>
+  }
+
+                    </div>
+
+                    <!-- Event icon -->
+                    <div
+                      class="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl sm:flex"
+                      [ngClass]="
+                        isCancelled(event)
+                          ? 'bg-red-50 text-red-600'
+                          : event.eventType === 'Workshop'
+                            ? 'bg-orange-50 text-orange-600'
+                            : event.eventType === 'Interactive'
+                              ? 'bg-cyan-50 text-cyan-600'
+                              : event.eventType === 'PrivateAvailability'
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'bg-purple-50 text-purple-600'
+                      ">
+                      @if (isCancelled(event)) {
+                        <span class="text-lg">!</span>
+                      } @else if (event.eventType === 'PrivateAvailability') {
+                        <span class="text-lg">◷</span>
+                      } @else if (event.eventType === 'PrivateSession') {
+                        <span class="text-lg">◆</span>
+                      } @else if (event.eventType === 'Workshop') {
+                        <span class="text-lg">▣</span>
+                      } @else {
+                        <span class="text-lg">◇</span>
+                      }
+                    </div>
+
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-10 text-center">
+                <p class="font-semibold text-[#182f57]">
+                  {{ languageService.translate('noActivitiesScheduledForDay') }}
+                </p>
+                <p class="mt-1 text-sm text-gray-500">
+                  {{ languageService.translate('availableSessionsAndActivitiesWillAppearHere') }}
+                </p>
+              </div>
+            }
+
+          } @else {
+            <div class="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-8 text-center">
+              <p class="font-semibold text-[#182f57]">
+                {{ languageService.translate('selectDateFromCalendar') }}
+              </p>
+              <p class="mt-1 text-sm text-gray-500">
+                {{ languageService.translate('viewActivitiesAndSessionDetailsForDay') }}
+              </p>
+            </div>
+          }
+        </div>
+
+        @if (currentMonthEventCount === 0) {
+          <div class="border-t border-gray-200 px-4 py-8 text-center">
+            <p class="font-semibold text-[#182f57]">
+              {{ languageService.translate('noScheduledActivitiesYet') }}
+            </p>
+          </div>
+        }
+      }
     </div>
   </div>
 </div>

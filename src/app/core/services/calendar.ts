@@ -6,12 +6,14 @@ import { Observable } from 'rxjs';
 export interface CalendarEvent {
   id: number;
   title: string;
-  eventType: 'Workshop' | 'Interactive';
+  eventType: 'Workshop' | 'Interactive' | 'PrivateAvailability' | 'PrivateSession';
   trackId: number;
   trackTitle: string;
   startDateTime: string;
   endDateTime: string;
-  status: string;
+  status: string | number;
+  studentName?: string | null;
+  meetingUrl?: string | null;
 }
 import { environment } from '../../../environments/environment';
 @Injectable({

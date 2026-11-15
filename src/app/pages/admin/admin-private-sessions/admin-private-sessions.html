@@ -1,0 +1,849 @@
+
+<div class="min-h-full bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
+
+  <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
+        {{ languageService.translate('administration') }}
+      </p>
+      <h1 class="text-2xl font-bold text-[#182f57] sm:text-3xl">
+        {{ languageService.translate('privateSessionsManagement') }}
+      </h1>
+      <p class="mt-2 text-sm text-slate-500">
+        {{ languageService.translate('privateSessionsManagementDescription') }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+        <p class="text-xs text-slate-500">{{ languageService.translate('activeArrangements') }}</p>
+        <p class="mt-1 text-2xl font-bold text-[#182f57]">
+          {{ activeArrangements.length }}
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+        <p class="text-xs text-slate-500">{{ languageService.translate('upcomingListedSessions') }}</p>
+        <p class="mt-1 text-2xl font-bold text-[#182f57]">
+          {{ occurrences.length }}
+        </p>
+      </div>
+
+      <div class="col-span-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 sm:col-span-1">
+        <p class="text-xs text-slate-500">{{ languageService.translate('pendingRequests') }}</p>
+        <p class="mt-1 text-2xl font-bold text-amber-600">
+          {{ pendingRequests.length }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-start text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-start text-sm text-emerald-700">
+      {{ successMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+      {{ languageService.translate('loadingPrivateSessionManagement') }}
+    </div>
+  } @else {
+
+    <div class="mb-6 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+      <button
+        type="button"
+        (click)="activeTab = 'create'"
+        class="rounded-xl px-4 py-3 text-sm font-semibold transition"
+        [class.bg-[#182f57]]="activeTab === 'create'"
+        [class.text-white]="activeTab === 'create'"
+        [class.text-slate-600]="activeTab !== 'create'"
+        [class.hover:bg-slate-100]="activeTab !== 'create'">
+        + {{ languageService.translate('createArrangement') }}
+      </button>
+
+      <button
+        type="button"
+        (click)="activeTab = 'arrangements'"
+        class="rounded-xl px-4 py-3 text-sm font-semibold transition"
+        [class.bg-[#182f57]]="activeTab === 'arrangements'"
+        [class.text-white]="activeTab === 'arrangements'"
+        [class.text-slate-600]="activeTab !== 'arrangements'"
+        [class.hover:bg-slate-100]="activeTab !== 'arrangements'">
+        {{ languageService.translate('arrangements') }}
+        <span class="ms-1 opacity-75">({{ arrangements.length }})</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeTab = 'sessions'"
+        class="rounded-xl px-4 py-3 text-sm font-semibold transition"
+        [class.bg-[#182f57]]="activeTab === 'sessions'"
+        [class.text-white]="activeTab === 'sessions'"
+        [class.text-slate-600]="activeTab !== 'sessions'"
+        [class.hover:bg-slate-100]="activeTab !== 'sessions'">
+        {{ languageService.translate('sessions') }}
+        <span class="ms-1 opacity-75">({{ occurrences.length }})</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeTab = 'requests'"
+        class="relative rounded-xl px-4 py-3 text-sm font-semibold transition"
+        [class.bg-[#182f57]]="activeTab === 'requests'"
+        [class.text-white]="activeTab === 'requests'"
+        [class.text-slate-600]="activeTab !== 'requests'"
+        [class.hover:bg-slate-100]="activeTab !== 'requests'">
+        {{ languageService.translate('requests') }}
+        <span class="ms-1 opacity-75">({{ requests.length }})</span>
+      </button>
+    </div>
+
+    @if (activeTab === 'create') {
+      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-[#182f57]">
+            {{ languageService.translate('createPrivateArrangement') }}
+          </h2>
+          <p class="mt-2 text-sm text-slate-500">
+            {{ languageService.translate('createPrivateArrangementDescription') }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('privateStudent') }} *
+            </label>
+            <select
+              [(ngModel)]="arrangementForm.studentId"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-start text-sm text-[#182f57] outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-cyan-100">
+              <option value="">{{ languageService.translate('choosePrivateStudent') }}</option>
+              @for (student of students; track student.id) {
+                <option [value]="student.id">
+                  {{ student.fullName || student.userName }} — {{ student.email }}
+                </option>
+              }
+            </select>
+            @if (students.length === 0) {
+              <p class="mt-2 text-xs text-amber-600">
+                {{ languageService.translate('noPrivateStudentsAvailable') }}
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('instructor') }} *
+            </label>
+            <select
+              [(ngModel)]="arrangementForm.instructorId"
+              (ngModelChange)="onInstructorChanged($event)"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-start text-sm text-[#182f57] outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-cyan-100">
+              <option value="">{{ languageService.translate('chooseActiveInstructor') }}</option>
+              @for (instructor of instructors; track instructor.id) {
+                <option [value]="instructor.id">
+                  {{ instructor.fullName || instructor.userName }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Instructor Availability -->
+          <div class="md:col-span-2 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
+            <div class="mb-3">
+              <h3 class="font-bold text-[#182f57]">
+                {{ languageService.translate('instructorAvailability') }}
+              </h3>
+              <p class="mt-1 text-xs text-slate-600">
+                {{ languageService.translate('selectInstructorToViewAvailability') }}
+              </p>
+            </div>
+
+            @if (!arrangementForm.instructorId) {
+              <p class="text-sm text-slate-500">
+                {{ languageService.translate('noInstructorSelected') }}
+              </p>
+            } @else if (isLoadingAvailability) {
+              <p class="text-sm text-slate-600">
+                {{ languageService.translate('loadingAvailability') }}
+              </p>
+            } @else if (availabilityError) {
+              <p class="text-sm text-red-600">
+                {{ availabilityError }}
+              </p>
+            } @else if (instructorAvailabilities.length === 0) {
+              <p class="text-sm text-amber-700">
+                {{ languageService.translate('noAvailabilityFound') }}
+              </p>
+            } @else {
+              <div class="space-y-3">
+                @for (availability of instructorAvailabilities; track availability.id) {
+                  <div class="rounded-lg border border-slate-200 bg-white p-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <span class="font-semibold text-[#182f57]">
+                        {{ dayNames[availability.dayOfWeek] ?? languageService.translate('unknown') }}
+                      </span>
+
+                      <span
+                        class="rounded-full px-3 py-1 text-xs font-semibold"
+                        [class.bg-emerald-100]="availability.isActive"
+                        [class.text-emerald-700]="availability.isActive"
+                        [class.bg-slate-100]="!availability.isActive"
+                        [class.text-slate-500]="!availability.isActive">
+                        {{ availability.isActive
+                          ? languageService.translate('active')
+                          : languageService.translate('inactive') }}
+                      </span>
+                    </div>
+
+                    <p class="mt-2 text-sm font-medium text-slate-700">
+                      {{ formatTime(availability.startTime) }}
+                      –
+                      {{ formatTime(availability.endTime) }}
+                    </p>
+
+                    <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-500">
+                      <span>
+                        {{ languageService.translate('validFrom') }}:
+                        {{ availability.validFrom | date:'mediumDate':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                      </span>
+
+                      <span>
+                        {{ languageService.translate('validUntil') }}:
+                        {{ availability.validTo
+                          ? (availability.validTo | date:'mediumDate':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US'))
+                          : languageService.translate('notSpecified') }}
+                      </span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('track') }} *
+            </label>
+            <select
+              [(ngModel)]="arrangementForm.trackId"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-start text-sm text-[#182f57] outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-cyan-100">
+              <option [ngValue]="null">{{ languageService.translate('chooseTrack') }}</option>
+              @for (track of tracks; track track.id) {
+                <option [ngValue]="track.id">
+                  {{ track.title }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('dayOfWeek') }} *
+            </label>
+            <select
+              [(ngModel)]="arrangementForm.dayOfWeek"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-start text-sm text-[#182f57] outline-none focus:border-[#41a6b1]">
+              @for (day of dayNames; track $index) {
+                <option [ngValue]="$index">{{ day }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('startTime') }} *
+            </label>
+            <input
+              type="time"
+              [(ngModel)]="arrangementForm.startTime"
+              class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-[#182f57] outline-none focus:border-[#41a6b1]"
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('endTime') }} *
+            </label>
+            <input
+              type="time"
+              [(ngModel)]="arrangementForm.endTime"
+              class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-[#182f57] outline-none focus:border-[#41a6b1]"
+            />
+            <p class="mt-1 text-xs text-slate-400">
+              {{ languageService.translate('privateSessionDurationRule') }}
+            </p>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('startDate') }} *
+            </label>
+            <input
+              type="date"
+              [(ngModel)]="arrangementForm.startDate"
+              class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-[#182f57] outline-none focus:border-[#41a6b1]"
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('endDate') }}
+              <span class="font-normal text-slate-400">({{ languageService.translate('optional') }})</span>
+            </label>
+            <input
+              type="date"
+              [(ngModel)]="arrangementForm.endDate"
+              [min]="arrangementForm.startDate"
+              class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-[#182f57] outline-none focus:border-[#41a6b1]"
+            />
+            <p class="mt-1 text-xs text-slate-400">
+              {{ languageService.translate('arrangementNoEndDateHint') }}
+            </p>
+          </div>
+
+          <!-- Main Meeting Link -->
+          <div class="md:col-span-2">
+            <label class="mb-2 block text-sm font-semibold text-slate-600">
+              {{ languageService.translate('mainMeetingLink') }} *
+            </label>
+            <input
+              type="url"
+              [(ngModel)]="arrangementForm.meetingLink"
+              placeholder="https://meet.google.com/..."
+              required
+              class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-[#182f57] outline-none focus:border-[#41a6b1]"
+            />
+            <p class="mt-1 text-xs text-slate-500">
+              {{ languageService.translate('mainMeetingLinkDescription') }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-cyan-100 bg-cyan-50 p-4 text-start text-sm text-[#29456E]">
+          <strong>{{ languageService.translate('beforeCreating') }}</strong>
+          {{ languageService.translate('privateArrangementRequirements') }}
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <button
+            type="button"
+            (click)="createArrangement()"
+            [disabled]="isSaving || students.length === 0 || instructors.length === 0 || tracks.length === 0"
+            class="rounded-xl bg-[#182f57] px-7 py-3 font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-50">
+            {{ isSaving ? languageService.translate('creating') : languageService.translate('createArrangement') }}
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (activeTab === 'arrangements') {
+      <section class="space-y-5">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold text-[#182f57]">
+                {{ languageService.translate('privateArrangements') }}
+              </h2>
+              <p class="mt-1 text-sm text-slate-500">
+                {{ languageService.translate('managePrivateArrangementsDescription') }}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              (click)="loadArrangements()"
+              class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-[#182f57] hover:bg-slate-50">
+              {{ languageService.translate('refresh') }}
+            </button>
+          </div>
+
+          @if (arrangements.length === 0) {
+            <div class="rounded-xl border border-dashed border-slate-200 py-12 text-center text-slate-500">
+              {{ languageService.translate('noPrivateArrangementsFound') }}
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @for (arrangement of arrangements; track arrangement.id) {
+                <div class="rounded-xl border border-slate-200 p-5">
+                  <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <div class="flex flex-wrap items-center gap-2">
+                        <h3 class="font-bold text-[#182f57]">
+                          {{ arrangement.studentName }}
+                        </h3>
+
+                        <span
+                          class="rounded-full px-3 py-1 text-xs font-semibold"
+                          [class.bg-emerald-100]="arrangement.isActive"
+                          [class.text-emerald-700]="arrangement.isActive"
+                          [class.bg-slate-100]="!arrangement.isActive"
+                          [class.text-slate-600]="!arrangement.isActive">
+                          {{ arrangement.isActive ? languageService.translate('active') : languageService.translate('ended') }}
+                        </span>
+
+                        <span class="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-[#29456E]">
+                          {{ getApprovalStatusName(arrangement.approvalStatus) }}
+                        </span>
+                      </div>
+
+                      <p class="mt-2 text-sm text-slate-600">
+                        {{ languageService.translate('instructor') }}: {{ arrangement.instructorName }}
+                      </p>
+                      <p class="mt-1 text-sm text-slate-600">
+                        {{ languageService.translate('track') }}: {{ arrangement.trackTitle }}
+                      </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                      @if (arrangement.isActive) {
+                        <button
+                          type="button"
+                          (click)="generateOccurrences(arrangement)"
+                          [disabled]="isSaving"
+                          class="rounded-lg bg-[#182f57] px-4 py-2 text-xs font-semibold text-white hover:bg-[#29456E] disabled:opacity-50">
+                          {{ languageService.translate('generateNext12Weeks') }}
+                        </button>
+
+                        <button
+                          type="button"
+                          (click)="endArrangement(arrangement)"
+                          [disabled]="isSaving"
+                          class="rounded-lg border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50">
+                          {{ languageService.translate('endArrangement') }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="mt-4 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-4">
+                    <div>
+                      <p class="text-xs text-slate-400">{{ languageService.translate('weeklyDay') }}</p>
+                      <p class="mt-1 font-semibold text-slate-700">
+                        {{ dayNames[arrangement.dayOfWeek] ?? languageService.translate('unknown') }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-xs text-slate-400">{{ languageService.translate('time') }}</p>
+                      <p class="mt-1 font-semibold text-slate-700">
+                        {{ formatTime(arrangement.startTime) }} – {{ formatTime(arrangement.endTime) }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-xs text-slate-400">{{ languageService.translate('startDate') }}</p>
+                      <p class="mt-1 font-semibold text-slate-700">
+                        {{ arrangement.startDate | date:'mediumDate':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-xs text-slate-400">{{ languageService.translate('endDate') }}</p>
+                      <p class="mt-1 font-semibold text-slate-700">
+                        {{ arrangement.endDate ? (arrangement.endDate | date:'mediumDate':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US')) : languageService.translate('notSpecified') }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeTab === 'sessions') {
+      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="mb-5">
+          <h2 class="text-xl font-bold text-[#182f57]">
+            {{ languageService.translate('privateSessions') }}
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            {{ languageService.translate('managePrivateSessionsDescription') }}
+          </p>
+        </div>
+
+        <div class="mb-5 grid grid-cols-1 gap-3 rounded-xl bg-[#F8FAFD] p-4 sm:grid-cols-3">
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">
+              {{ languageService.translate('fromDate') }}
+            </label>
+            <input
+              type="date"
+              [(ngModel)]="occurrenceFromDate"
+              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">
+              {{ languageService.translate('toDate') }}
+            </label>
+            <input
+              type="date"
+              [(ngModel)]="occurrenceToDate"
+              [min]="occurrenceFromDate"
+              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">
+              {{ languageService.translate('status') }}
+            </label>
+            <select
+              [(ngModel)]="occurrenceStatusFilter"
+              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-start text-sm">
+              <option value="">{{ languageService.translate('allStatuses') }}</option>
+              <option [value]="sessionStatuses.Scheduled">{{ languageService.translate('scheduled') }}</option>
+              <option [value]="sessionStatuses.Ongoing">{{ languageService.translate('ongoing') }}</option>
+              <option [value]="sessionStatuses.Active">{{ languageService.translate('active') }}</option>
+              <option [value]="sessionStatuses.Completed">{{ languageService.translate('completed') }}</option>
+              <option [value]="sessionStatuses.Finished">{{ languageService.translate('finished') }}</option>
+              <option [value]="sessionStatuses.Missed">{{ languageService.translate('missed') }}</option>
+              <option [value]="sessionStatuses.Cancelled">{{ languageService.translate('cancelled') }}</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-3 sm:flex sm:justify-end">
+            <button
+              type="button"
+              (click)="loadOccurrences()"
+              class="w-full rounded-lg bg-[#182f57] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#29456E] sm:w-auto">
+              {{ languageService.translate('applyFilters') }}
+            </button>
+          </div>
+        </div>
+
+        @if (occurrences.length === 0) {
+          <div class="rounded-xl border border-dashed border-slate-200 py-12 text-center text-slate-500">
+            {{ languageService.translate('noPrivateSessionsForFilters') }}
+          </div>
+        } @else {
+          <div class="space-y-4">
+            @for (occurrence of occurrences; track occurrence.id) {
+              <div class="rounded-xl border border-slate-200 p-4 sm:p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h3 class="font-bold text-[#182f57]">
+                        {{ occurrence.studentName }}
+                      </h3>
+
+                      <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                        {{ getStatusName(occurrence.status) }}
+                      </span>
+
+                      @if (occurrence.isReplacement) {
+                        <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-[#29456E]">
+                          {{ languageService.translate('replacement') }}
+                        </span>
+                      }
+                    </div>
+
+                    <p class="mt-2 text-sm text-slate-600">
+                      {{ languageService.translate('instructor') }}: {{ occurrence.instructorName }}
+                    </p>
+                    <p class="mt-1 text-sm text-slate-600">
+                      {{ languageService.translate('track') }}: {{ occurrence.trackTitle }}
+                    </p>
+                  </div>
+
+                  <span class="text-xs text-slate-400">
+                    {{ languageService.translate('sessionNumber') }}{{ occurrence.id }}
+                  </span>
+                </div>
+
+                <div class="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2">
+                  <div>
+                    <p class="text-xs text-slate-400">{{ languageService.translate('start') }}</p>
+                    <p class="mt-1 font-medium text-slate-700">
+                      {{ formatDateTime(occurrence.startUtc) }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-400">{{ languageService.translate('end') }}</p>
+                    <p class="mt-1 font-medium text-slate-700">
+                      {{ formatDateTime(occurrence.endUtc) }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+                  @if (
+                    occurrence.status === sessionStatuses.Scheduled ||
+                    occurrence.status === sessionStatuses.Active
+                  ) {
+                    <button
+                      type="button"
+                      (click)="updateOccurrenceStatus(occurrence, sessionStatuses.Completed, 'Complete')"
+                      [disabled]="isSaving"
+                      class="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50">
+                      {{ languageService.translate('markCompleted') }}
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="updateOccurrenceStatus(occurrence, sessionStatuses.Missed, 'Miss')"
+                      [disabled]="isSaving"
+                      class="rounded-lg border border-amber-200 px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-50">
+                      {{ languageService.translate('markMissed') }}
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="updateOccurrenceStatus(occurrence, sessionStatuses.Cancelled, 'Cancel')"
+                      [disabled]="isSaving"
+                      class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50">
+                      {{ languageService.translate('cancelSession') }}
+                    </button>
+                  }
+
+                  @if (
+                    occurrence.status === sessionStatuses.Missed ||
+                    occurrence.status === sessionStatuses.Cancelled
+                  ) {
+                    <button
+                      type="button"
+                      (click)="openReplacementForm(occurrence)"
+                      class="rounded-lg bg-[#182f57] px-3 py-2 text-xs font-semibold text-white hover:bg-[#29456E]">
+                      {{ languageService.translate('assignReplacement') }}
+                    </button>
+                  }
+                </div>
+
+                @if (replacementOccurrenceId === occurrence.id) {
+                  <div class="mt-4 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
+                    <h4 class="font-semibold text-[#182f57]">
+                      {{ languageService.translate('assignReplacementSession') }}
+                    </h4>
+
+                    <p class="mt-1 text-xs text-slate-600">
+                      {{ languageService.translate('replacementSessionDescription') }}
+                    </p>
+
+                    <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                      <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                          {{ languageService.translate('replacementDate') }}
+                        </label>
+                        <input
+                          type="date"
+                          [(ngModel)]="replacementForm.date"
+                          class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                          {{ languageService.translate('startTime') }}
+                        </label>
+                        <input
+                          type="time"
+                          [(ngModel)]="replacementForm.startTime"
+                          class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                          {{ languageService.translate('endTime') }}
+                        </label>
+                        <input
+                          type="time"
+                          [(ngModel)]="replacementForm.endTime"
+                          class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                          {{ languageService.translate('replacementMeetingLink') }} *
+                        </label>
+                        <input
+                          type="url"
+                          [(ngModel)]="replacementForm.meetingLink"
+                          placeholder="https://meet.google.com/..."
+                          required
+                          class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <p class="mt-3 text-xs text-slate-600">
+                      {{ languageService.translate('replacementMeetingLinkDescription') }}
+                    </p>
+
+                    <div class="mt-4 flex flex-wrap justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="closeReplacementForm()"
+                        class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+                        {{ languageService.translate('close') }}
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="assignReplacement(occurrence)"
+                        [disabled]="isSaving"
+                        class="rounded-lg bg-[#182f57] px-4 py-2 text-xs font-semibold text-white hover:bg-[#29456E] disabled:opacity-50">
+                        {{ isSaving ? languageService.translate('saving') : languageService.translate('confirmReplacement') }}
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    @if (activeTab === 'requests') {
+      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="mb-5">
+          <h2 class="text-xl font-bold text-[#182f57]">
+            {{ languageService.translate('privateSessionRequests') }}
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            {{ languageService.translate('reviewPrivateSessionRequestsDescription') }}
+          </p>
+        </div>
+
+        <div class="mb-5 grid grid-cols-1 gap-3 rounded-xl bg-[#F8FAFD] p-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">
+              {{ languageService.translate('requestStatus') }}
+            </label>
+            <select
+              [(ngModel)]="requestStatusFilter"
+              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-start text-sm">
+              <option value="">{{ languageService.translate('allStatuses') }}</option>
+              <option [value]="approvalStatuses.Pending">{{ languageService.translate('pending') }}</option>
+              <option [value]="approvalStatuses.Approved">{{ languageService.translate('approved') }}</option>
+              <option [value]="approvalStatuses.Rejected">{{ languageService.translate('rejected') }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-500">
+              {{ languageService.translate('requestType') }}
+            </label>
+            <select
+              [(ngModel)]="requestTypeFilter"
+              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-start text-sm">
+              <option value="">{{ languageService.translate('allRequestTypes') }}</option>
+              <option [value]="requestTypes.StudentAbsence">{{ languageService.translate('studentAbsence') }}</option>
+              <option [value]="requestTypes.InstructorCancellation">{{ languageService.translate('instructorCancellation') }}</option>
+              <option [value]="requestTypes.Cancellation">{{ languageService.translate('studentCancellation') }}</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2 sm:flex sm:justify-end">
+            <button
+              type="button"
+              (click)="loadRequests()"
+              class="w-full rounded-lg bg-[#182f57] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#29456E] sm:w-auto">
+              {{ languageService.translate('applyFilters') }}
+            </button>
+          </div>
+        </div>
+
+        @if (requests.length === 0) {
+          <div class="rounded-xl border border-dashed border-slate-200 py-12 text-center text-slate-500">
+            {{ languageService.translate('noRequestsForFilters') }}
+          </div>
+        } @else {
+          <div class="space-y-4">
+            @for (request of requests; track request.id) {
+              <div class="rounded-xl border border-slate-200 p-4 sm:p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 class="font-bold text-[#182f57]">
+                      {{ request.studentName }}
+                    </h3>
+
+                    <p class="mt-2 text-sm text-slate-600">
+                      {{ getRequestTypeName(request.requestType) }}
+                    </p>
+
+                    <p class="mt-1 text-sm text-slate-600">
+                      {{ languageService.translate('instructor') }}: {{ request.instructorName }}
+                    </p>
+
+                    <p class="mt-1 text-sm text-slate-600">
+                      {{ languageService.translate('track') }}: {{ request.trackTitle }}
+                    </p>
+                  </div>
+
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-semibold"
+                    [class.bg-amber-100]="request.status === approvalStatuses.Pending"
+                    [class.text-amber-700]="request.status === approvalStatuses.Pending"
+                    [class.bg-emerald-100]="request.status === approvalStatuses.Approved"
+                    [class.text-emerald-700]="request.status === approvalStatuses.Approved"
+                    [class.bg-red-100]="request.status === approvalStatuses.Rejected"
+                    [class.text-red-700]="request.status === approvalStatuses.Rejected">
+                    {{ getApprovalStatusName(request.status) }}
+                  </span>
+                </div>
+
+                <div class="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3">
+                  <div>
+                    <p class="text-xs text-slate-400">{{ languageService.translate('sessionStart') }}</p>
+                    <p class="mt-1 text-slate-700">
+                      {{ formatDateTime(request.startUtc) }}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs text-slate-400">{{ languageService.translate('sessionEnd') }}</p>
+                    <p class="mt-1 text-slate-700">
+                      {{ formatDateTime(request.endUtc) }}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="text-xs text-slate-400">{{ languageService.translate('requestSubmitted') }}</p>
+                    <p class="mt-1 text-slate-700">
+                      {{ formatDateTime(request.createdAtUtc) }}
+                    </p>
+                  </div>
+                </div>
+
+                @if (request.status === approvalStatuses.Pending) {
+                  <div class="mt-4 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4">
+                    <button
+                      type="button"
+                      (click)="reviewRequest(request, approvalStatuses.Rejected)"
+                      [disabled]="isSaving"
+                      class="rounded-lg border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50">
+                      {{ languageService.translate('reject') }}
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="reviewRequest(request, approvalStatuses.Approved)"
+                      [disabled]="isSaving"
+                      class="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50">
+                      {{ languageService.translate('approve') }}
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

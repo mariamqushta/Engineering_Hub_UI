@@ -27,7 +27,7 @@ export class Header implements OnInit, OnDestroy {
   profileImageUrl: string | null = null;
   fullName = '';
   userName = '';
-
+  isStudent = false;
   private routerSubscription?: Subscription;
   private userSubscription?: Subscription;
   private isCheckingUser = false;
@@ -63,7 +63,7 @@ export class Header implements OnInit, OnDestroy {
           this.isLoggedIn = true;
           this.fullName = user.fullName ?? '';
           this.userName = user.userName ?? user.username ?? '';
-
+          // this.isStudent = roles.includes('Student');
           const image = user.profileImageUrl ?? user.ProfileImageUrl ?? null;
 
           // The backend returns a relative path, so use the API server origin.
@@ -92,7 +92,7 @@ export class Header implements OnInit, OnDestroy {
           this.profileImageUrl = null;
           this.fullName = '';
           this.userName = '';
-
+          //  this.isStudent = false;
           this.isCheckingUser = false;
           this.cdr.markForCheck();
         }

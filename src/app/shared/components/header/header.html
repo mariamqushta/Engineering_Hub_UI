@@ -29,7 +29,16 @@
       {{ languageService.translate('calendar') }}
     </a>
   </li>
-
+<!-- @if (isLoggedIn && isStudent) { -->
+  <li>
+    <a
+      routerLink="/student/admin-chat"
+      class="text-white hover:text-[#49DCEB] cursor-pointer"
+    >
+      {{ languageService.translate('adminChat') }}
+    </a>
+  </li>
+<!-- } -->
 <li>
   <a
     routerLink="/student/status"

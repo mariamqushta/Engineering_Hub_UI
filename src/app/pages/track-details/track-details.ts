@@ -24,7 +24,8 @@ export class TrackDetails {
   selectedTab: string = 'lessons';
   isTrackCompleted = false;
   lessons: Lesson[] = [];
-
+  accountType: number | null = null;
+  isAccountTypeLoaded = false;
   interactiveActivities: any[] = [];
   workshops: any[] = [];
 
@@ -55,8 +56,29 @@ this.loadWorkshops(id);
 this.loadTrackCompletionStatus(id);
 this.loadCoachingAccess();
     }
-  }
+    this.authService.getCurrentUser().subscribe({
+  next: (user) => {
+    const accountType = Number(user.accountType);
 
+    this.accountType =
+      accountType === 0 || accountType === 1
+        ? accountType
+        : null;
+
+    this.isAccountTypeLoaded = true;
+    this.cdr.detectChanges();
+  },
+  error: (error) => {
+    console.error('Could not determine student account type:', error);
+    this.accountType = null;
+    this.isAccountTypeLoaded = true;
+    this.cdr.detectChanges();
+  }
+});
+  }
+openAdminChat(): void {
+  this.router.navigate(['/student/admin-chat']);
+}
 loadLessons(trackId: number): void {
   this.trackService.getLessonsByTrack(trackId).subscribe({
     next: (data) => {

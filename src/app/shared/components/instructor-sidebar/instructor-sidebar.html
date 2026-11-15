@@ -10,7 +10,14 @@
       <p>{{ languageService.translate('instructorPortal') }}</p>
     </div>
   </div>
-
+    <button
+  type="button"
+  (click)="languageService.toggleLanguage()"
+  class="rounded-lg border border-[#49DCEB] px-3 py-2 text-white hover:text-[#49DCEB]"
+  [attr.aria-label]="languageService.translate('language')"
+>
+  {{ languageService.translate('language') }}
+</button>
   <nav class="sidebar-menu">
     @for (item of menuItems; track item.name) {
       <button
