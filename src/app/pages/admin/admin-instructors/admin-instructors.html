@@ -2,10 +2,10 @@
 <div class="min-h-full bg-[#F3F6FB] p-4 sm:p-6 lg:p-8">
   <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
     <div class="text-start">
-      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">
+      <p class="mb-2 text-sm font-semibold uppercase tracking-wider text-[#41a6b1]">
         {{ languageService.translate('administration') }}
       </p>
-      <h1 class="text-2xl font-bold text-[#003300] sm:text-3xl">
+      <h1 class="text-2xl font-bold text-[#182f57] sm:text-3xl">
         {{ languageService.translate('instructors') }}
       </h1>
       <p class="mt-2 text-sm text-slate-500">
@@ -17,7 +17,7 @@
       <p class="text-sm text-slate-500">
         {{ languageService.translate('totalInstructors') }}
       </p>
-      <p class="text-2xl font-bold text-[#003300]">
+      <p class="text-2xl font-bold text-[#182f57]">
         {{ instructors.length }}
       </p>
     </div>
@@ -43,7 +43,7 @@
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div class="overflow-x-auto">
         <table class="w-full min-w-[1050px] text-start">
-          <thead class="bg-[#003300] text-sm text-white">
+          <thead class="bg-[#182f57] text-sm text-white">
             <tr>
               <th class="px-5 py-4 font-semibold">
                 {{ languageService.translate('instructor') }}
@@ -75,21 +75,19 @@
                         class="h-12 w-12 rounded-full border border-slate-200 object-cover"
                       />
                     } @else {
-                      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#003300] font-bold text-[#D4AF37]">
+                      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#182f57] font-bold text-[#49DCEB]">
                         {{ (instructor.fullName || instructor.userName || 'I').charAt(0).toUpperCase() }}
                       </div>
                     }
 
                     <div class="text-start">
-                      <p class="font-semibold text-[#003300]">
+                      <p class="font-semibold text-[#182f57]">
                         {{ instructor.fullName || languageService.translate('nameNotProvided') }}
                       </p>
                       <p class="mt-1 text-sm text-slate-500">
                         @{{ instructor.userName }}
                       </p>
-                      <p class="mt-1 text-xs text-slate-400">
-                        {{ languageService.translate('idLabel') }}: {{ instructor.id }}
-                      </p>
+                
                     </div>
                   </div>
 
@@ -141,7 +139,7 @@
                   @if (instructor.tracks.length > 0) {
                     <div class="flex max-w-xs flex-wrap gap-2">
                       @for (track of instructor.tracks; track track.id) {
-                        <span class="rounded-lg border border-[#F0E68C]/30 bg-[#F0E68C]/20 px-3 py-2 text-start text-sm font-medium text-[#003300]">
+                        <span class="rounded-lg border border-cyan-100 bg-cyan-50 px-3 py-2 text-start text-sm font-medium text-[#182f57]">
                           {{ track.title }}
                         </span>
                       }
@@ -163,7 +161,7 @@
                       [(ngModel)]="instructor.selectedTrackId"
                       [ngModelOptions]="{standalone: true}"
                       [disabled]="isSaving || getAvailableTracks(instructor).length === 0"
-                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-start text-sm text-[#003300] outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30">
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-start text-sm text-[#182f57] outline-none focus:border-[#41a6b1] focus:ring-2 focus:ring-cyan-100">
                       <option [ngValue]="null">
                         {{ languageService.translate(getAvailableTracks(instructor).length ? 'chooseATrack' : 'allTracksAssigned') }}
                       </option>
@@ -179,7 +177,7 @@
                       type="button"
                       (click)="assignInstructor(instructor)"
                       [disabled]="isSaving || instructor.selectedTrackId === null"
-                      class="w-full rounded-xl bg-[#003300] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#4a7c59] disabled:cursor-not-allowed disabled:opacity-50">
+                      class="w-full rounded-xl bg-[#182f57] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#29456E] disabled:cursor-not-allowed disabled:opacity-50">
                       {{ languageService.translate(isSaving ? 'saving' : 'assignTrack') }}
                     </button>
 

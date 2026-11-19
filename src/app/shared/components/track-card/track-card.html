@@ -1,27 +1,27 @@
-<div class="h-full w-100 max-w-sm overflow-hidden rounded-2xl bg-[#003333] border-2 border-[#D4AF37] shadow-md">
-  <div class="flex h-full min-h-64 flex-col p-5">
+<article class="track-card-shell h-full w-full max-w-sm overflow-hidden rounded-2xl shadow-md">
+  <div class="track-card-content flex h-full min-h-64 flex-col p-5">
 
-    <h2 class="text-xl font-bold text-[#FFD700]">
+    <h2 class="track-card-title text-xl font-bold">
       {{ track.title }}
     </h2>
 
-    <p class="mt-2 text-[#D4AF37]">
+    <p class="track-card-description mt-2">
       {{ track.description }}
     </p>
 
     <div class="mt-auto flex gap-3 pt-5">
       <button
         [routerLink]="['/track', track.id]"
-        class="rounded-lg bg-[#D4AF37] px-4 py-2 text-[#003300] hover:bg-[#b8860b]">
+        class="track-card-primary rounded-lg px-4 py-2 font-semibold">
         {{ languageService.translate('viewTrack') }}
       </button>
 
       <button
         (click)="bookTrack()"
-        class="rounded-lg border border-[#D4AF37] px-4 py-2 text-[#D4AF37] hover:bg-[#004444]">
+        class="track-card-secondary rounded-lg border px-4 py-2 font-semibold">
         {{ languageService.translate('bookTrack') }}
       </button>
     </div>
 
   </div>
-</div>
+</article>

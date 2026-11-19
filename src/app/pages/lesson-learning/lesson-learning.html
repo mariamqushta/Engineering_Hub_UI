@@ -23,19 +23,19 @@
        class="mx-auto max-w-5xl">
 
     <div
-      class="mb-6 flex flex-col gap-5 rounded-2xl border-2 border-[#D4AF37] bg-[#003333] p-4 shadow-md sm:flex-row sm:items-start sm:justify-between">
+      class="lesson-heading-banner islamic-banner mb-6 flex flex-col gap-5 p-4 shadow-md sm:flex-row sm:items-start sm:justify-between">
 
       <!-- Lesson Information -->
       <div class="min-w-0 flex-1">
-        <p class="mb-2 text-sm text-[#D4AF37]">
+        <p class="lesson-content-label mb-2 text-sm">
           {{ languageService.translate('lesson') }} {{ lesson.order }}
         </p>
 
-        <h1 class="mb-3 break-words text-2xl font-bold text-[#FFD700] md:text-3xl">
+        <h1 class="lesson-important-text mb-3 break-words text-2xl font-bold md:text-3xl">
           {{ lesson.title }}
         </h1>
 
-        <p *ngIf="lesson.description" class="text-[#D4AF37]">
+        <p *ngIf="lesson.description" class="lesson-heading-description">
           {{ lesson.description }}
         </p>
       </div>
@@ -53,32 +53,32 @@
     </div>
 
     <!-- Lesson content navigation -->
-    <div class="mt-6 grid gap-6 md:grid-cols-[240px_minmax(0,1fr)]">
+    <div class="lesson-content-layout mt-6 grid gap-6 md:grid-cols-[240px_minmax(0,1fr)]">
 
       <!-- Content list -->
-      <aside class="h-fit rounded-2xl bg-[#003333] border-2 p-3 border-[#D4AF37] shadow-md">
-        <h2 class="mb-4 text-lg font-bold text-[#FFD700]">
+      <aside class="lesson-content-nav h-fit rounded-2xl border p-3 shadow-md">
+        <h2 class="lesson-content-heading mb-4 text-lg font-bold">
           {{ languageService.translate('lessonContent') }}
         </h2>
 
         <div *ngIf="contents.length === 0"
-             class="text-sm text-[#D4AF37]">
+             class="lesson-content-muted text-sm">
           {{ languageService.translate('noLessonContentAvailable') }}
         </div>
 
         <button
           *ngFor="let item of contents; let i = index"
           (click)="currentContentIndex = i"
-          class="mb-2 flex w-full items-center gap-3 rounded-lg border-2 border-[#D4AF37] p-3 text-left transition-all duration-200"
+          class="lesson-content-item mb-2 flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all duration-200"
           [ngClass]="currentContentIndex === i
-            ? 'border-[#4a7c59] bg-[#004444] text-[#FFD700] shadow-sm'
-            : 'border-[#003333] text-[#D4AF37] hover:border-gray-300 hover:bg-gray-50'">
+            ? 'is-selected shadow-sm'
+            : 'hover:border-gray-300 hover:bg-gray-50'">
 
           <span
             class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
             [ngClass]="currentContentIndex === i
-              ? 'bg-[#4a7c59] text-[#FFD700]'
-              : 'bg-[#003333] text-white'">
+              ? 'is-selected'
+              : 'is-unselected'">
             {{ i + 1 }}
           </span>
 
@@ -86,7 +86,7 @@
             <span class="block truncate font-semibold">
               {{ item.lessonTypeName }}
             </span>
-            <span class="block text-xs text-[#D4AF37]">
+            <span class="lesson-content-muted block text-xs">
               {{ languageService.translate('content') }} {{ i + 1 }}
             </span>
           </span>
@@ -102,10 +102,10 @@
         <button
           type="button"
           (click)="openEndOfLessonQuiz()"
-          class="mb-2 flex w-full items-center gap-3 rounded-lg border-2 border-[#49DCEB] p-3 text-left text-[#41a6b1] transition-all duration-200 hover:bg-[#182f57]">
+          class="lesson-quiz-link mb-2 flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all duration-200">
 
           <span
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#29456E] text-white">
+            class="lesson-quiz-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
             ✓
           </span>
 
@@ -123,22 +123,22 @@
       <!-- Only the selected content -->
       <section class="min-w-0">
         <div *ngIf="currentContent as content"
-             class="content-enter rounded-2xl bg-[#003333] border-2 border-[#D4AF37] shadow-md md:p-6">
+             class="lesson-content-panel content-enter rounded-2xl border shadow-md md:p-6">
 
           <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p class="text-sm text-[#41a6b1]">
+              <p class="lesson-content-muted text-sm">
                 {{ languageService.translate('content') }}
                 {{ currentContentIndex + 1 }}
                 {{ languageService.translate('of') }}
                 {{ totalContents }}
               </p>
-              <h2 class="mt-1 text-xl font-bold text-[#FFD700]">
+              <h2 class="lesson-important-text mt-1 text-xl font-bold">
                 {{ content.lessonTypeName }}
               </h2>
             </div>
 
-            <span class="rounded-full bg-[#004444] px-3 py-1 text-sm text-[#FFD700]">
+            <span class="lesson-content-count rounded-full px-3 py-1 text-sm">
               {{ currentContentIndex + 1 }} / {{ totalContents }}
             </span>
           </div>
@@ -184,7 +184,7 @@
 
           <!-- Workshop / interactive references -->
           <div *ngIf="content.workshopId || content.interactiveActivityId"
-               class="mt-4 space-y-2 text-[#D4AF37]">
+               class="lesson-important-text mt-4 space-y-2">
             <p *ngIf="content.workshopId">
               {{ languageService.translate('workshopReference') }}:
               {{ content.workshopId }}

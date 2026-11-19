@@ -54,14 +54,14 @@
           <span class="font-medium text-slate-800">
             {{ languageService.translate('date') }}:
           </span>
-          {{ workshop.date | date:'mediumDate' }}
+          {{ workshop.date | date:'mediumDate':'UTC' }}
         </p>
 
         <p class="text-sm text-slate-600">
           <span class="font-medium text-slate-800">
             {{ languageService.translate('time') }}:
           </span>
-          {{ workshop.startTime }} – {{ workshop.endTime }}
+          {{ workshop.startTime | time12Hour }} – {{ workshop.endTime | time12Hour }}
         </p>
 
         <p class="text-sm text-slate-600">
@@ -147,10 +147,10 @@
       @for (day of calendarDays; track $index) {
 
         @if (day === null) {
-          <div class="min-h-14 rounded-lg sm:min-h-24"></div>
+          <div class="h-16 rounded-lg sm:h-28"></div>
         } @else {
           <div
-            class="min-h-14 min-w-0 rounded-lg border p-1 sm:min-h-24 sm:p-2"
+            class="relative h-16 min-w-0 overflow-hidden rounded-lg border p-1 sm:h-28 sm:p-2"
             [ngClass]="{
               'border-[#49DCEB] bg-cyan-50': isSelectedDate(day),
               'border-slate-100 bg-white': !isSelectedDate(day)
@@ -162,7 +162,7 @@
               (click)="selectDate(day)"
               [disabled]="!hasWorkshopOnDate(day)"
               [attr.aria-label]="monthNames[currentMonth] + ' ' + day"
-              class="mb-1 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition disabled:cursor-default"
+              class="absolute start-1 top-1 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition disabled:cursor-default"
               [ngClass]="{
                 'bg-[#182f57] text-white': isSelectedDate(day),
                 'text-[#2499a8] hover:bg-cyan-100': hasWorkshopOnDate(day) && !isSelectedDate(day),
@@ -173,13 +173,13 @@
             </button>
 
             <!-- Each workshop has its own selection control -->
-            <div class="space-y-1">
+            <div class="absolute inset-x-1 bottom-1 top-9 space-y-1 overflow-y-auto sm:inset-x-2 sm:bottom-2 sm:top-10">
               @for (workshop of workshopsOnDate(day); track workshop.id) {
                 <button
                   type="button"
                   (click)="selectWorkshop(workshop)"
                   [attr.aria-pressed]="isSelectedWorkshop(workshop)"
-                  [title]="workshop.title + ' — ' + workshop.startTime"
+                  [title]="workshop.title + ' — ' + (workshop.startTime | time12Hour)"
                   class="block w-full min-w-0 rounded px-1 py-1 text-left text-[10px] leading-tight transition sm:text-xs"
                   [ngClass]="{
                     'bg-[#29456E] text-white': isSelectedWorkshop(workshop),
@@ -191,7 +191,7 @@
                   </span>
 
                   <span class="block truncate opacity-80">
-                    {{ workshop.startTime }}
+                    {{ workshop.startTime | time12Hour }}
                   </span>
                 </button>
               }

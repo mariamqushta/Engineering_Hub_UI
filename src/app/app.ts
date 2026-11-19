@@ -15,6 +15,7 @@ import { Header } from './shared/components/header/header';
   styleUrl: './app.css'
 })
 export class App {
+  readonly currentYear = new Date().getFullYear();
   isInstructorRoute = false;
   isAdminRoute = false;
   constructor(private router: Router) {

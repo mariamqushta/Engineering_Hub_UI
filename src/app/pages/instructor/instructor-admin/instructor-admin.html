@@ -10,7 +10,7 @@
 
         <div>
           <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#41a6b1]">
-            Engineering Hub
+            Islamic Learning Platform
           </p>
           <h1 class="mt-1 text-2xl font-extrabold text-[#182f57] sm:text-3xl">
             {{ languageService.translate('contactAdmin') }}
@@ -30,13 +30,13 @@
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-[#182f57]/5">
 
-      <div class="flex items-center gap-3 bg-gradient-to-r from-[#002222] to-[#4a7c59] px-5 py-5 sm:px-7">
+      <div class="islamic-banner islamic-strip flex items-center gap-3 px-5 py-5 sm:px-7">
         <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg font-bold text-[#D4AF37]">
           A
         </div>
 
         <div class="min-w-0">
-          <h2 class="truncate font-bold text-white">{{ languageService.translate('engineeringHubAdmin') }}</h2>
+          <h2 class="truncate font-bold text-white">{{ languageService.translate('islamicLearningAdmin') }}</h2>
           <p class="mt-1 text-xs text-slate-300">{{ languageService.translate('yourSupportConversation') }}</p>
         </div>
       </div>
@@ -81,7 +81,7 @@
                 </div>
 
                 <p class="mt-2 text-xs text-slate-400">
-                  {{ message.sentAt | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                  {{ message.sentAt | date:'h:mm a':undefined:'en-US' }}
                 </p>
               </div>
             </div>

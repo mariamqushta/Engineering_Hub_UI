@@ -48,7 +48,7 @@
               {{ languageService.translate('date') }}
             </p>
             <p class="mt-1 font-semibold text-slate-800">
-              {{ activity.date | date:'EEEE, MMMM d, y' }}
+              {{ activity.date | date:'EEEE, MMMM d, y':'UTC' }}
             </p>
           </div>
 
@@ -57,7 +57,7 @@
               {{ languageService.translate('time') }}
             </p>
             <p class="mt-1 font-semibold text-slate-800">
-              {{ activity.startTime }} - {{ activity.endTime }}
+              {{ activity.startTime | time12Hour }} - {{ activity.endTime | time12Hour }}
             </p>
           </div>
 
@@ -219,11 +219,11 @@
       @for (day of calendarDays; track $index) {
 
         @if (day === null) {
-          <div class="min-h-20 rounded-lg bg-slate-50/50 sm:min-h-28"></div>
+          <div class="h-20 rounded-lg bg-slate-50/50 sm:h-32"></div>
         } @else {
 
           <div
-            class="min-h-20 min-w-0 rounded-lg border p-1 transition sm:min-h-32 sm:p-2"
+            class="relative h-20 min-w-0 overflow-hidden rounded-lg border p-1 transition sm:h-32 sm:p-2"
             [ngClass]="{
               'border-[#182f57] bg-blue-50':
                 isSelectedDate(day),
@@ -238,7 +238,7 @@
               type="button"
               (click)="selectDate(day)"
               [disabled]="!hasActivityOnDate(day)"
-              class="mb-1 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition sm:h-8 sm:w-8 sm:text-sm"
+              class="absolute start-1 top-1 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition sm:h-8 sm:w-8 sm:text-sm"
               [ngClass]="{
                 'bg-[#182f57] text-white':
                   isSelectedDate(day),
@@ -251,7 +251,7 @@
             </button>
 
             <!-- Sessions on This Date -->
-            <div class="space-y-1">
+            <div class="absolute inset-x-1 bottom-1 top-9 space-y-1 overflow-y-auto sm:inset-x-2 sm:bottom-2 sm:top-10">
               @for (
                 activity of getActivitiesOnDate(day);
                 track activity.id
@@ -272,20 +272,21 @@
                   }"
                   [attr.aria-label]="
                     activity.title + ', ' +
-                    activity.startTime + ' ' +
+                    (activity.startTime | time12Hour) + ' ' +
                     languageService.translate('to') + ' ' +
-                    activity.endTime
+                    (activity.endTime | time12Hour)
                   "
                   [title]="
                     activity.title + ' · ' +
-                    activity.startTime + ' - ' + activity.endTime
+                    (activity.startTime | time12Hour) + ' - ' +
+                    (activity.endTime | time12Hour)
                   ">
                   <span class="block truncate font-semibold">
                     {{ activity.title }}
                   </span>
 
                   <span class="mt-0.5 block truncate">
-                    {{ activity.startTime }}
+                    {{ activity.startTime | time12Hour }}
                   </span>
                 </button>
               }

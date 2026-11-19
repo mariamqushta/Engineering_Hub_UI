@@ -3,7 +3,7 @@
 
     <div class="mb-8">
       <p class="text-sm font-semibold uppercase tracking-widest text-[#41a6b1]">
-        {{ languageService.translate('engineeringHub') }}
+        {{ languageService.translate('islamicLearningPlatform') }}
       </p>
       <h1 class="mt-2 text-3xl font-extrabold text-[#182f57]">
         {{ languageService.translate('coachingMessages') }}
@@ -40,7 +40,7 @@
             class="flex w-full items-start gap-3 border-b border-slate-100 p-4 text-left transition hover:bg-cyan-50"
             [class.bg-cyan-50]="selectedConversation?.conversationId === conversation.conversationId">
 
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#182f57] font-bold text-[#49DCEB]">
+            <div class="conversation-avatar flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-bold" aria-hidden="true">
               {{ conversation.studentName.charAt(0).toUpperCase() }}
             </div>
 
@@ -76,7 +76,7 @@
 
         @if (selectedConversation) {
           <header class="flex items-center gap-3 border-b border-slate-200 p-5">
-            <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#182f57] font-bold text-[#49DCEB]">
+            <div class="conversation-avatar flex h-11 w-11 items-center justify-center rounded-full font-bold" aria-hidden="true">
               {{ selectedConversation.studentName.charAt(0).toUpperCase() }}
             </div>
 
@@ -111,7 +111,7 @@
                       class="mt-2 text-right text-xs"
                       [class.text-slate-300]="message.isMine"
                       [class.text-slate-400]="!message.isMine">
-                      {{ message.sentAt | date:'shortTime' }}
+                      {{ message.sentAt | date:'h:mm a':undefined:'en-US' }}
                     </p>
                   </div>
                 </div>

@@ -8,6 +8,7 @@ import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
 import { TrackService } from '../../../core/services/track.service';
 import { Track } from '../../../core/models/track';
+import { formatTime12Hour } from '../../../shared/pipes/time12-hour.pipe';
 
 type ActivityFormMode = 'single' | 'recurring';
 
@@ -24,6 +25,7 @@ interface InteractiveActivity {
   price: number;
   meetingUrl: string | null;
   status: number;
+  approvalStatus: string | number;
 }
 
 interface RecurringActivityGroup {
@@ -103,7 +105,7 @@ export class InstructorInteractive implements OnInit {
     private trackService: TrackService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-     public languageService: LanguageService,
+    public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -117,74 +119,77 @@ export class InstructorInteractive implements OnInit {
   }
 
   /**
-   * Groups only activities that have the same backend schedule ID.
    * Activities without a schedule ID remain individual cards.
    */
   get normalActivities(): InteractiveActivity[] {
-  return this.activities
-    .filter(activity => activity.scheduleId === null)
-    .sort((a, b) => a.date.localeCompare(b.date));
-}
-
-get recurringSchedules(): RecurringActivityGroup[] {
-  const groups = new Map<number, InteractiveActivity[]>();
-
-  for (const activity of this.activities) {
-    if (activity.scheduleId === null) {
-      continue;
-    }
-
-    const scheduleId = activity.scheduleId;
-
-    if (!groups.has(scheduleId)) {
-      groups.set(scheduleId, []);
-    }
-
-    const occurrences = groups.get(scheduleId)!;
-
-    // Prevent duplicate occurrences within the same schedule.
-    if (!occurrences.some(item => item.id === activity.id)) {
-      occurrences.push(activity);
-    }
+    return this.activities
+      .filter(activity => activity.scheduleId === null)
+      .sort((a, b) => a.date.localeCompare(b.date));
   }
 
-  const dayNames = [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-    'Thursday', 'Friday', 'Saturday'
-  ];
+  /**
+   * Groups activities by their backend schedule ID.
+   * Approval status remains attached to each occurrence.
+   */
+  get recurringSchedules(): RecurringActivityGroup[] {
+    const groups = new Map<number, InteractiveActivity[]>();
 
-  return Array.from(groups.entries()).map(([scheduleId, items]) => {
-    const occurrences = [...items].sort(
-      (a, b) => a.date.localeCompare(b.date)
-    );
+    for (const activity of this.activities) {
+      if (activity.scheduleId === null) {
+        continue;
+      }
 
-    const first = occurrences[0];
-    const last = occurrences[occurrences.length - 1];
+      const scheduleId = activity.scheduleId;
 
-    const days = [
-      ...new Set(
-        occurrences.map(item => {
-          const date = item.date.substring(0, 10);
-          return dayNames[new Date(`${date}T12:00:00`).getDay()];
-        })
-      )
-    ].sort(
-      (a, b) => dayNames.indexOf(a) - dayNames.indexOf(b)
-    );
+      if (!groups.has(scheduleId)) {
+        groups.set(scheduleId, []);
+      }
 
-    return {
-      key: `schedule-${scheduleId}`,
-      title: first.title,
-      description: first.description,
-      startDate: first.date,
-      endDate: last.date,
-      startTime: first.startTime,
-      endTime: first.endTime,
-      days,
-      occurrences
-    };
-  });
-}
+      const occurrences = groups.get(scheduleId)!;
+
+      if (!occurrences.some(item => item.id === activity.id)) {
+        occurrences.push(activity);
+      }
+    }
+
+    const dayNames = [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+      'Thursday', 'Friday', 'Saturday'
+    ];
+
+    return Array.from(groups.entries()).map(([scheduleId, items]) => {
+      const occurrences = [...items].sort(
+        (a, b) => a.date.localeCompare(b.date)
+      );
+
+      const first = occurrences[0];
+      const last = occurrences[occurrences.length - 1];
+
+      const days = [
+        ...new Set(
+          occurrences.map(item => {
+            const date = item.date.substring(0, 10);
+            return dayNames[new Date(`${date}T12:00:00`).getDay()];
+          })
+        )
+      ].sort(
+        (a, b) => dayNames.indexOf(a) - dayNames.indexOf(b)
+      );
+
+      return {
+        key: `schedule-${scheduleId}`,
+        title: first.title,
+        description: first.description,
+        startDate: first.date,
+        endDate: last.date,
+        startTime: first.startTime,
+        endTime: first.endTime,
+        days,
+        occurrences
+      };
+    });
+  }
+
   loadMyTracks(): void {
     this.isLoadingTracks = true;
     this.errorMessage = '';
@@ -199,18 +204,7 @@ get recurringSchedules(): RecurringActivityGroup[] {
           const data = Array.isArray(response)
             ? response
             : response?.data ?? response?.tracks ?? [];
-          console.log('API response:', response);
-console.log('First API item:', data[0]);
-console.log(
-  'Schedule IDs:',
-  data.map((item: any) => ({
-    id: item.id,
-    scheduleId: item.scheduleId,
-    ScheduleId: item.ScheduleId,
-    interactiveScheduleId: item.interactiveScheduleId,
-    InteractiveScheduleId: item.InteractiveScheduleId
-  }))
-);
+
           this.tracks = data.map((item: any) => ({
             id: Number(item.id ?? item.Id ?? item.trackId ?? item.TrackId),
             title: item.title ?? item.Title ?? item.name ?? item.Name ?? '',
@@ -251,6 +245,10 @@ console.log(
     }
   }
 
+  /**
+   * Loads all activities belonging to the logged-in instructor.
+   * The instructor endpoint includes Pending, Approved and Rejected activities.
+   */
   loadActivities(): void {
     if (this.selectedTrackId === null) {
       this.activities = [];
@@ -260,8 +258,10 @@ console.log(
     this.isLoadingActivities = true;
     this.errorMessage = '';
 
-    this.trackService
-      .getInteractiveActivitiesByTrack(this.selectedTrackId)
+    this.http.get<any[] | { data?: any[]; activities?: any[] }>(
+      `${this.apiUrl}/InteractiveActivity/Instructor`,
+      { withCredentials: true }
+    )
       .pipe(finalize(() => {
         this.isLoadingActivities = false;
         this.cdr.detectChanges();
@@ -272,46 +272,101 @@ console.log(
             ? response
             : response?.data ?? response?.activities ?? [];
 
-          this.activities = data.map((item: any) => ({
-            id: Number(item.id ?? item.Id),
-            trackId: Number(item.trackId ?? item.TrackId),
-            scheduleId: this.readScheduleId(item),
-            title: item.title ?? item.Title ?? '',
-            description: item.description ?? item.Description ?? null,
-            date: item.date ?? item.Date ?? '',
-            startTime: item.startTime ?? item.StartTime ?? '',
-            endTime: item.endTime ?? item.EndTime ?? '',
-            capacity: Number(item.capacity ?? item.Capacity ?? 0),
-            price: Number(item.price ?? item.Price ?? 0),
-            meetingUrl: item.meetingUrl ?? item.MeetingUrl ?? null,
-            status: Number(item.status ?? item.Status ?? 0)
-          }));
+          this.activities = data
+            .map((item: any) => ({
+              id: Number(item.id ?? item.Id),
+              trackId: Number(item.trackId ?? item.TrackId),
+              scheduleId: this.readScheduleId(item),
+              title: item.title ?? item.Title ?? '',
+              description: item.description ?? item.Description ?? null,
+              date: item.date ?? item.Date ?? '',
+              startTime: item.startTime ?? item.StartTime ?? '',
+              endTime: item.endTime ?? item.EndTime ?? '',
+              capacity: Number(item.capacity ?? item.Capacity ?? 0),
+              price: Number(item.price ?? item.Price ?? 0),
+              meetingUrl: item.meetingUrl ?? item.MeetingUrl ?? null,
+              status: Number(item.status ?? item.Status ?? 0),
+              approvalStatus:
+                item.approvalStatus ??
+                item.ApprovalStatus ??
+                'Pending'
+            }))
+            .filter((activity: InteractiveActivity) =>
+              activity.trackId === this.selectedTrackId
+            );
 
           this.cdr.detectChanges();
         },
         error: error => {
           console.error('Error loading interactive activities:', error);
+
           this.errorMessage =
+            error.error?.message ??
             'Could not load interactive activities for this track.';
+
           this.cdr.detectChanges();
         }
       });
   }
 
-private readScheduleId(item: any): number | null {
-  const value =
-    item.scheduleId ??
-    item.ScheduleId ??
-    item.interactiveScheduleId ??
-    item.InteractiveScheduleId;
+  private readScheduleId(item: any): number | null {
+    const value =
+      item.scheduleId ??
+      item.ScheduleId ??
+      item.interactiveScheduleId ??
+      item.InteractiveScheduleId;
 
-  if (value === null || value === undefined || value === '') {
-    return null;
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    const id = Number(value);
+
+    return Number.isInteger(id) && id > 0 ? id : null;
   }
 
-  const id = Number(value);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
+  /**
+   * Approval status helpers.
+   * Numeric enum values assume Pending=0, Approved=1, Rejected=2.
+   */
+  getApprovalStatusLabel(status: string | number): string {
+    const value = String(status).toLowerCase();
+
+    switch (value) {
+      case '0':
+      case 'pending':
+        return 'Pending Admin Approval';
+
+      case '1':
+      case 'approved':
+        return 'Approved';
+
+      case '2':
+      case 'rejected':
+        return 'Rejected';
+
+      default:
+        return value;
+    }
+  }
+
+  getApprovalStatusClass(status: string | number): string {
+    const value = String(status).toLowerCase();
+
+    if (value === '1' || value === 'approved') {
+      return 'bg-emerald-100 text-emerald-700';
+    }
+
+    if (value === '2' || value === 'rejected') {
+      return 'bg-red-100 text-red-700';
+    }
+
+    if (value === '0' || value === 'pending') {
+      return 'bg-amber-100 text-amber-700';
+    }
+
+    return 'bg-slate-100 text-slate-700';
+  }
 
   openCreateForm(): void {
     if (this.selectedTrackId === null) {
@@ -435,27 +490,29 @@ private readScheduleId(item: any): number | null {
       payload,
       { withCredentials: true }
     )
-    .pipe(finalize(() => {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }))
-    .subscribe({
-      next: () => {
-        this.showForm = false;
-        this.activityFormMode = 'single';
-        this.resetScheduleForm();
-        this.successMessage = 'Recurring schedule created successfully.';
-        this.loadActivities();
-      },
-      error: error => {
-        console.error('Error creating recurring schedule:', error);
-        this.errorMessage =
-          error.error?.message ??
-          (typeof error.error === 'string' ? error.error : null) ??
-          'Could not create the recurring schedule.';
+      .pipe(finalize(() => {
+        this.isSaving = false;
         this.cdr.detectChanges();
-      }
-    });
+      }))
+      .subscribe({
+        next: () => {
+          this.showForm = false;
+          this.activityFormMode = 'single';
+          this.resetScheduleForm();
+          this.successMessage = 'Recurring schedule created successfully.';
+          this.loadActivities();
+        },
+        error: error => {
+          console.error('Error creating recurring schedule:', error);
+
+          this.errorMessage =
+            error.error?.message ??
+            (typeof error.error === 'string' ? error.error : null) ??
+            'Could not create the recurring schedule.';
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   createActivity(): void {
@@ -524,26 +581,28 @@ private readScheduleId(item: any): number | null {
       payload,
       { withCredentials: true }
     )
-    .pipe(finalize(() => {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }))
-    .subscribe({
-      next: () => {
-        this.showForm = false;
-        this.resetForm();
-        this.successMessage = 'Interactive activity created successfully.';
-        this.loadActivities();
-      },
-      error: error => {
-        console.error('Error creating interactive activity:', error);
-        this.errorMessage =
-          error.error?.message ??
-          (typeof error.error === 'string' ? error.error : null) ??
-          'Could not create the activity. Check your track assignment and entered details.';
+      .pipe(finalize(() => {
+        this.isSaving = false;
         this.cdr.detectChanges();
-      }
-    });
+      }))
+      .subscribe({
+        next: () => {
+          this.showForm = false;
+          this.resetForm();
+          this.successMessage = 'Interactive activity created successfully.';
+          this.loadActivities();
+        },
+        error: error => {
+          console.error('Error creating interactive activity:', error);
+
+          this.errorMessage =
+            error.error?.message ??
+            (typeof error.error === 'string' ? error.error : null) ??
+            'Could not create the activity. Check your track assignment and entered details.';
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   cancelActivity(activity: InteractiveActivity): void {
@@ -570,25 +629,28 @@ private readScheduleId(item: any): number | null {
       {},
       { withCredentials: true }
     )
-    .pipe(finalize(() => {
-      this.isCancelling = null;
-      this.cdr.detectChanges();
-    }))
-    .subscribe({
-      next: () => {
-        this.successMessage =
-          'Interactive activity cancelled successfully.';
-        this.loadActivities();
-      },
-      error: error => {
-        console.error('Error cancelling interactive activity:', error);
-        this.errorMessage =
-          error.error?.message ??
-          (typeof error.error === 'string' ? error.error : null) ??
-          'Could not cancel this activity.';
+      .pipe(finalize(() => {
+        this.isCancelling = null;
         this.cdr.detectChanges();
-      }
-    });
+      }))
+      .subscribe({
+        next: () => {
+          this.successMessage =
+            'Interactive activity cancelled successfully.';
+
+          this.loadActivities();
+        },
+        error: error => {
+          console.error('Error cancelling interactive activity:', error);
+
+          this.errorMessage =
+            error.error?.message ??
+            (typeof error.error === 'string' ? error.error : null) ??
+            'Could not cancel this activity.';
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   getStatusLabel(status: number): string {
@@ -604,7 +666,7 @@ private readScheduleId(item: any): number | null {
   }
 
   formatTime(value: string): string {
-    return value ? value.substring(0, 5) : '';
+    return formatTime12Hour(value);
   }
 
   private isValidMeetingUrl(value: string): boolean {

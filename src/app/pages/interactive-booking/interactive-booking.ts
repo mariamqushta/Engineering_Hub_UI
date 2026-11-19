@@ -17,10 +17,11 @@ import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/services/auth';
 import { Router } from '@angular/router';
+import { Time12HourPipe } from '../../shared/pipes/time12-hour.pipe';
 @Component({
   selector: 'app-interactive-booking',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12HourPipe],
   templateUrl: './interactive-booking.html',
   styleUrl: './interactive-booking.css',
 })
@@ -172,14 +173,14 @@ private loadMyBookings(): void {
 
   selectFirstActivityInMonth(): void {
     const activity = this.activities.find(item => {
-      const date = new Date(item.date);
+      const date = this.parseDate(item.date);
 
       return date.getMonth() === this.currentMonth &&
              date.getFullYear() === this.currentYear;
     });
 
     if (activity) {
-      this.selectedDay = new Date(activity.date).getDate();
+      this.selectedDay = this.parseDate(activity.date).getDate();
       this.selectedActivity = activity;
     } else {
       this.selectedDay = null;
@@ -193,7 +194,7 @@ private loadMyBookings(): void {
     this.selectedDay = day;
 
     this.selectedActivity = this.activities.find(item => {
-      const date = new Date(item.date);
+      const date = this.parseDate(item.date);
 
       return date.getDate() === day &&
              date.getMonth() === this.currentMonth &&
@@ -204,7 +205,7 @@ private loadMyBookings(): void {
   }
 getActivitiesOnDate(day: number): InteractiveActivity[] {
   return this.activities.filter(item => {
-    const date = new Date(item.date);
+    const date = this.parseDate(item.date);
 
     return (
       date.getDate() === day &&
@@ -215,18 +216,23 @@ getActivitiesOnDate(day: number): InteractiveActivity[] {
 }
 
 selectActivity(activity: InteractiveActivity): void {
-  this.selectedDay = new Date(activity.date).getDate();
+  this.selectedDay = this.parseDate(activity.date).getDate();
   this.selectedActivity = activity;
   this.clearBookingFeedback();
 }
   hasActivityOnDate(day: number): boolean {
     return this.activities.some(item => {
-      const date = new Date(item.date);
+      const date = this.parseDate(item.date);
 
       return date.getDate() === day &&
              date.getMonth() === this.currentMonth &&
              date.getFullYear() === this.currentYear;
     });
+  }
+
+  private parseDate(dateValue: string): Date {
+    const [year, month, day] = dateValue.slice(0, 10).split('-').map(Number);
+    return new Date(year, month - 1, day);
   }
 
   isSelectedDate(day: number): boolean {

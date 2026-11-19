@@ -3,7 +3,7 @@
     <span class="brand-icon">EH</span>
 
     <span class="brand-text">
-      <strong>{{ languageService.translate('engineeringHub') }}</strong>
+      <strong>{{ languageService.translate('islamicLearningPlatform') }}</strong>
       <small>{{ languageService.translate('adminPanel') }}</small>
     </span>
   </a>
@@ -82,7 +82,27 @@
       <span class="nav-icon">▣</span>
       <span>{{ languageService.translate('workshops') }}</span>
     </a>
+    <a
+      routerLink="/admin/interactive"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">▷</span>
+      <span>{{ languageService.translate('interactiveActivities') }}</span>
+    </a>
 
+
+        <a
+      routerLink="/admin/private-sessions"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      <span class="nav-icon">◷</span>
+      <span>{{ languageService.translate('privateSessions') }}</span>
+    </a>
+
+
+    
     <p class="section-label">
       {{ languageService.translate('communication') }}
     </p>
@@ -105,23 +125,9 @@
       <span>{{ languageService.translate('instructorsChat') }}</span>
     </a>
 
-    <a
-      routerLink="/admin/interactive"
-      routerLinkActive="active"
-      class="nav-link"
-    >
-      <span class="nav-icon">▷</span>
-      <span>{{ languageService.translate('interactiveActivities') }}</span>
-    </a>
 
-    <a
-      routerLink="/admin/private-sessions"
-      routerLinkActive="active"
-      class="nav-link"
-    >
-      <span class="nav-icon">◷</span>
-      <span>{{ languageService.translate('privateSessions') }}</span>
-    </a>
+
+
   </nav>
 
   <div class="sidebar-bottom">
@@ -144,3 +150,4 @@
     </button>
   </div>
 </aside>
+

@@ -1,0 +1,86 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  height: 100%;
+}
+
+.track-card-shell {
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: 0 10px 24px rgb(49 91 126 / 10%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.track-card-shell::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  height: 0.45rem;
+  background: linear-gradient(90deg, var(--color-red));
+  content: '';
+}
+
+.track-card-shell:hover {
+  transform: translateY(-4px);
+  border-color: #c8dce8;
+  box-shadow: 0 16px 32px rgb(49 91 126 / 16%);
+}
+
+.track-card-content {
+  min-height: 16rem;
+}
+
+.track-card-title {
+  color: var(--color-blue-deep);
+}
+
+.track-card-description {
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.track-card-primary,
+.track-card-secondary {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.track-card-primary {
+  border: 1px solid var(--color-blue);
+  background: var(--color-blue);
+  color: #fff;
+}
+
+.track-card-primary:hover {
+  border-color: var(--color-red-strong);
+  background: var(--color-red-strong);
+}
+
+.track-card-secondary {
+  border-color: #edcbd0;
+  background: var(--color-red-soft);
+  color: var(--color-red-strong);
+}
+
+.track-card-secondary:hover {
+  border-color: var(--color-red);
+  background: var(--color-red);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-card-shell,
+  .track-card-primary,
+  .track-card-secondary {
+    transition: none;
+  }
+}

@@ -1,7 +1,7 @@
 <div class="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
   <!-- Page Heading -->
-  <div class="mb-8">
+  <div class="islamic-banner mb-8 px-6 py-6 sm:px-8 sm:py-8">
     <div class="mb-3 flex items-center gap-3">
       <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#003300] text-[#D4AF37] shadow-md">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -12,8 +12,8 @@
       </div>
 
       <div>
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">
-          Engineering Hub
+        <p class="banner-eyebrow text-sm font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">
+          Islamic Learning Platform
         </p>
         <h1 class="text-2xl font-extrabold tracking-tight text-[#FFD700] sm:text-3xl">
           {{ languageService.translate('trackLearningSpace') }}
@@ -35,8 +35,8 @@
         type="button"
         (click)="selectedTab = 'lessons'"
         [class]="selectedTab === 'lessons'
-          ? 'bg-[#003300] text-white shadow-md'
-          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#003300]'"
+          ? 'bg-[#182f57] text-white shadow-md'
+          : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
         class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
@@ -64,14 +64,14 @@
         </svg>
         <span>{{ languageService.translate('interactive') }}</span>
       </button> -->
-      @if (accountType === 0) {
+      @if (accountType === 0||accountType === null) {
   <!-- Interactive Tab for Group Students -->
   <button
     type="button"
     (click)="selectedTab = 'interactive'"
     [class]="selectedTab === 'interactive'
-      ? 'bg-[#003300] text-white shadow-md'
-      : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#003300]'"
+      ? 'bg-[#182f57] text-white shadow-md'
+      : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
     class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
@@ -92,7 +92,7 @@
     (click)="selectedTab = 'private-session'"
     [class]="selectedTab === 'private-session'
       ? 'bg-[#182f57] text-white shadow-md'
-      : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+      : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
     class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
     <svg xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +113,7 @@
         (click)="selectedTab = 'workshop'"
         [class]="selectedTab === 'workshop'
           ? 'bg-[#182f57] text-white shadow-md'
-          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+          : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
         class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
@@ -131,7 +131,7 @@
         (click)="selectedTab = 'coaching'"
         [class]="selectedTab === 'coaching'
           ? 'bg-[#182f57] text-white shadow-md'
-          : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+          : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
         class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
@@ -277,7 +277,7 @@
     </section>
   }
 
-@if (selectedTab === 'interactive' && accountType === 0) {
+@if (selectedTab === 'interactive' &&( accountType === 0|| accountType === null)) {
   <app-interactive-booking
     [activities]="interactiveActivities">
   </app-interactive-booking>
@@ -286,7 +286,7 @@
   <section class="mt-8">
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-      <div class="bg-gradient-to-r from-[#081A3A] to-[#24416c] px-6 py-8 sm:px-8">
+      <div class="islamic-banner px-6 py-8 sm:px-8">
         <div class="flex items-center gap-4">
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[#49DCEB] ring-1 ring-white/20">
             <svg xmlns="http://www.w3.org/2000/svg"
@@ -299,7 +299,7 @@
           </div>
 
           <div>
-            <p class="text-sm font-medium text-[#49DCEB]">
+            <p class="banner-eyebrow text-sm font-medium text-[#49DCEB]">
               {{ languageService.translate('privateLearning') }}
             </p>
 
@@ -358,7 +358,7 @@
     <section class="mt-8">
       <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-        <div class="bg-gradient-to-r from-[#002222] to-[#2d5a2d] px-6 py-8 sm:px-8">
+        <div class="islamic-banner px-6 py-8 sm:px-8">
           <div class="flex items-center gap-4">
 
             <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[#D4AF37] ring-1 ring-white/20">
@@ -370,7 +370,7 @@
             </div>
 
             <div>
-              <p class="text-sm font-medium text-[#D4AF37]">
+              <p class="banner-eyebrow text-sm font-medium text-[#D4AF37]">
                 {{ languageService.translate('personalGuidance') }}
               </p>
               <h2 class="mt-1 text-xl font-bold text-white sm:text-2xl">

@@ -1,18 +1,18 @@
-<div class="flex min-h-screen items-center justify-center">
-  <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+<main class="auth-page">
+  <section class="auth-card">
+    <header class="islamic-banner auth-heading">
+      <p class="banner-eyebrow">{{ languageService.translate('islamicLearningPlatform') }}</p>
+      <h1>{{ languageService.translate('login') }}</h1>
+    </header>
 
-    <h1 class="mb-6 text-2xl font-bold">
-      {{ languageService.translate('login') }}
-    </h1>
-
-    <form (ngSubmit)="login()" #loginForm="ngForm" class="grid gap-4">
+    <form (ngSubmit)="login()" #loginForm="ngForm" class="auth-form">
 
       <input
         type="text"
         name="userName"
         [(ngModel)]="userName"
         [placeholder]="languageService.translate('username')"
-        class="rounded-lg border p-3"
+        class="auth-input"
         autocomplete="username"
         required
       >
@@ -22,7 +22,7 @@
         name="password"
         [(ngModel)]="password"
         [placeholder]="languageService.translate('password')"
-        class="rounded-lg border p-3"
+        class="auth-input"
         autocomplete="current-password"
         required
       >
@@ -36,7 +36,7 @@
       <button
         type="submit"
         [disabled]="loginForm.invalid || isLoading"
-        class="rounded-lg bg-[#29456E] p-3 text-white disabled:cursor-not-allowed disabled:opacity-60"
+        class="auth-submit disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ isLoading
           ? languageService.translate('loggingIn')
@@ -44,5 +44,5 @@
       </button>
 
     </form>
-  </div>
-</div>
+  </section>
+</main>

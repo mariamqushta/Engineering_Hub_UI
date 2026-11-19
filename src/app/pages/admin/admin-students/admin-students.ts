@@ -4,6 +4,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { Time12HourPipe } from '../../../shared/pipes/time12-hour.pipe';
 interface TrackBooking {
   id: number;
   trackId: number;
@@ -56,6 +57,7 @@ interface Student {
   profileImageUrl: string | null;
   bio: string | null;
   isActive: boolean;
+  accountType: string | number;
   createdAt: string;
   trackBookings: TrackBooking[];
   workshopBookings: WorkshopBooking[];
@@ -73,7 +75,7 @@ interface StudentsResponse {
 @Component({
   selector: 'app-admin-students',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12HourPipe],
   templateUrl: './admin-students.html'
 })
 export class AdminStudents implements OnInit {
@@ -160,7 +162,19 @@ export class AdminStudents implements OnInit {
     this.expandedStudentId =
       this.expandedStudentId === studentId ? null : studentId;
   }
+getStudentAccountType(type: string | number): string {
+  const value = String(type).toLowerCase();
 
+  if (value === '0' || value === 'group') {
+    return 'group';
+  }
+
+  if (value === '1' || value === 'private') {
+    return 'private';
+  }
+
+  return 'unknown';
+}
   getBookingCount(student: Student): number {
     return student.totalTrackBookings +
       student.totalWorkshopBookings +

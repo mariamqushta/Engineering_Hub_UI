@@ -1,20 +1,19 @@
 
-<div class="flex min-h-screen items-center justify-center">
+<main class="auth-page">
+  <section class="auth-card">
+    <header class="islamic-banner auth-heading">
+      <p class="banner-eyebrow">{{ languageService.translate('islamicLearningPlatform') }}</p>
+      <h1>{{ languageService.translate('register') }}</h1>
+    </header>
 
-  <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-
-    <h1 class="mb-6 text-2xl font-bold">
-      {{ languageService.translate('register') }}
-    </h1>
-
-    <form (ngSubmit)="register()" class="grid gap-4">
+    <form (ngSubmit)="register()" class="auth-form" novalidate>
 
       <input
         type="text"
         name="fullName"
         [(ngModel)]="fullName"
         [placeholder]="languageService.translate('fullName')"
-        class="rounded-lg border p-3"
+        class="auth-input"
         required
       >
 
@@ -23,8 +22,26 @@
         name="userName"
         [(ngModel)]="userName"
         [placeholder]="languageService.translate('username')"
-        class="rounded-lg border p-3"
+        class="auth-input"
         required
+      >
+
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        [placeholder]="languageService.translate('emailAddress')"
+        autocomplete="email"
+        class="auth-input"
+      >
+
+      <input
+        type="tel"
+        name="phoneNumber"
+        [(ngModel)]="phoneNumber"
+        [placeholder]="languageService.translate('phoneNumber')"
+        autocomplete="tel"
+        class="auth-input"
       >
 
       <input
@@ -32,14 +49,14 @@
         name="password"
         [(ngModel)]="password"
         [placeholder]="languageService.translate('password')"
-        class="rounded-lg border p-3"
+        class="auth-input"
         required
       >
 
       <select
         name="role"
         [(ngModel)]="role"
-        class="rounded-lg border p-3">
+        class="auth-input">
 
         <option value="Student">
           Student
@@ -55,7 +72,7 @@
         <select
           name="accountType"
           [(ngModel)]="accountType"
-          class="rounded-lg border p-3">
+          class="auth-input">
 
           <option [ngValue]="0">
             Group Student
@@ -68,14 +85,19 @@
         </select>
       }
 
+      @if (errorMessage) {
+        <p class="text-sm text-red-600" role="alert">
+          {{ errorMessage }}
+        </p>
+      }
+
       <button
         type="submit"
-        class="rounded-lg bg-[#29456E] p-3 text-white">
+        class="auth-submit">
         {{ languageService.translate('register') }}
       </button>
 
     </form>
 
-  </div>
-
-</div>
+  </section>
+</main>

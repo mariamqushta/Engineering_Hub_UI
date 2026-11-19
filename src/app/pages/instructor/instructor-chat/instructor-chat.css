@@ -1,0 +1,6 @@
+.conversation-avatar {
+  border: 2px solid #fff;
+  background-color: var(--color-blue-deep);
+  color: #fff;
+  box-shadow: 0 2px 6px rgb(49 91 126 / 24%);
+}

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { formatTime12Hour } from '../../../shared/pipes/time12-hour.pipe';
 
 interface Track {
   id: number;
@@ -447,7 +448,7 @@ export class AdminInstructors implements OnInit {
   }
 
   formatTime(time: string): string {
-    return time?.substring(0, 5) ?? '';
+    return formatTime12Hour(time);
   }
 
   formatDate(date: string | null): string {

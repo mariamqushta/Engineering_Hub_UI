@@ -4,6 +4,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { formatTime12Hour } from '../../../shared/pipes/time12-hour.pipe';
 type BookingTab = 'tracks' | 'interactive' | 'workshops';
 
 interface StudentInfo {
@@ -275,13 +276,7 @@ export class AdminBookingRequest implements OnInit {
   }
 
   formatTime(time?: string): string {
-    if (!time) return '—';
-
-    const parts = time.split(':');
-
-    return parts.length >= 2
-      ? `${parts[0]}:${parts[1]}`
-      : time;
+    return formatTime12Hour(time) || '—';
   }
 
   private showMessage(

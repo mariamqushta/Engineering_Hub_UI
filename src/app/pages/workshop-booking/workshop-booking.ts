@@ -17,10 +17,11 @@ import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
+import { Time12HourPipe } from '../../shared/pipes/time12-hour.pipe';
 @Component({
   selector: 'app-workshop-booking',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12HourPipe],
   templateUrl: './workshop-booking.html',
   styleUrl: './workshop-booking.css'
 })

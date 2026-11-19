@@ -99,7 +99,7 @@ downloadCertificate(certificate: Certificate): void {
 
         link.href = fileUrl;
         link.download =
-          `EngineeringHub-Certificate-${certificate.id}.pdf`;
+          `IslamicLearning-Certificate-${certificate.id}.pdf`;
 
         document.body.appendChild(link);
         link.click();

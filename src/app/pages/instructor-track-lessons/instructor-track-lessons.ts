@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
+import { formatTime12Hour } from '../../shared/pipes/time12-hour.pipe';
 interface LessonItem {
   id: number;
   title: string;
@@ -694,8 +695,8 @@ export class InstructorTrackLessons implements OnInit {
       description,
       date,
       startTime && endTime
-        ? `${startTime}–${endTime}`
-        : startTime || endTime
+        ? `${formatTime12Hour(startTime)}–${formatTime12Hour(endTime)}`
+        : formatTime12Hour(startTime || endTime)
     ].filter(Boolean).join(' · ');
 
     return { id, title, details };

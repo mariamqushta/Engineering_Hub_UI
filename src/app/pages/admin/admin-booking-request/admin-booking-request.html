@@ -1,6 +1,6 @@
 <div class="min-h-full space-y-6">
   <div>
-    <h2 class="text-2xl font-bold text-[#003300]">
+    <h2 class="text-2xl font-bold text-[#182f57]">
       {{ languageService.translate('bookingRequests') }}
     </h2>
     <p class="mt-1 text-sm text-gray-500">
@@ -27,16 +27,16 @@
       type="button"
       (click)="changeTab('tracks')"
       class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
-      [class.border-[#D4AF37]]="activeTab === 'tracks'"
-      [class.bg-[#003300]]="activeTab === 'tracks'"
+      [class.border-[#41a6b1]]="activeTab === 'tracks'"
+      [class.bg-[#182f57]]="activeTab === 'tracks'"
       [class.text-white]="activeTab === 'tracks'"
       [class.border-gray-200]="activeTab !== 'tracks'"
       [class.bg-white]="activeTab !== 'tracks'"
-      [class.text-[#003300]]="activeTab !== 'tracks'">
+      [class.text-[#182f57]]="activeTab !== 'tracks'">
       {{ languageService.translate('trackPackage') }}
       <span class="ml-2 rounded-full px-2 py-1 text-xs"
         [class.bg-white]="activeTab === 'tracks'"
-        [class.text-[#003300]]="activeTab === 'tracks'"
+        [class.text-[#182f57]]="activeTab === 'tracks'"
         [class.bg-gray-100]="activeTab !== 'tracks'">
         {{ requests.length }}
       </span>
@@ -46,12 +46,12 @@
       type="button"
       (click)="changeTab('interactive')"
       class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
-      [class.border-[#D4AF37]]="activeTab === 'interactive'"
-      [class.bg-[#003300]]="activeTab === 'interactive'"
+      [class.border-[#41a6b1]]="activeTab === 'interactive'"
+      [class.bg-[#182f57]]="activeTab === 'interactive'"
       [class.text-white]="activeTab === 'interactive'"
       [class.border-gray-200]="activeTab !== 'interactive'"
       [class.bg-white]="activeTab !== 'interactive'"
-      [class.text-[#003300]]="activeTab !== 'interactive'">
+      [class.text-[#182f57]]="activeTab !== 'interactive'">
       {{ languageService.translate('interactiveActivities') }}
       <span class="ml-2 rounded-full px-2 py-1 text-xs"
         [class.bg-white]="activeTab === 'interactive'"
@@ -65,12 +65,12 @@
       type="button"
       (click)="changeTab('workshops')"
       class="rounded-xl border px-4 py-3 text-sm font-semibold transition"
-      [class.border-[#D4AF37]]="activeTab === 'workshops'"
-      [class.bg-[#003300]]="activeTab === 'workshops'"
+      [class.border-[#41a6b1]]="activeTab === 'workshops'"
+      [class.bg-[#182f57]]="activeTab === 'workshops'"
       [class.text-white]="activeTab === 'workshops'"
       [class.border-gray-200]="activeTab !== 'workshops'"
       [class.bg-white]="activeTab !== 'workshops'"
-      [class.text-[#003300]]="activeTab !== 'workshops'">
+      [class.text-[#182f57]]="activeTab !== 'workshops'">
       {{ languageService.translate('workshops') }}
       <span class="ml-2 rounded-full px-2 py-1 text-xs"
         [class.bg-white]="activeTab === 'workshops'"
@@ -192,7 +192,7 @@
                     }}
                   </p>
                   <p class="mt-1 text-xs text-gray-500">
-                    {{ request.student?.email || request.studentId }}
+                    {{ request.student?.email || '—' }}
                   </p>
                 </td>
 
@@ -209,7 +209,7 @@
                     {{ getBookingType(request.bookingType) }}
                   </td>
 
-                  <td class="whitespace-nowrap px-5 py-4 font-semibold text-[#003300]">
+                  <td class="whitespace-nowrap px-5 py-4 font-semibold text-[#182f57]">
                     {{ request.requestedPrice | number:'1.2-2' }}
                     {{ languageService.translate('currencyEGP') }}
                   </td>
@@ -263,7 +263,7 @@
                     <button
                       type="button"
                       (click)="approveRequest(request.id)"
-                      class="rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-green-700">
+                      class="rounded-lg bg-[#182f57] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#29456E]">
                       {{ languageService.translate('approve') }}
                     </button>
 
@@ -288,4 +288,3 @@
     {{ languageService.translate('pendingRequestsAcrossCategories') }}
   </p>
 </div>
-

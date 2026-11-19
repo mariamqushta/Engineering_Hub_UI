@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { Track } from '../models/track';
 import { Lesson } from '../models/lesson';
 import { LessonContent } from '../models/LessonContent';
+import { InteractiveActivity } from '../models/InteractiveActivity';
+import { Workshop } from '../models/workshop';
 import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
@@ -22,14 +24,14 @@ export class TrackService {
       `${this.apiUrl.replace('/Track', '/Lesson')}/Track/${trackId}`
     );
   }
-  getInteractiveActivitiesByTrack(trackId: number): Observable<any[]> {
-  return this.http.get<any[]>(
+  getInteractiveActivitiesByTrack(trackId: number): Observable<InteractiveActivity[]> {
+  return this.http.get<InteractiveActivity[]>(
     `${this.apiUrl.replace('/Track', '/InteractiveActivity')}/Track/${trackId}`
   );
 }
 
-getWorkshopsByTrack(trackId: number): Observable<any[]> {
-  return this.http.get<any[]>(
+getWorkshopsByTrack(trackId: number): Observable<Workshop[]> {
+  return this.http.get<Workshop[]>(
     `${this.apiUrl.replace('/Track', '/Workshop')}/Track/${trackId}`
   );
 }

@@ -10,6 +10,8 @@ import { CertificateService } from '../../core/services/certificate';
 import { AuthService } from '../../core/services/auth';
 import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
+import { InteractiveActivity } from '../../core/models/InteractiveActivity';
+import { Workshop } from '../../core/models/workshop';
 @Component({
   selector: 'app-track-details',
   standalone:true,
@@ -26,8 +28,8 @@ export class TrackDetails {
   lessons: Lesson[] = [];
   accountType: number | null = null;
   isAccountTypeLoaded = false;
-  interactiveActivities: any[] = [];
-  workshops: any[] = [];
+  interactiveActivities: InteractiveActivity[] = [];
+  workshops: Workshop[] = [];
 
   constructor(
   private route: ActivatedRoute,

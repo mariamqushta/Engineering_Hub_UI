@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { LanguageService } from '../../../core/services/language.service';
+import { formatTime12Hour } from '../../../shared/pipes/time12-hour.pipe';
 
 interface Student {
   id: string;
@@ -967,7 +968,7 @@ loadInstructorAvailability(instructorId: string): void {
   }
 
   formatTime(time: string): string {
-    return time?.substring(0, 5) ?? '';
+    return formatTime12Hour(time);
   }
 
   formatDateTime(value: string): string {
@@ -975,7 +976,7 @@ loadInstructorAvailability(instructorId: string): void {
       ? 'ar-EG'
       : 'en-US';
 
-    return new Date(value).toLocaleString(locale);
+    return new Date(value).toLocaleString(locale, { hour12: true });
   }
 
   get activeArrangements(): PrivateArrangement[] {
