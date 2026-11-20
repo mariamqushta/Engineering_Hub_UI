@@ -15,8 +15,11 @@ export class Register {
   userName: string = '';
   password: string = '';
   fullName: string = '';
+  email = '';
+  phone = '';
   role: string = 'Student';
   accountType: number = 0;
+  errorMessage = '';
 
   constructor(
     private authService: AuthService,
@@ -25,17 +28,27 @@ export class Register {
   ) {}
 
   register(): void {
+    const email = this.email.trim();
+    const phone = this.phone.trim();
+
+    if (!email && !phone) {
+      this.errorMessage =
+        this.languageService.translate('emailOrPhoneRequired');
+      return;
+    }
+
+    this.errorMessage = '';
 
     const data = {
       userName: this.userName,
       password: this.password,
       fullName: this.fullName,
+      email: email || undefined,
+      phoneNumber: phone || undefined,
       role: this.role,
       accountType: this.role === 'Student' ? this.accountType : 0
     };
-console.log('Registration data:', data);
-console.log('Selected Role:', data.role);
-console.log('Selected Account Type:', data.accountType);
+
     this.authService.register(data).subscribe({
 
       next: (response) => {
@@ -46,8 +59,6 @@ console.log('Selected Account Type:', data.accountType);
 
       error: (error) => {
         console.error('Registration error:', error);
-        console.log('Status:', error.status);
-        console.log('Response:', error.error);
 
         alert(
           `Registration failed.\nStatus: ${error.status}\nMessage: ${

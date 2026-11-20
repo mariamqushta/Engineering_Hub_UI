@@ -57,7 +57,7 @@
               {{ languageService.translate('time') }}
             </p>
             <p class="mt-1 font-semibold text-slate-800">
-              {{ activity.startTime }} - {{ activity.endTime }}
+              {{ activity.startTime | time12 }} - {{ activity.endTime | time12 }}
             </p>
           </div>
 
@@ -223,7 +223,7 @@
         } @else {
 
           <div
-            class="min-h-20 min-w-0 rounded-lg border p-1 transition sm:min-h-32 sm:p-2"
+            class="relative min-h-20 min-w-0 rounded-lg border p-1 transition sm:min-h-32 sm:p-2"
             [ngClass]="{
               'border-[#182f57] bg-blue-50':
                 isSelectedDate(day),
@@ -238,7 +238,7 @@
               type="button"
               (click)="selectDate(day)"
               [disabled]="!hasActivityOnDate(day)"
-              class="mb-1 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition sm:h-8 sm:w-8 sm:text-sm"
+              class="absolute start-1 top-1 z-10 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition sm:start-2 sm:top-2 sm:h-8 sm:w-8 sm:text-sm"
               [ngClass]="{
                 'bg-[#182f57] text-white':
                   isSelectedDate(day),
@@ -251,7 +251,7 @@
             </button>
 
             <!-- Sessions on This Date -->
-            <div class="space-y-1">
+            <div class="space-y-1 pt-7 sm:pt-9">
               @for (
                 activity of getActivitiesOnDate(day);
                 track activity.id
@@ -272,20 +272,20 @@
                   }"
                   [attr.aria-label]="
                     activity.title + ', ' +
-                    activity.startTime + ' ' +
+                    formatTime(activity.startTime) + ' ' +
                     languageService.translate('to') + ' ' +
-                    activity.endTime
+                    formatTime(activity.endTime)
                   "
                   [title]="
                     activity.title + ' · ' +
-                    activity.startTime + ' - ' + activity.endTime
+                    formatTime(activity.startTime) + ' - ' + formatTime(activity.endTime)
                   ">
                   <span class="block truncate font-semibold">
                     {{ activity.title }}
                   </span>
 
                   <span class="mt-0.5 block truncate">
-                    {{ activity.startTime }}
+                    {{ activity.startTime | time12 }}
                   </span>
                 </button>
               }

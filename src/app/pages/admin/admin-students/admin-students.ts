@@ -4,6 +4,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 interface TrackBooking {
   id: number;
   trackId: number;
@@ -57,6 +58,7 @@ interface Student {
   bio: string | null;
   isActive: boolean;
   createdAt: string;
+  accountType: string | number;
   trackBookings: TrackBooking[];
   workshopBookings: WorkshopBooking[];
   interactiveBookings: InteractiveBooking[];
@@ -73,7 +75,7 @@ interface StudentsResponse {
 @Component({
   selector: 'app-admin-students',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12Pipe],
   templateUrl: './admin-students.html'
 })
 export class AdminStudents implements OnInit {
@@ -155,6 +157,19 @@ export class AdminStudents implements OnInit {
       (student.email ?? '').toLowerCase().includes(term)
     );
   }
+  getStudentAccountType(type: string | number): string {
+  const value = String(type).toLowerCase();
+
+  if (value === '0' || value === 'group') {
+    return 'group';
+  }
+
+  if (value === '1' || value === 'private') {
+    return 'private';
+  }
+
+  return 'unknown';
+}
 
   toggleDetails(studentId: string): void {
     this.expandedStudentId =

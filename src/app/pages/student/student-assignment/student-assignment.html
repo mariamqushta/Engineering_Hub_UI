@@ -87,7 +87,7 @@
                       <span class="font-semibold">
                         {{ languageService.translate('dueDate') }}:
                       </span>
-                      {{ assignment.dueDate | date:'medium' }}
+                      {{ assignment.dueDate | date:'MMM d, y' }} · {{ assignment.dueDate | time12 }}
                     </p>
                   }
                 </div>
@@ -159,7 +159,7 @@
 
                   <p class="mt-2 text-sm text-gray-500">
                     {{ languageService.translate('submittedOn') }}:
-                    {{ assignment.submission.submittedAt | date:'medium' }}
+                    {{ assignment.submission.submittedAt | date:'MMM d, y' }} · {{ assignment.submission.submittedAt | time12 }}
                   </p>
 
                   @if (assignment.submission.content) {

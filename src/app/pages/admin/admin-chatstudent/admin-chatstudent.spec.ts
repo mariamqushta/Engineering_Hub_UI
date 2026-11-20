@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminChatstudent } from './admin-chatstudent';
+import { AdminChatStudent } from './admin-chatstudent';
 
-describe('AdminChatstudent', () => {
-  let component: AdminChatstudent;
-  let fixture: ComponentFixture<AdminChatstudent>;
+describe('AdminChatStudent', () => {
+  let component: AdminChatStudent;
+  let fixture: ComponentFixture<AdminChatStudent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminChatstudent],
+      imports: [AdminChatStudent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminChatstudent);
+    fixture = TestBed.createComponent(AdminChatStudent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

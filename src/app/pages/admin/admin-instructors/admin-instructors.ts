@@ -447,7 +447,15 @@ export class AdminInstructors implements OnInit {
   }
 
   formatTime(time: string): string {
-    return time?.substring(0, 5) ?? '';
+    if (!time) return '';
+    const match = time.match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return time;
+
+    const hours = Number(match[1]);
+    const minutes = match[2];
+    if (hours < 0 || hours > 23) return time;
+
+    return `${hours % 12 || 12}:${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
   }
 
   formatDate(date: string | null): string {

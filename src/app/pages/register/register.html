@@ -36,6 +36,32 @@
         required
       >
 
+      @if (errorMessage) {
+        <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        [required]="!phone.trim()"
+        (ngModelChange)="errorMessage = ''"
+        [placeholder]="languageService.translate('emailLabel')"
+        class="rounded-lg border p-3"
+      >
+
+      <input
+        type="tel"
+        name="phone"
+        [(ngModel)]="phone"
+        [required]="!email.trim()"
+        (ngModelChange)="errorMessage = ''"
+        [placeholder]="languageService.translate('phoneNumber')"
+        class="rounded-lg border p-3"
+      >
+
       <select
         name="role"
         [(ngModel)]="role"

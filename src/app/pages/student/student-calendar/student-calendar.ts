@@ -11,6 +11,7 @@ import {
 } from '../../../core/services/calendar';
 import { LanguageService } from '../../../core/services/language.service';
 import { AuthService } from '../../../core/services/auth';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 
 interface CalendarDay {
   date: Date;
@@ -22,7 +23,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-student-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12Pipe],
   templateUrl: './student-calendar.html',
 })
 export class StudentCalendar implements OnInit {

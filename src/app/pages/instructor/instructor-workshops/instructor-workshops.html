@@ -300,9 +300,14 @@
             {{ workshop.description || languageService.translate('noDescriptionProvided') }}
           </p>
         </div>
+      </div>
 
+      <!-- Status badges -->
+      <div class="mb-5 flex flex-wrap gap-2">
+
+        <!-- Workshop session status -->
         <span
-          class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+          class="rounded-full px-3 py-1 text-xs font-semibold"
           [ngClass]="{
             'bg-blue-50 text-blue-700': workshop.status === 0,
             'bg-green-50 text-green-700': workshop.status === 1,
@@ -311,6 +316,14 @@
           }">
           {{ getStatusLabel(workshop.status) }}
         </span>
+
+        <!-- Admin approval status -->
+        <span
+          class="rounded-full px-3 py-1 text-xs font-semibold"
+          [ngClass]="getApprovalStatusClass(workshop.approvalStatus)">
+          {{ getApprovalStatusLabel(workshop.approvalStatus) }}
+        </span>
+
       </div>
 
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -329,7 +342,7 @@
             {{ languageService.translate('time') }}
           </p>
           <p class="mt-1 font-semibold text-[#29456E]">
-            {{ workshop.startTime }} – {{ workshop.endTime }}
+            {{ workshop.startTime | time12 }} – {{ workshop.endTime | time12 }}
           </p>
         </div>
 

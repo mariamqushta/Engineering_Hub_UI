@@ -111,7 +111,7 @@
                       class="mt-2 text-right text-xs"
                       [class.text-slate-300]="message.isMine"
                       [class.text-slate-400]="!message.isMine">
-                      {{ message.sentAt | date:'shortTime' }}
+                      {{ message.sentAt | time12 }}
                     </p>
                   </div>
                 </div>

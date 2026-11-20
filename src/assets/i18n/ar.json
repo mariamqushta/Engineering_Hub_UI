@@ -80,6 +80,7 @@
   "noEmail": "لا يوجد بريد إلكتروني",
   "noPhoneNumber": "لا يوجد رقم هاتف",
   "emailLabel": "البريد الإلكتروني",
+  "emailOrPhoneRequired": "أدخل البريد الإلكتروني أو رقم الهاتف.",
   "confirmed": "مؤكد",
   "unconfirmed": "غير مؤكد",
   "active": "نشط",
@@ -975,7 +976,9 @@
   "availableSessionsAndActivitiesWillAppearHere": "ستظهر هنا مواعيد الجلسات الخاصة المتاحة والأنشطة المجدولة.",
   "selectDateFromCalendar": "اختر تاريخًا من التقويم",
   "viewActivitiesAndSessionDetailsForDay": "اعرض جميع الأنشطة وتفاصيل الجلسات الخاصة في هذا اليوم.",
-  "couldNotLoadYourCalendar": "تعذر تحميل التقويم. يرجى المحاولة مرة أخرى."
+  "couldNotLoadYourCalendar": "تعذر تحميل التقويم. يرجى المحاولة مرة أخرى.",
+  "scheduleOverlapError": "يتعارض هذا الوقت مع حدث مجدول آخر. اختر وقتًا مختلفًا.",
+  "couldNotVerifyScheduleConflicts": "تعذر التحقق من تعارض المواعيد. يرجى المحاولة مرة أخرى."
 
 ,  "mainMeetingLink": "رابط الاجتماع الأساسي",
   "mainMeetingLinkDescription": "سيتم استخدام هذا الرابط لجميع الجلسات العادية ضمن هذا الاتفاق.",

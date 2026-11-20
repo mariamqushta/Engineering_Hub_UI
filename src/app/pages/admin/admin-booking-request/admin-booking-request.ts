@@ -278,10 +278,13 @@ export class AdminBookingRequest implements OnInit {
     if (!time) return '—';
 
     const parts = time.split(':');
+    if (parts.length < 2) return time;
 
-    return parts.length >= 2
-      ? `${parts[0]}:${parts[1]}`
-      : time;
+    const hours = Number(parts[0]);
+    const minutes = parts[1];
+    if (hours < 0 || hours > 23) return time;
+
+    return `${hours % 12 || 12}:${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
   }
 
   private showMessage(

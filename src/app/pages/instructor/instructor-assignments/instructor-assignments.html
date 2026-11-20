@@ -481,7 +481,7 @@
 
             <p class="mt-1 text-sm text-gray-500">
               {{ languageService.translate('submitted') }}:
-              {{ submission.submittedAt | date:'medium' }}
+              {{ submission.submittedAt | date:'MMM d, y' }} · {{ submission.submittedAt | time12 }}
             </p>
           </div>
 

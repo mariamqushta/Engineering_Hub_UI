@@ -87,9 +87,7 @@
                       <p class="mt-1 text-sm text-slate-500">
                         @{{ instructor.userName }}
                       </p>
-                      <p class="mt-1 text-xs text-slate-400">
-                        {{ languageService.translate('idLabel') }}: {{ instructor.id }}
-                      </p>
+                     
                     </div>
                   </div>
 
@@ -212,9 +210,7 @@
                         (click)="toggleAvailability(instructor)"
                         class="flex w-full items-center justify-between gap-2 rounded-xl border border-cyan-100 bg-cyan-50 px-3 py-3 text-start text-sm font-semibold text-[#182f57] transition hover:bg-cyan-100">
                         <span>{{ languageService.translate('privateAvailability') }}</span>
-                        <span>
-                          {{ expandedAvailabilityInstructorId === instructor.id ? '−' : '+' }}
-                        </span>
+
                       </button>
                     </div>
                   </div>

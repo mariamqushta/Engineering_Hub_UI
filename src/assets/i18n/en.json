@@ -79,6 +79,7 @@
   "noEmail": "No email",
   "noPhoneNumber": "No phone number",
   "emailLabel": "Email",
+  "emailOrPhoneRequired": "Enter an email address or phone number.",
   "confirmed": "Confirmed",
   "unconfirmed": "Unconfirmed",
   "active": "Active",
@@ -976,7 +977,9 @@
   "availableSessionsAndActivitiesWillAppearHere": "Your available private-session time and scheduled activities will appear here.",
   "selectDateFromCalendar": "Select a date from the calendar",
   "viewActivitiesAndSessionDetailsForDay": "View all activities and private-session details for that day.",
-  "couldNotLoadYourCalendar": "Could not load your calendar. Please try again."
+  "couldNotLoadYourCalendar": "Could not load your calendar. Please try again.",
+  "scheduleOverlapError": "This time overlaps with another scheduled event. Choose another time.",
+  "couldNotVerifyScheduleConflicts": "Could not verify the schedule for conflicts. Please try again."
 ,  "mainMeetingLink": "Main Meeting Link",
   "mainMeetingLinkDescription": "This link will be used for all regular sessions in this arrangement.",
   "replacementMeetingLink": "Replacement Meeting Link",

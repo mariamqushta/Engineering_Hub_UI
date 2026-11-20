@@ -10,6 +10,7 @@ import {
   CalendarEvent,
 } from '../../../core/services/calendar';
 import { LanguageService } from '../../../core/services/language.service';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 
 interface CalendarDay {
   date: Date;
@@ -21,7 +22,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-instructor-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12Pipe],
   templateUrl: './instructor-calendar.html',
 })
 export class InstructorCalendar implements OnInit {

@@ -607,7 +607,9 @@ loadInstructorAvailability(instructorId: string): void {
         this.errorMessage =
           error.error?.message ||
           (typeof error.error === 'string' ? error.error : null) ||
-          this.t('couldNotCreatePrivateArrangement');
+          (error.status === 409
+            ? this.t('scheduleOverlapError')
+            : this.t('couldNotCreatePrivateArrangement'));
 
         this.isSaving = false;
         this.cdr.markForCheck();
@@ -871,7 +873,9 @@ loadInstructorAvailability(instructorId: string): void {
         this.errorMessage =
           error.error?.message ||
           (typeof error.error === 'string' ? error.error : null) ||
-          this.t('couldNotAssignReplacementSession');
+          (error.status === 409
+            ? this.t('scheduleOverlapError')
+            : this.t('couldNotAssignReplacementSession'));
 
         this.isSaving = false;
         this.cdr.markForCheck();
@@ -967,15 +971,26 @@ loadInstructorAvailability(instructorId: string): void {
   }
 
   formatTime(time: string): string {
-    return time?.substring(0, 5) ?? '';
+    if (!time) return '';
+    const match = time.match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return time;
+
+    const hours = Number(match[1]);
+    const minutes = match[2];
+    if (hours < 0 || hours > 23) return time;
+
+    return `${hours % 12 || 12}:${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
   }
 
   formatDateTime(value: string): string {
-    const locale = this.languageService.currentLanguage === 'ar'
-      ? 'ar-EG'
-      : 'en-US';
-
-    return new Date(value).toLocaleString(locale);
+    return new Date(value).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
   }
 
   get activeArrangements(): PrivateArrangement[] {

@@ -15,11 +15,12 @@ import {
 } from '../../../core/services/support-chat';
 import { AuthService } from '../../../core/services/auth';
 import { LanguageService } from '../../../core/services/language.service';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 
 @Component({
   selector: 'app-admin-chatstudent',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Time12Pipe],
   templateUrl: './admin-chatstudent.html',
   styleUrl: './admin-chatstudent.css'
 })

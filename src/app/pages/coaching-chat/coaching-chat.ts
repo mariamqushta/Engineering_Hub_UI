@@ -6,10 +6,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CoachingService, CoachingMessage } from '../../core/services/coaching-chat';
 import { AuthService } from '../../core/services/auth';
 import { LanguageService } from '../../core/services/language.service';
+import { Time12Pipe } from '../../shared/pipes/time-12.pipe';
 @Component({
   selector: 'app-coaching-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, Time12Pipe],
   templateUrl: './coaching-chat.html',
   styleUrl: './coaching-chat.css'
 })
