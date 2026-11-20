@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,6 +8,7 @@ import { LessonContent } from '../models/LessonContent';
 import { InteractiveActivity } from '../models/InteractiveActivity';
 import { Workshop } from '../models/workshop';
 import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,83 +23,84 @@ export class TrackService {
 
   getLessonsByTrack(trackId: number): Observable<Lesson[]> {
     return this.http.get<Lesson[]>(
-      `${this.apiUrl.replace('/Track', '/Lesson')}/Track/${trackId}`
+      `${environment.apiUrl}/api/Lesson/Track/${trackId}`
     );
   }
+
   getInteractiveActivitiesByTrack(trackId: number): Observable<InteractiveActivity[]> {
-  return this.http.get<InteractiveActivity[]>(
-    `${this.apiUrl.replace('/Track', '/InteractiveActivity')}/Track/${trackId}`
-  );
-}
+    return this.http.get<InteractiveActivity[]>(
+      `${environment.apiUrl}/api/InteractiveActivity/Track/${trackId}`
+    );
+  }
 
-getWorkshopsByTrack(trackId: number): Observable<Workshop[]> {
-  return this.http.get<Workshop[]>(
-    `${this.apiUrl.replace('/Track', '/Workshop')}/Track/${trackId}`
-  );
-}
+  getWorkshopsByTrack(trackId: number): Observable<Workshop[]> {
+    return this.http.get<Workshop[]>(
+      `${environment.apiUrl}/api/Workshop/Track/${trackId}`
+    );
+  }
 
-getBookingPrice(
-  trackId: number,
-  bookingType: number
-): Observable<{ price: number }> {
-  return this.http.get<{ price: number }>(
-    `https://localhost:7109/api/TrackBooking/price/${trackId}/${bookingType}`,
-    { withCredentials: true }
-  );
-}
+  getBookingPrice(
+    trackId: number,
+    bookingType: number
+  ): Observable<{ price: number }> {
+    return this.http.get<{ price: number }>(
+      `${environment.apiUrl}/api/TrackBooking/price/${trackId}/${bookingType}`,
+      { withCredentials: true }
+    );
+  }
 
-getLesson(lessonId: number): Observable<Lesson> {
-  return this.http.get<Lesson>(
-    `https://localhost:7109/api/Lesson/${lessonId}`,
-    { withCredentials: true }
-  );
-}
+  getLesson(lessonId: number): Observable<Lesson> {
+    return this.http.get<Lesson>(
+      `${environment.apiUrl}/api/Lesson/${lessonId}`,
+      { withCredentials: true }
+    );
+  }
 
-getLessonContents(lessonId: number): Observable<LessonContent[]> {
-  return this.http.get<LessonContent[]>(
-    `https://localhost:7109/api/LessonContent/lesson/${lessonId}`,
-    { withCredentials: true }
-  );
-}
+  getLessonContents(lessonId: number): Observable<LessonContent[]> {
+    return this.http.get<LessonContent[]>(
+      `${environment.apiUrl}/api/LessonContent/lesson/${lessonId}`,
+      { withCredentials: true }
+    );
+  }
 
-getMyTracks() {
-  return this.http.get<any[]>(
-    `${this.apiUrl}/my-tracks`,
-    { withCredentials: true }
-  );
-}
-bookTrack(
-  trackId: number,
-  bookingType: number
-): Observable<{ message: string; price: number }> {
-  return this.http.post<{ message: string; price: number }>(
-    'https://localhost:7109/api/TrackBooking',
-    {
-      trackId: trackId,
-      bookingType: bookingType
-    },
-    { withCredentials: true }
-  );
-}
-getStudentLessonsByTrack(trackId: number): Observable<Lesson[]> {
-  return this.http.get<Lesson[]>(
-    `https://localhost:7109/api/Lesson/Track/${trackId}/student`,
-    { withCredentials: true }
-  );
-}
+  getMyTracks() {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/my-tracks`,
+      { withCredentials: true }
+    );
+  }
 
-getInteractiveSchedulesByTrack(trackId: number): Observable<any[]> {
-  return this.http.get<any[]>(
-    `${this.apiUrl.replace('/Track', '/InteractiveActivity')}/Track/${trackId}/Schedules`
-  );
-}
+  bookTrack(
+    trackId: number,
+    bookingType: number
+  ): Observable<{ message: string; price: number }> {
+    return this.http.post<{ message: string; price: number }>(
+      `${environment.apiUrl}/api/TrackBooking`,
+      {
+        trackId: trackId,
+        bookingType: bookingType
+      },
+      { withCredentials: true }
+    );
+  }
 
-getMyBookings() {
-  return this.http.get<any[]>(
-    'https://localhost:7109/api/TrackBooking/MyBookings',
-    { withCredentials: true }
-  );
-}
+  getStudentLessonsByTrack(trackId: number): Observable<Lesson[]> {
+    return this.http.get<Lesson[]>(
+      `${environment.apiUrl}/api/Lesson/Track/${trackId}/student`,
+      { withCredentials: true }
+    );
+  }
 
+  getInteractiveSchedulesByTrack(trackId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${environment.apiUrl}/api/InteractiveActivity/Track/${trackId}/Schedules`
+    );
+  }
 
+  getMyBookings() {
+    return this.http.get<any[]>(
+      `${environment.apiUrl}/api/TrackBooking/MyBookings`,
+      { withCredentials: true }
+    );
+  }
 }
