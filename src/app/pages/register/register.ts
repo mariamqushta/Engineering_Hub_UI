@@ -21,6 +21,7 @@ export class Register {
   accountType: number = 0;
   errorMessage = '';
 
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -53,10 +54,13 @@ export class Register {
       fullName: this.fullName.trim(),
       email: email || null,
       phoneNumber: phoneNumber || null,
+
       role: this.role,
       accountType: this.role === 'Student' ? this.accountType : 0
     };
-
+console.log('Registration data:', data);
+console.log('Selected Role:', data.role);
+console.log('Selected Account Type:', data.accountType);
     this.authService.register(data).subscribe({
 
       next: (response) => {
@@ -80,6 +84,7 @@ export class Register {
     });
   }
 
+
   private isValidEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
   }
@@ -90,4 +95,5 @@ export class Register {
     const digitCount = value.replace(/\D/g, '').length;
     return digitCount >= 7 && digitCount <= 15;
   }
+
 }

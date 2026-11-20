@@ -13,7 +13,9 @@
     <button
   type="button"
   (click)="languageService.toggleLanguage()"
+
   class="rounded-lg border border-[#D4AF37] px-3 py-2 text-white hover:text-[#D4AF37]"
+
   [attr.aria-label]="languageService.translate('language')"
 >
   {{ languageService.translate('language') }}

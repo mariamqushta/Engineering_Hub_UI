@@ -64,14 +64,22 @@
         </svg>
         <span>{{ languageService.translate('interactive') }}</span>
       </button> -->
+<<<<<<< HEAD
       @if (accountType === 0||accountType === null) {
+=======
+      @if (accountType === 0) {
+>>>>>>> origin/main
   <!-- Interactive Tab for Group Students -->
   <button
     type="button"
     (click)="selectedTab = 'interactive'"
     [class]="selectedTab === 'interactive'
       ? 'bg-[#182f57] text-white shadow-md'
+<<<<<<< HEAD
       : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
+=======
+      : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+>>>>>>> origin/main
     class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
@@ -92,7 +100,11 @@
     (click)="selectedTab = 'private-session'"
     [class]="selectedTab === 'private-session'
       ? 'bg-[#182f57] text-white shadow-md'
+<<<<<<< HEAD
       : 'bg-transparent text-slate-600 hover:bg-blue-50 hover:text-[#182f57]'"
+=======
+      : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-[#182f57]'"
+>>>>>>> origin/main
     class="flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200">
 
     <svg xmlns="http://www.w3.org/2000/svg"
@@ -277,7 +289,11 @@
     </section>
   }
 
+<<<<<<< HEAD
 @if (selectedTab === 'interactive' &&( accountType === 0|| accountType === null)) {
+=======
+@if (selectedTab === 'interactive' && accountType === 0) {
+>>>>>>> origin/main
   <app-interactive-booking
     [activities]="interactiveActivities">
   </app-interactive-booking>
@@ -286,7 +302,11 @@
   <section class="mt-8">
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
+<<<<<<< HEAD
       <div class="islamic-banner px-6 py-8 sm:px-8">
+=======
+      <div class="bg-gradient-to-r from-[#081A3A] to-[#24416c] px-6 py-8 sm:px-8">
+>>>>>>> origin/main
         <div class="flex items-center gap-4">
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[#49DCEB] ring-1 ring-white/20">
             <svg xmlns="http://www.w3.org/2000/svg"
@@ -299,7 +319,11 @@
           </div>
 
           <div>
+<<<<<<< HEAD
             <p class="banner-eyebrow text-sm font-medium text-[#49DCEB]">
+=======
+            <p class="text-sm font-medium text-[#49DCEB]">
+>>>>>>> origin/main
               {{ languageService.translate('privateLearning') }}
             </p>
 

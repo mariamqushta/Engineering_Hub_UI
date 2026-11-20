@@ -31,6 +31,7 @@ export class TrackDetails {
   interactiveActivities: InteractiveActivity[] = [];
   workshops: Workshop[] = [];
 
+
   constructor(
   private route: ActivatedRoute,
   private router: Router,

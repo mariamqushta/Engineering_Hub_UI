@@ -7,6 +7,7 @@
         {{ languageService.translate('islamicLearningPlatform') }}
       </p>
       <h1 class="mt-2 text-3xl font-extrabold text-[#003300]">
+
         {{ languageService.translate('studentsChat') }}
       </h1>
       <p class="mt-2 text-slate-500">
@@ -40,18 +41,22 @@
             class="flex w-full items-start gap-3 border-b border-slate-100 p-4 text-start transition hover:bg-cyan-50"
             [class.bg-cyan-50]="selectedConversation?.conversationId === conversation.conversationId">
 
+
             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#003300] font-bold text-[#D4AF37]">
               {{ conversation.participantName.charAt(0).toUpperCase() }}
             </div>
 
             <div class="min-w-0 flex-1">
               <div class="flex items-center justify-between gap-2">
+
                 <span class="truncate font-semibold text-[#003300]">
+
                   {{ conversation.participantName }}
                 </span>
 
                 @if (conversation.unreadCount > 0) {
                   <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#D4AF37] px-1.5 text-xs font-bold text-[#003300]">
+
                     {{ conversation.unreadCount }}
                   </span>
                 }
@@ -74,6 +79,7 @@
           </button>
         } @empty {
           <div class="p-6 text-center">
+
             <p class="font-semibold text-[#003300]">
               {{ languageService.translate('noStudentConversations') }}
             </p>
@@ -88,10 +94,12 @@
         @if (selectedConversation) {
           <header class="flex items-center gap-3 border-b border-slate-200 p-5">
             <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#003300] font-bold text-[#D4AF37]">
+
               {{ selectedConversation.participantName.charAt(0).toUpperCase() }}
             </div>
 
             <div>
+
               <h2 class="font-bold text-[#003300]">
                 {{ selectedConversation.participantName }}
               </h2>
@@ -127,7 +135,9 @@
                     <p class="mt-2 text-end text-xs"
                       [class.text-slate-300]="message.isMine"
                       [class.text-slate-400]="!message.isMine">
+
                       {{ message.sentAt | date:'h:mm a':undefined:'en-US' }}
+
                     </p>
                   </div>
                 </div>
@@ -156,6 +166,7 @@
               type="submit"
               [disabled]="!newMessage.trim() || isSending"
               class="rounded-xl bg-[#003300] px-5 py-3 font-semibold text-white transition hover:bg-[#2d5a2d] disabled:cursor-not-allowed disabled:opacity-50">
+
               {{ isSending ? languageService.translate('sending') : languageService.translate('send') }}
             </button>
           </form>

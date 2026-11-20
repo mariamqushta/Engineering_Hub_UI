@@ -169,6 +169,7 @@
                   type="button"
                   (click)="openDay(day)"
                   class="relative h-[150px] overflow-hidden border-b border-e border-gray-200 p-2 text-start transition-colors hover:bg-blue-50/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#41a6b1]"
+
                   [ngClass]="{
                     'bg-gray-50/70': !day.inCurrentMonth,
                     'bg-cyan-50': day.isToday,
@@ -176,7 +177,9 @@
                   }">
 
                   <!-- Day number -->
+
                   <div class="absolute inset-x-2 top-2 flex items-center justify-between">
+
                     <span
                       class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
                       [ngClass]="day.isToday
@@ -195,7 +198,9 @@
                   </div>
 
                   <!-- Events -->
+
                   <div class="absolute inset-x-2 bottom-2 top-12 flex flex-col gap-1.5 overflow-y-auto">
+
                     @for (event of day.events; track trackEvent($index, event)) {
                       <div
                         class="rounded-md border-s-[3px] p-2 text-xs text-start"
@@ -214,8 +219,10 @@
                         </p>
 
                         <p class="mt-1 opacity-80">
+
                           {{ event.startDateTime | date:'h:mm a':undefined:'en-US' }}
                           – {{ event.endDateTime | date:'h:mm a':undefined:'en-US' }}
+
                         </p>
                       </div>
                     }
@@ -278,6 +285,7 @@
                     <p class="mt-1 text-xs text-gray-500">
                       {{ languageService.translate('until') }}
                       {{ event.endDateTime | date:'h:mm a':undefined:'en-US' }}
+
                     </p>
                     </div>
 
