@@ -64,7 +64,7 @@
         </svg>
         <span>{{ languageService.translate('interactive') }}</span>
       </button> -->
-      @if (accountType === 0) {
+      @if (accountType === 0 || accountType === null) {
   <!-- Interactive Tab for Group Students -->
   <button
     type="button"
@@ -277,7 +277,7 @@
     </section>
   }
 
-@if (selectedTab === 'interactive' && accountType === 0) {
+@if (selectedTab === 'interactive' && (accountType === 0 || accountType === null)) {
   <app-interactive-booking
     [activities]="interactiveActivities">
   </app-interactive-booking>

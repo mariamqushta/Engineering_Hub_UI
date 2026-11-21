@@ -17,11 +17,12 @@ import {
 
 import { AuthService } from '../../../core/services/auth';
 import { LanguageService } from '../../../core/services/language.service';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 
 @Component({
   selector: 'app-student-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Time12Pipe],
   templateUrl: './student-admin.html',
   styleUrl: './student-admin.css'
 })

@@ -16,6 +16,7 @@ import {
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 
 interface Submission {
   id?: number;
@@ -45,7 +46,7 @@ interface Assignment {
 @Component({
   selector: 'app-student-assignment',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, Time12Pipe],
   templateUrl: './student-assignment.html',
   styleUrl: './student-assignment.css'
 })

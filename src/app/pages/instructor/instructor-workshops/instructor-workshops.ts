@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,13 +6,25 @@ import { finalize } from 'rxjs';
 
 import { TrackService } from '../../../core/services/track.service';
 import { Track } from '../../../core/models/track';
-import {  Workshop } from '../../../core/models/workshop';
+import { Workshop } from '../../../core/models/workshop';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import {
+  CalendarService,
+  findScheduleConflict
+} from '../../../core/services/calendar';
+import type { ScheduleConflictQuery } from '../../../core/services/calendar';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
+
+// Adds the Admin approval status without requiring changes to the shared Workshop model.
+type InstructorWorkshop = Workshop & {
+  approvalStatus?: number | string | null;
+};
+
 @Component({
   selector: 'app-instructor-workshops',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Time12Pipe],
   templateUrl: './instructor-workshops.html',
   styleUrl: './instructor-workshops.css'
 })
@@ -21,7 +32,7 @@ export class InstructorWorkshops implements OnInit {
   private readonly apiUrl = `${environment.apiUrl}/api`;
 
   tracks: Track[] = [];
-  workshops: Workshop[] = [];
+  workshops: InstructorWorkshop[] = [];
 
   selectedTrackId: number | null = null;
 
@@ -50,8 +61,9 @@ export class InstructorWorkshops implements OnInit {
   constructor(
     private trackService: TrackService,
     private http: HttpClient,
+    private calendarService: CalendarService,
     private cdr: ChangeDetectorRef,
-     public languageService: LanguageService,
+    public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -116,6 +128,14 @@ export class InstructorWorkshops implements OnInit {
     }
   }
 
+  /**
+   * Loads all workshops belonging to the logged-in instructor.
+   *
+   * This endpoint is important because the public track endpoint may
+   * hide Pending and Rejected workshops from the instructor.
+   *
+   * We then filter the results by the currently selected track.
+   */
   loadWorkshops(): void {
     if (this.selectedTrackId === null) {
       this.workshops = [];
@@ -125,7 +145,10 @@ export class InstructorWorkshops implements OnInit {
     this.isLoadingWorkshops = true;
     this.errorMessage = '';
 
-    this.trackService.getWorkshopsByTrack(this.selectedTrackId)
+    this.http.get<any[] | { data?: any[]; workshops?: any[] }>(
+      `${this.apiUrl}/Workshop/Instructor`,
+      { withCredentials: true }
+    )
       .pipe(finalize(() => {
         this.isLoadingWorkshops = false;
         this.cdr.detectChanges();
@@ -136,7 +159,7 @@ export class InstructorWorkshops implements OnInit {
             ? response
             : response?.data ?? response?.workshops ?? [];
 
-          this.workshops = data.map((item: any) => ({
+          const instructorWorkshops: InstructorWorkshop[] = data.map((item: any) => ({
             id: Number(item.id ?? item.Id),
             trackId: Number(item.trackId ?? item.TrackId),
             title: item.title ?? item.Title ?? '',
@@ -147,14 +170,28 @@ export class InstructorWorkshops implements OnInit {
             place: item.place ?? item.Place ?? '',
             capacity: Number(item.capacity ?? item.Capacity ?? 0),
             price: Number(item.price ?? item.Price ?? 0),
-            status: Number(item.status ?? item.Status ?? 0)
+            status: Number(item.status ?? item.Status ?? 0),
+            approvalStatus: this.normalizeApprovalStatus(
+              item.approvalStatus ?? item.ApprovalStatus
+            )
           }));
+
+          this.workshops = instructorWorkshops.filter(
+            workshop => workshop.trackId === this.selectedTrackId
+          );
 
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error loading workshops:', error);
-          this.errorMessage = 'Could not load workshops for this track.';
+          console.error('Error loading instructor workshops:', error);
+
+          this.errorMessage =
+            error.status === 401 || error.status === 403
+              ? 'You do not have permission to view your workshops. Please log in again.'
+              : error.status === 404
+                ? 'The instructor workshops endpoint was not found. Please check the backend route.'
+                : 'Could not load your workshops for this track.';
+
           this.cdr.detectChanges();
         }
       });
@@ -229,38 +266,82 @@ export class InstructorWorkshops implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.http.post<Workshop>(
-      `${this.apiUrl}/Workshop`,
-      payload,
-      { withCredentials: true }
-    )
-    .pipe(finalize(() => {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }))
-    .subscribe({
-      next: () => {
-        this.showForm = false;
-        this.resetForm();
-        this.successMessage = 'Workshop created successfully.';
-        this.loadWorkshops();
+    this.verifyScheduleAvailability({
+      startDate: this.form.date,
+      startTime: this.form.startTime,
+      endTime: this.form.endTime
+    }, () => {
+      this.http.post<Workshop>(
+        `${this.apiUrl}/Workshop`,
+        payload,
+        { withCredentials: true }
+      )
+        .pipe(finalize(() => {
+          this.isSaving = false;
+          this.cdr.detectChanges();
+        }))
+        .subscribe({
+          next: () => {
+            this.showForm = false;
+            this.resetForm();
+
+            this.successMessage =
+              'Workshop created and submitted to the Admin for approval. You can follow its approval status below.';
+
+            this.loadWorkshops();
+          },
+          error: error => {
+            console.error('Error creating workshop:', error);
+
+            this.errorMessage =
+              error.error?.message ??
+              (typeof error.error === 'string' ? error.error : null) ??
+              (error.status === 409
+                ? this.languageService.translate('scheduleOverlapError')
+                : 'Could not create the workshop. Check your track assignment and the entered details.');
+
+            this.cdr.detectChanges();
+          }
+        });
+    });
+  }
+
+  private verifyScheduleAvailability(
+    query: ScheduleConflictQuery,
+    submit: () => void
+  ): void {
+    this.calendarService.getInstructorCalendar().subscribe({
+      next: events => {
+        const conflict = findScheduleConflict(events ?? [], query);
+
+        if (conflict) {
+          this.isSaving = false;
+          this.errorMessage = this.languageService.translate('scheduleOverlapError');
+          this.cdr.detectChanges();
+          return;
+        }
+
+        submit();
       },
-      error: (error) => {
-        console.error('Error creating workshop:', error);
-
-        this.errorMessage =
-          error.error?.message ??
-          (typeof error.error === 'string' ? error.error : null) ??
-          'Could not create the workshop. Check your track assignment and the entered details.';
-
+      error: error => {
+        console.error('Could not verify instructor schedule:', error);
+        this.isSaving = false;
+        this.errorMessage = this.languageService.translate(
+          'couldNotVerifyScheduleConflicts'
+        );
         this.cdr.detectChanges();
       }
     });
   }
 
-  cancelWorkshop(workshop: Workshop): void {
+  cancelWorkshop(workshop: InstructorWorkshop): void {
     if (workshop.status === 3) {
       this.errorMessage = 'This workshop is already cancelled.';
+      return;
+    }
+
+    if (workshop.status === 2) {
+      this.errorMessage = 'A finished workshop cannot be cancelled.';
       return;
     }
 
@@ -281,36 +362,109 @@ export class InstructorWorkshops implements OnInit {
       {},
       { withCredentials: true }
     )
-    .pipe(finalize(() => {
-      this.isCancelling = null;
-      this.cdr.detectChanges();
-    }))
-    .subscribe({
-      next: () => {
-        this.successMessage = 'Workshop cancelled successfully.';
-        this.loadWorkshops();
-      },
-      error: (error) => {
-        console.error('Error cancelling workshop:', error);
-
-        this.errorMessage =
-          error.error?.message ??
-          (typeof error.error === 'string' ? error.error : null) ??
-          'Could not cancel this workshop.';
-
+      .pipe(finalize(() => {
+        this.isCancelling = null;
         this.cdr.detectChanges();
-      }
-    });
+      }))
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Workshop cancelled successfully.';
+          this.loadWorkshops();
+        },
+        error: (error) => {
+          console.error('Error cancelling workshop:', error);
+
+          this.errorMessage =
+            error.error?.message ??
+            (typeof error.error === 'string' ? error.error : null) ??
+            'Could not cancel this workshop.';
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   getStatusLabel(status: number): string {
-    // Confirm the numeric enum values against your backend before relying on these labels.
     switch (status) {
       case 0: return 'Scheduled';
       case 1: return 'Active';
       case 2: return 'Finished';
       case 3: return 'Cancelled';
       default: return 'Unknown';
+    }
+  }
+
+  /**
+   * Converts the API approval status into a consistent value.
+   * Supports both numeric enums and string values.
+   */
+  private normalizeApprovalStatus(
+    value: number | string | null | undefined
+  ): number | string | null {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    const numericValue = Number(value);
+
+    if (!Number.isNaN(numericValue)) {
+      return numericValue;
+    }
+
+    return value.trim();
+  }
+
+  getApprovalStatusLabel(status: number | string | null | undefined): string {
+    if (status === null || status === undefined) {
+      return 'Approval status unavailable';
+    }
+
+    const normalized = String(status).toLowerCase();
+
+    switch (normalized) {
+      case '0':
+      case 'pending':
+        return 'Pending Admin Approval';
+
+      case '1':
+      case 'approved':
+        return 'Approved by Admin';
+
+      case '2':
+      case 'rejected':
+        return 'Rejected by Admin';
+
+      default:
+        return 'Unknown Approval Status';
+    }
+  }
+
+  getApprovalStatusClass(status: number | string | null | undefined): string {
+    if (status === null || status === undefined) {
+      return 'bg-gray-100 text-gray-600';
+    }
+
+    const normalized = String(status).toLowerCase();
+
+    switch (normalized) {
+      case '0':
+      case 'pending':
+        return 'bg-amber-50 text-amber-700';
+
+      case '1':
+      case 'approved':
+        return 'bg-green-50 text-green-700';
+
+      case '2':
+      case 'rejected':
+        return 'bg-red-50 text-red-700';
+
+      default:
+        return 'bg-gray-100 text-gray-600';
     }
   }
 

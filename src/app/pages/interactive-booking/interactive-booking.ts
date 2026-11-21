@@ -17,10 +17,11 @@ import { LanguageService } from '../../core/services/language.service';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/services/auth';
 import { Router } from '@angular/router';
+import { Time12Pipe } from '../../shared/pipes/time-12.pipe';
 @Component({
   selector: 'app-interactive-booking',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Time12Pipe],
   templateUrl: './interactive-booking.html',
   styleUrl: './interactive-booking.css',
 })
@@ -50,6 +51,18 @@ bookingMessage = '';
 bookingError = '';
 
 bookingStatuses: Record<number, 'Pending' | 'Approved' | 'Rejected'> = {};
+
+  formatTime(value: string): string {
+    if (!value) return '';
+    const match = value.match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return value;
+
+    const hours = Number(match[1]);
+    const minutes = match[2];
+    if (hours < 0 || hours > 23) return value;
+
+    return `${hours % 12 || 12}:${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
+  }
 
 
   constructor(

@@ -10,6 +10,7 @@ import {
 import { AuthService } from '../../../core/services/auth';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 
 interface ChatConversation {
   conversationId: number;
@@ -21,7 +22,7 @@ interface ChatConversation {
 @Component({
   selector: 'app-instructor-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Time12Pipe],
   templateUrl: './instructor-chat.html',
   styleUrl: './instructor-chat.css'
 })

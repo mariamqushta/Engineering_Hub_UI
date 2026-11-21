@@ -81,7 +81,7 @@
                 </div>
 
                 <p class="mt-2 text-xs text-slate-400">
-                  {{ message.sentAt | date:'shortTime':undefined:(languageService.currentLanguage === 'ar' ? 'ar-EG' : 'en-US') }}
+                  {{ message.sentAt | time12 }}
                 </p>
               </div>
             </div>

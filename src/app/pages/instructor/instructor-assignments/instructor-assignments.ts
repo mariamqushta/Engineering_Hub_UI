@@ -7,10 +7,11 @@ import { TrackService } from '../../../core/services/track.service';
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { Time12Pipe } from '../../../shared/pipes/time-12.pipe';
 @Component({
   selector: 'app-instructor-assignments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Time12Pipe],
   templateUrl: './instructor-assignments.html',
   styleUrl: './instructor-assignments.css'
 })

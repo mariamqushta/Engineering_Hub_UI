@@ -18,6 +18,8 @@ register(data: {
   userName: string;
   password: string;
   fullName: string;
+  email?: string;
+  phoneNumber?: string;
   role: string;
   accountType: number;
 }): Observable<any> {
