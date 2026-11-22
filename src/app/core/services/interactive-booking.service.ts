@@ -21,7 +21,7 @@ export interface MyInteractiveBooking {
 @Injectable({ providedIn: 'root' })
 export class InteractiveBookingService {
   private readonly apiUrl =
-    `${environment.apiUrl}/InteractiveBooking`;
+    `${environment.apiUrl}/api/InteractiveBooking`;
 
   constructor(private http: HttpClient) {}
 
