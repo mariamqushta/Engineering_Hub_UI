@@ -27,7 +27,7 @@ export class Status implements OnInit {
   private http = inject(HttpClient);
    private cdr = inject(ChangeDetectorRef);
 
-private readonly apiUrl = 'https://localhost:7109/api';
+private readonly apiUrl = `${environment.apiUrl}/api`;
 
   bookings: BookingItem[] = [];
   isLoading = true;
