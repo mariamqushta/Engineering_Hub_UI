@@ -33,7 +33,7 @@ interface WorkshopBookingResult {
 })
 export class WorkshopBookingService {
   private readonly apiUrl =
-    `${environment.apiUrl}/WorkshopBooking`;
+    `${environment.apiUrl}/api/WorkshopBooking`;
 
   constructor(private http: HttpClient) {}
 
